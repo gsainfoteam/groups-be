@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uuid String @id
+  createdAt DateTime @default(now()) @map("created_at")
+
+  groups UserGroup[]
+  roles UserRole[]
+
+  @@map("user")
+}
+
+model Group {
+  uuid String @id @default(uuid())
+  name String @unique
+  description String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  users UserGroup[]
+  roles Role[]
+  userRoles UserRole[]
+
+  @@map("group")
+}
+
+model UserGroup {
+  userUuid String @map("user_uuid")
+  User    User    @relation(fields: [userUuid], references: [uuid])
+  groupUuid String @map("group_uuid")
+  Group   Group   @relation(fields: [groupUuid], references: [uuid])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([userUuid, groupUuid])
+  @@map("user_group")
+}
+
+model Role {
+  id Int 
+  name String
+  groupUuid String @map("group_uuid")
+  Group   Group   @relation(fields: [groupUuid], references: [uuid])
+  authoities Authoity[] @map("authoities")
+  externalAuthoities String[] @map("external_authoities")
+
+  userRoles UserRole[]
+
+  @@id([id, groupUuid])
+  @@unique([name, groupUuid])
+}
+
+enum Authoity {
+  ROLE_CREATE
+  ROLE_UPDATE
+  ROLE_DELETE
+  GROUP_UPDATE
+  GROUP_DELETE
+}
+
+model UserRole {
+  userUuid String @map("user_uuid")
+  User    User    @relation(fields: [userUuid], references: [uuid])
+  groupUuid String @map("group_uuid")
+  Group   Group   @relation(fields: [groupUuid], references: [uuid])
+  roleId Int @map("role_id")
+  Role    Role    @relation(fields: [roleId, groupUuid], references: [id, groupUuid])
+
+  @@id([userUuid, groupUuid])
+  @@map("user_role")
+}

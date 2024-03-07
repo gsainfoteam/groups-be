@@ -14,6 +14,7 @@ Table role {
     id int [increment]
     name string
     group_uuid string
+    external_authority string[]
     authority Authority
 
     Indexes {
