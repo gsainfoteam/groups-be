@@ -13,6 +13,11 @@ export class UserRepository {
   private readonly logger = new Logger(UserRepository.name);
   constructor(private readonly prismaService: PrismaService) {}
 
+  /**
+   * this function gets the user by uuid, if not found returns null. So, the null validation is needed in the service
+   * @param param0 object which has the uuid of the user
+   * @returns User type or null
+   */
   async getUserByUuid({ uuid }: Pick<User, 'uuid'>): Promise<User | null> {
     this.logger.log('Fetching user by uuid');
     return this.prismaService.user.findUnique({
@@ -20,6 +25,11 @@ export class UserRepository {
     });
   }
 
+  /**
+   * this function creates the user, if database throw unique constraint error, it throws conflict exception
+   * @param param0 object which has the uuid of the user
+   * @returns User type
+   */
   async createUser({ uuid }: Pick<User, 'uuid'>): Promise<User> {
     this.logger.log('Creating user');
     return this.prismaService.user

@@ -11,6 +11,11 @@ export class UserService {
     private readonly userRepository: UserRepository,
   ) {}
 
+  /**
+   * this function validates the user by idp and creates the user if not found
+   * @param accessToken the access token from idp
+   * @returns User type
+   */
   async validateUser(accessToken: string): Promise<User> {
     this.logger.log('Validating user');
     const userInfo = await this.idpService.getUserInfo(accessToken);
