@@ -29,7 +29,8 @@
     "@prisma/client": "^5.10.2",
     "axios": "^1.6.7",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "ts-case-convert": "^2.0.7"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

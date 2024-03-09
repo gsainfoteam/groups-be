@@ -5,6 +5,7 @@ import { GroupModule } from './group/group.module';
 import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
+import { IdpModule } from './idp/idp.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RoleModule } from './role/role.module';
     MemberModule,
     UserModule,
     RoleModule,
+    IdpModule,
   ],
   controllers: [AppController],
 })
