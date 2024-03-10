@@ -9,6 +9,14 @@ async function bootstrap() {
     .setTitle('Vapor-auth API')
     .setDescription('The Vapor-auth API description')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

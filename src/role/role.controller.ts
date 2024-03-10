@@ -13,6 +13,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -27,6 +28,7 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
 
 @ApiTags('Role')
+@ApiBearerAuth('access-token')
 @Controller('group/:groupUuid/role')
 @UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
