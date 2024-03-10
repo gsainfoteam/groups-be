@@ -1,5 +1,8 @@
 ERD: https://dbdocs.io/siwonpada/vapor_auth_be
 
+staging_url: https://api.stg.auth.vapor.gistory.me  
+staging_swagger_url: https://api.stg.auth.vapor.gistory.me/api
+
 Group CRUD
 Confirm Group -> when the create the group
 User Role in the Group
@@ -20,4 +23,4 @@ POST /group/:groupname/member/:uuid/role/:id
 GET /group/:groupname/role  
 POST /group/:groupname/role  
 UPDATE /group/:groupname/role  
-DELETE /group/:groupname/role  
+DELETE /group/:groupname/role
