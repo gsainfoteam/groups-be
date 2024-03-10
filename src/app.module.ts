@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { GroupModule } from './group/group.module';
-import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { IdpModule } from './idp/idp.module';
@@ -13,7 +12,6 @@ import { IdpModule } from './idp/idp.module';
       envFilePath: '.env',
     }),
     GroupModule,
-    MemberModule,
     UserModule,
     RoleModule,
     IdpModule,
