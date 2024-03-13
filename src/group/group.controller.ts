@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
 import { UserGuard } from 'src/user/guard/user.guard';
@@ -6,6 +14,7 @@ import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
 import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
+import { CreateGroupDto } from './dto/req/createGroup.dto';
 
 @ApiTags('group')
 @Controller('group')
@@ -24,5 +33,10 @@ export class GroupController {
   @Get(':name')
   async getGroup(@Param('name') name: GetGroupRequestDto) {
     return this.groupService.getGroup(name);
+  }
+
+  @Post()
+  async createGroup(@Body() body: CreateGroupDto) {
+    return this.groupService.createGroup(body);
   }
 }

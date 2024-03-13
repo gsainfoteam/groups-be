@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,6 +8,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { Group } from '@prisma/client';
+import { CreateGroupDto } from './dto/req/createGroup.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class GroupRepository {
@@ -51,6 +54,25 @@ export class GroupRepository {
       })
       .catch((err) => {
         this.logger.error('getGroup');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
+  }
+
+  async createGroup({ name, description }: CreateGroupDto) {
+    return this.prismaService.group
+      .create({
+        data: { name, description },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') {
+            throw new ConflictException(
+              `group with name "${name}" already exists`,
+            );
+          }
+        }
+        this.logger.error('createGroup');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
       });
