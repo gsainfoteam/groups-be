@@ -3,6 +3,7 @@ import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
 import { GroupRepository } from './group.repository';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @Injectable()
 export class GroupService {
@@ -18,5 +19,9 @@ export class GroupService {
 
   async createGroup(body: CreateGroupDto) {
     return this.groupRepository.createGroup(body);
+  }
+
+  async updateGroup(body: UpdateGroupDto) {
+    return this.groupRepository.updateGroup(body);
   }
 }

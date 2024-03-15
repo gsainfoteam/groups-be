@@ -10,6 +10,7 @@ import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { Group } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -73,6 +74,26 @@ export class GroupRepository {
           }
         }
         this.logger.error('createGroup');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
+  }
+
+  async updateGroup({ uuid, name, description }: UpdateGroupDto) {
+    return this.prismaService.group
+      .update({
+        where: { uuid: uuid },
+        data: { name: name, description: description },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') {
+            throw new ConflictException(
+              `group with name "${name}" already exists`,
+            );
+          }
+        }
+        this.logger.error('updateGroup');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
       });

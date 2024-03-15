@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -15,6 +16,7 @@ import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @ApiTags('group')
 @Controller('group')
@@ -38,5 +40,10 @@ export class GroupController {
   @Post()
   async createGroup(@Body() body: CreateGroupDto) {
     return this.groupService.createGroup(body);
+  }
+
+  @Patch()
+  async updateGroup(@Body() body: UpdateGroupDto) {
+    return this.groupService.updateGroup(body);
   }
 }
