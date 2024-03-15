@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -17,6 +18,7 @@ import { User } from '@prisma/client';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
+import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 
 @ApiTags('group')
 @Controller('group')
@@ -45,5 +47,10 @@ export class GroupController {
   @Patch()
   async updateGroup(@Body() body: UpdateGroupDto) {
     return this.groupService.updateGroup(body);
+  }
+
+  @Delete()
+  async deleteGroup(@Body() body: DeleteGroupDto) {
+    return this.groupService.deleteGroup(body);
   }
 }

@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -11,6 +12,7 @@ import { Group } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
+import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -96,6 +98,23 @@ export class GroupRepository {
         this.logger.error('updateGroup');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
+      });
+  }
+
+  async deleteGroup({ uuid }: DeleteGroupDto) {
+    return this.prismaService.group
+      .delete({
+        where: { uuid: uuid },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+        }
+        this.logger.error('deleteNotice');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('Database error');
       });
   }
 }

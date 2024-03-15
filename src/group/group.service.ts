@@ -4,6 +4,7 @@ import { GroupRepository } from './group.repository';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
+import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 
 @Injectable()
 export class GroupService {
@@ -23,5 +24,9 @@ export class GroupService {
 
   async updateGroup(body: UpdateGroupDto) {
     return this.groupRepository.updateGroup(body);
+  }
+
+  async deleteGroup(body: DeleteGroupDto) {
+    return this.groupRepository.deleteGroup(body);
   }
 }
