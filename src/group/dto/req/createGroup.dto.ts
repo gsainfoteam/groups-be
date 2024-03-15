@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateGroupDto {
   @ApiProperty({
-    description: 'Name of the group',
+    description: '그룹의 이름',
     example: 'Infoteam',
   })
   name: string;
 
   @ApiProperty({
-    description: 'Description of the group',
+    description: '그룹에 대한 설명',
     example: 'Infoteam is...',
   })
   description?: string;

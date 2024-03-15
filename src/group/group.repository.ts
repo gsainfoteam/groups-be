@@ -81,10 +81,10 @@ export class GroupRepository {
       });
   }
 
-  async updateGroup({ uuid, name, description }: UpdateGroupDto) {
+  async updateGroup(name: string, { description }: UpdateGroupDto) {
     return this.prismaService.group
       .update({
-        where: { uuid: uuid },
+        where: { name: name },
         data: { name: name, description: description },
       })
       .catch((err) => {
@@ -101,10 +101,10 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup({ uuid }: DeleteGroupDto) {
+  async deleteGroup({ name }: DeleteGroupDto) {
     return this.prismaService.group
       .delete({
-        where: { uuid: uuid },
+        where: { name: name },
       })
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {

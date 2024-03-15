@@ -44,13 +44,13 @@ export class GroupController {
     return this.groupService.createGroup(body);
   }
 
-  @Patch()
-  async updateGroup(@Body() body: UpdateGroupDto) {
-    return this.groupService.updateGroup(body);
+  @Patch(':name')
+  async updateGroup(@Param('name') name: string, @Body() body: UpdateGroupDto) {
+    return this.groupService.updateGroup(name, body);
   }
 
-  @Delete()
-  async deleteGroup(@Body() body: DeleteGroupDto) {
-    return this.groupService.deleteGroup(body);
+  @Delete(':name')
+  async deleteGroup(@Param('name') name: DeleteGroupDto) {
+    return this.groupService.deleteGroup(name);
   }
 }

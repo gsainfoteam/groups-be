@@ -22,11 +22,11 @@ export class GroupService {
     return this.groupRepository.createGroup(body);
   }
 
-  async updateGroup(body: UpdateGroupDto) {
-    return this.groupRepository.updateGroup(body);
+  async updateGroup(name: string, body: UpdateGroupDto) {
+    return this.groupRepository.updateGroup(name, body);
   }
 
-  async deleteGroup(body: DeleteGroupDto) {
-    return this.groupRepository.deleteGroup(body);
+  async deleteGroup({ name }: DeleteGroupDto) {
+    return this.groupRepository.deleteGroup({ name });
   }
 }
