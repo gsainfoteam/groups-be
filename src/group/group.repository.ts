@@ -13,6 +13,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
+import { GetGroupMember } from './dto/req/getGroupMember.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -115,6 +116,24 @@ export class GroupRepository {
         this.logger.error('deleteNotice');
         this.logger.debug(err);
         throw new InternalServerErrorException('Database error');
+      });
+  }
+
+  async getGroupMember({ name }: GetGroupMember) {
+    return this.prismaService.user
+      .findMany({
+        where: {
+          groups: {
+            some: {
+              Group: { name: name },
+            },
+          },
+        },
+      })
+      .catch((err) => {
+        this.logger.error('getGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
       });
   }
 }
