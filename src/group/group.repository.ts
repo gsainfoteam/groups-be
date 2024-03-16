@@ -14,6 +14,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 import { GetGroupMember } from './dto/req/getGroupMember.dto';
+import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -132,6 +133,41 @@ export class GroupRepository {
       })
       .catch((err) => {
         this.logger.error('getGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
+  }
+
+  async addGroupMember(
+    groupName: string,
+    { uuid: newUserUuid }: AddGroupMember,
+  ) {
+    return this.prismaService.user
+      .create({
+        data: {
+          uuid: newUserUuid,
+          groups: {
+            create: [
+              {
+                Group: {
+                  create: {
+                    name: groupName,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') {
+            throw new ConflictException(
+              `User already exists in group ${groupName}`,
+            );
+          }
+        }
+        this.logger.error('addGroupMember');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
       });

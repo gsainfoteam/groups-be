@@ -6,6 +6,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 import { GetGroupMember } from './dto/req/getGroupMember.dto';
+import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
 
 @Injectable()
 export class GroupService {
@@ -33,5 +34,9 @@ export class GroupService {
 
   async getGroupMember({ name }: GetGroupMember) {
     return this.groupRepository.getGroupMember({ name });
+  }
+
+  async addGroupMember(groupName: string, body: AddGroupMember) {
+    return this.groupRepository.addGroupMember(groupName, body);
   }
 }

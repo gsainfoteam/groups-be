@@ -20,6 +20,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 import { GetGroupMember } from './dto/req/getGroupMember.dto';
+import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
 
 @ApiTags('group')
 @Controller('group')
@@ -58,5 +59,13 @@ export class GroupController {
   @Get(':name/member')
   async getGroupMember(@Param('name') name: GetGroupMember) {
     return this.groupService.getGroupMember(name);
+  }
+
+  @Post(':name/member')
+  async addGroupMember(
+    @Param('name') groupName: string,
+    @Body() body: AddGroupMember,
+  ) {
+    return this.groupService.addGroupMember(groupName, body);
   }
 }
