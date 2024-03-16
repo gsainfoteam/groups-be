@@ -4,10 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
@@ -24,6 +27,7 @@ import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
 
 @ApiTags('group')
 @Controller('group')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
@@ -72,7 +76,7 @@ export class GroupController {
   @Delete(':name/member/:uuid')
   async deleteGroupMemeber(
     @Param('name') groupName: string,
-    @Param('uuid') userUuid: string,
+    @Param('uuid', new ParseUUIDPipe()) userUuid: string,
   ) {
     return this.groupService.deleteGroupMember(groupName, userUuid);
   }
