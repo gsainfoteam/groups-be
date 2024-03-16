@@ -39,4 +39,8 @@ export class GroupService {
   async addGroupMember(groupName: string, body: AddGroupMember) {
     return this.groupRepository.addGroupMember(groupName, body);
   }
+
+  async deleteGroupMember(groupName: string, userUuid: string) {
+    return this.groupRepository.deleteGroupMember(groupName, userUuid);
+  }
 }

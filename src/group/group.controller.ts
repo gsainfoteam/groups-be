@@ -68,4 +68,12 @@ export class GroupController {
   ) {
     return this.groupService.addGroupMember(groupName, body);
   }
+
+  @Delete(':name/member/:uuid')
+  async deleteGroupMemeber(
+    @Param('name') groupName: string,
+    @Param('uuid') userUuid: string,
+  ) {
+    return this.groupService.deleteGroupMember(groupName, userUuid);
+  }
 }

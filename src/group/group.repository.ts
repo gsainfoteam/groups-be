@@ -172,4 +172,28 @@ export class GroupRepository {
         throw new InternalServerErrorException('database error');
       });
   }
+
+  async deleteGroupMember(groupName: string, userUuid: string) {
+    return this.prismaService.group
+      .delete({
+        where: {
+          name: groupName,
+          users: {
+            some: {
+              userUuid: userUuid,
+            },
+          },
+        },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+        }
+        this.logger.error('deleteGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('Database error');
+      });
+  }
 }
