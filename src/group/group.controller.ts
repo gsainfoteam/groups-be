@@ -53,4 +53,31 @@ export class GroupController {
   async deleteGroup(@Param('name') name: DeleteGroupDto) {
     return this.groupService.deleteGroup(name);
   }
+
+  // user-role part
+  @Post('/:groupname/member/:uuid/role/:id')
+  async addUserRole(
+    @Param('groupname') group_uuid: string,
+    @Param('uuid') user_uuid: string,
+    @Param('id') role_id: number,
+  ) {
+    return this.groupService.addUserRole({ user_uuid, group_uuid, role_id });
+  }
+
+  @Get('/:groupname/member/:uuid/role')
+  async getUserRoles(
+    @Param('groupname') group_uuid: string,
+    @Param('uuid') user_uuid: string,
+  ) {
+    return this.groupService.getUserRoles(user_uuid, group_uuid);
+  }
+
+  @Get('/:groupname/role/:id')
+  async getUsersByRole(
+    @Param('groupname') group_uuid: string,
+    @Param('id') role_id: number,
+  ) {
+    return this.groupService.getUsersByRole(group_uuid, role_id);
+  }
+
 }

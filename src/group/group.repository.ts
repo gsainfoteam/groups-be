@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
@@ -13,6 +14,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
+import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -116,5 +118,64 @@ export class GroupRepository {
         this.logger.debug(err);
         throw new InternalServerErrorException('Database error');
       });
+  }
+
+  // user-role part
+  async addUserRole({ user_uuid, group_uuid, role_id }: CreateUserRoleDto): Promise<void> {
+    try {
+      await this.prismaService.userRole.create({
+        data: {
+          userUuid: user_uuid,
+          groupUuid: group_uuid,
+          roleId: role_id,
+        },
+      });
+      this.logger.log(`UserRole [${user_uuid}, ${group_uuid}, ${role_id}] created`);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          this.logger.error(`UserRole already exists`);
+        }
+      } else {
+        this.logger.error('Failed to create UserRole', error);
+        throw error;
+      }
+    }
+  }
+
+  async getUserRoles(user_uuid: string, group_uuid: string): Promise<number[]> {
+    const roles = await this.prismaService.userRole.findMany({
+      where: {
+        userUuid: user_uuid,
+        groupUuid: group_uuid,
+      },
+      select: {
+        roleId: true,
+      },
+    });
+
+    if (!roles.length) {
+      throw new NotFoundException(`No roles found for user ${user_uuid} in group ${group_uuid}`);
+    }
+
+    return roles.map(role => role.roleId);
+  }
+
+  async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
+    const users = await this.prismaService.userRole.findMany({
+      where: {
+        groupUuid: group_uuid,
+        roleId: role_id,
+      },
+      select: {
+        userUuid: true,
+      },
+    });
+
+    if (!users.length) {
+      throw new NotFoundException(`No users found with role ${role_id} in group ${group_uuid}`);
+    }
+
+    return users.map(user => user.userUuid);
   }
 }
