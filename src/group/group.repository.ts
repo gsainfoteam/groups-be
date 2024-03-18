@@ -122,6 +122,10 @@ export class GroupRepository {
 
   // user-role part
   async addUserRole({ user_uuid, group_uuid, role_id }: CreateUserRoleDto): Promise<void> {
+    const exists = await this.groupExists(group_uuid);
+    if (!exists) {
+      throw new NotFoundException(`Group with UUID ${group_uuid} does not exist.`);
+    }
     try {
       await this.prismaService.userRole.create({
         data: {
@@ -178,4 +182,35 @@ export class GroupRepository {
 
     return users.map(user => user.userUuid);
   }
+
+  async deleteGroupRoles(groupUuid: string): Promise<void> {
+    const exists = await this.groupExists(groupUuid);
+    if (!exists) {
+      throw new NotFoundException(`Group with UUID ${groupUuid} does not exist.`);
+    }
+
+    await this.prismaService.userRole.deleteMany({
+      where: {
+        groupUuid: groupUuid,
+      },
+    });
+  }
+  
+  async deleteUserRoles(userUuid: string): Promise<void> {
+    await this.prismaService.userRole.deleteMany({
+      where: {
+        userUuid: userUuid,
+      },
+    });
+  }
+
+  async groupExists(groupUuid: string): Promise<boolean> {
+    const group = await this.prismaService.group.findUnique({
+      where: {
+        uuid: groupUuid,
+      },
+    });
+    return !!group;
+  }
+  
 }

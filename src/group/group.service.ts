@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Delete, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
 import { GroupRepository } from './group.repository';
 import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
@@ -43,5 +43,14 @@ export class GroupService {
   async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
     return this.groupRepository.getUsersByRole(group_uuid, role_id);
   }
+  
+  async deleteGroupRoles(groupUuid: string): Promise<void> {
+    await this.groupRepository.deleteGroupRoles(groupUuid);
+  }
+  
+  async deleteUserRoles(userUuid: string): Promise<void> {
+    await this.groupRepository.deleteUserRoles(userUuid);
+  }
+
   
 }
