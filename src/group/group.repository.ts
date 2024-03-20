@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -48,9 +47,7 @@ export class GroupRepository {
     }
   }
 
-  // 테스트 완료
   async getGroup(name: string) {
-    console.log(`repository ${name}`);
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
@@ -58,13 +55,19 @@ export class GroupRepository {
         },
       })
       .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new NotFoundException(
+              `group with name '${name}' does not exist`,
+            );
+          }
+        }
         this.logger.error('getGroup');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
       });
   }
 
-  // 테스트 완료
   async createGroup({ name, description }: CreateGroupDto) {
     return this.prismaService.group
       .create({
@@ -84,7 +87,6 @@ export class GroupRepository {
       });
   }
 
-  // 테스트 완료
   async updateGroup(
     currentName: string,
     { name, description }: UpdateGroupDto,
@@ -95,10 +97,16 @@ export class GroupRepository {
         data: { name: name, description: description },
       })
       .catch((err) => {
+        console.log(err);
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
             throw new ConflictException(
-              `group with name "${name}" already exists`,
+              `group with name '${name}' already exists`,
+            );
+          }
+          if (err.code === 'P2025') {
+            throw new NotFoundException(
+              `group with name '${currentName}' does not exist`,
             );
           }
         }
@@ -108,7 +116,6 @@ export class GroupRepository {
       });
   }
 
-  // 테스트 완료
   async deleteGroup(name: string) {
     return this.prismaService.group
       .delete({
@@ -117,7 +124,9 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new NotFoundException();
+            throw new NotFoundException(
+              `group with name '${name}' does not exist`,
+            );
           }
         }
         this.logger.error('deleteNotice');
@@ -132,7 +141,7 @@ export class GroupRepository {
         where: {
           groups: {
             some: {
-              Group: { name: name },
+              groupName: name,
             },
           },
         },
@@ -148,29 +157,23 @@ export class GroupRepository {
     groupName: string,
     { uuid: newUserUuid }: AddGroupMemberDto,
   ) {
-    return this.prismaService.user
+    return this.prismaService.userGroup
       .create({
         data: {
-          uuid: newUserUuid,
-          groups: {
-            create: [
-              {
-                Group: {
-                  connect: {
-                    name: groupName,
-                  },
-                },
-              },
-            ],
-          },
+          userUuid: newUserUuid,
+          groupName,
         },
       })
       .catch((err) => {
-        console.log(err);
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
             throw new ConflictException(
-              `User already exists in group ${groupName}`,
+              `User already exists in group '${groupName}'`,
+            );
+          }
+          if (err.code === 'P2003') {
+            throw new NotFoundException(
+              `group with name '${groupName}' does not exist`,
             );
           }
         }
@@ -193,7 +196,9 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new ForbiddenException();
+            throw new NotFoundException(
+              `user does not exist in group '${groupName}' or group with name '${groupName}' does not exist`,
+            );
           }
         }
         this.logger.error('deleteGroupMember');

@@ -28,6 +28,7 @@ import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
+  // 테스트 필요
   @Get()
   @UseGuards(UserGuard)
   async getGroupList(
@@ -61,11 +62,13 @@ export class GroupController {
     return this.groupService.deleteGroup(name);
   }
 
+  // 테스트 완료
   @Get(':name/member')
   async getGroupMember(@Param('name') name: string) {
     return this.groupService.getGroupMember(name);
   }
 
+  // 테스트 완료
   @Post(':name/member')
   async addGroupMember(
     @Param('name') groupName: string,
@@ -74,6 +77,7 @@ export class GroupController {
     return this.groupService.addGroupMember(groupName, body);
   }
 
+  // 테스트 완료
   @Delete(':name/member/:uuid')
   async deleteGroupMemeber(
     @Param('name') groupName: string,
