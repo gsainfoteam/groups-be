@@ -30,7 +30,7 @@ model Group {
 }
 
 model UserGroup {
-  userUuid  String   @map("user_uuid")
+  userUuid  String   @map("user_uuid") @db.Uuid
   User      User     @relation(fields: [userUuid], references: [uuid])
   groupName String   @map("group_name")
   Group     Group    @relation(fields: [groupName], references: [name])
@@ -63,7 +63,7 @@ enum Authoity {
 }
 
 model UserRole {
-  userUuid  String @map("user_uuid")
+  userUuid  String @map("user_uuid") @db.Uuid
   User      User   @relation(fields: [userUuid], references: [uuid])
   groupName String @map("group_name")
   Group     Group  @relation(fields: [groupName], references: [name])
