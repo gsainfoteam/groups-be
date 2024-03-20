@@ -4,17 +4,15 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
-import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { Group } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
-import { GetGroupMember } from './dto/req/getGroupMember.dto';
-import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -50,7 +48,9 @@ export class GroupRepository {
     }
   }
 
-  async getGroup({ name }: GetGroupRequestDto): Promise<Group> {
+  // 테스트 완료
+  async getGroup(name: string) {
+    console.log(`repository ${name}`);
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
@@ -64,6 +64,7 @@ export class GroupRepository {
       });
   }
 
+  // 테스트 완료
   async createGroup({ name, description }: CreateGroupDto) {
     return this.prismaService.group
       .create({
@@ -73,7 +74,7 @@ export class GroupRepository {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
             throw new ConflictException(
-              `group with name "${name}" already exists`,
+              `group with name '${name}' already exists`,
             );
           }
         }
@@ -83,10 +84,14 @@ export class GroupRepository {
       });
   }
 
-  async updateGroup(name: string, { description }: UpdateGroupDto) {
+  // 테스트 완료
+  async updateGroup(
+    currentName: string,
+    { name, description }: UpdateGroupDto,
+  ) {
     return this.prismaService.group
       .update({
-        where: { name: name },
+        where: { name: currentName },
         data: { name: name, description: description },
       })
       .catch((err) => {
@@ -103,7 +108,8 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup({ name }: DeleteGroupDto) {
+  // 테스트 완료
+  async deleteGroup(name: string) {
     return this.prismaService.group
       .delete({
         where: { name: name },
@@ -111,7 +117,7 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new ForbiddenException();
+            throw new NotFoundException();
           }
         }
         this.logger.error('deleteNotice');
@@ -120,7 +126,7 @@ export class GroupRepository {
       });
   }
 
-  async getGroupMember({ name }: GetGroupMember) {
+  async getGroupMember(name: string) {
     return this.prismaService.user
       .findMany({
         where: {
@@ -140,7 +146,7 @@ export class GroupRepository {
 
   async addGroupMember(
     groupName: string,
-    { uuid: newUserUuid }: AddGroupMember,
+    { uuid: newUserUuid }: AddGroupMemberDto,
   ) {
     return this.prismaService.user
       .create({
@@ -150,7 +156,7 @@ export class GroupRepository {
             create: [
               {
                 Group: {
-                  create: {
+                  connect: {
                     name: groupName,
                   },
                 },
@@ -160,6 +166,7 @@ export class GroupRepository {
         },
       })
       .catch((err) => {
+        console.log(err);
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
             throw new ConflictException(
@@ -174,14 +181,12 @@ export class GroupRepository {
   }
 
   async deleteGroupMember(groupName: string, userUuid: string) {
-    return this.prismaService.group
+    return this.prismaService.userGroup
       .delete({
         where: {
-          name: groupName,
-          users: {
-            some: {
-              userUuid: userUuid,
-            },
+          userUuid_groupName: {
+            userUuid,
+            groupName,
           },
         },
       })

@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
 import { GroupRepository } from './group.repository';
-import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
-import { GetGroupMember } from './dto/req/getGroupMember.dto';
-import { AddGroupMember } from './dto/req/addGroupMemeber.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 
 @Injectable()
 export class GroupService {
@@ -16,8 +13,8 @@ export class GroupService {
     return this.groupRepository.getGroupList({ type }, userUuid);
   }
 
-  async getGroup({ name }: GetGroupRequestDto) {
-    return this.groupRepository.getGroup({ name });
+  async getGroup(name: string) {
+    return this.groupRepository.getGroup(name);
   }
 
   async createGroup(body: CreateGroupDto) {
@@ -28,15 +25,15 @@ export class GroupService {
     return this.groupRepository.updateGroup(name, body);
   }
 
-  async deleteGroup({ name }: DeleteGroupDto) {
-    return this.groupRepository.deleteGroup({ name });
+  async deleteGroup(name: string) {
+    return this.groupRepository.deleteGroup(name);
   }
 
-  async getGroupMember({ name }: GetGroupMember) {
-    return this.groupRepository.getGroupMember({ name });
+  async getGroupMember(name: string) {
+    return this.groupRepository.getGroupMember(name);
   }
 
-  async addGroupMember(groupName: string, body: AddGroupMember) {
+  async addGroupMember(groupName: string, body: AddGroupMemberDto) {
     return this.groupRepository.addGroupMember(groupName, body);
   }
 
