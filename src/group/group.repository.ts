@@ -87,26 +87,17 @@ export class GroupRepository {
       });
   }
 
-  async updateGroup(
-    currentName: string,
-    { name, description }: UpdateGroupDto,
-  ) {
+  async updateGroup(name: string, { description }: UpdateGroupDto) {
     return this.prismaService.group
       .update({
-        where: { name: currentName },
-        data: { name: name, description: description },
+        where: { name },
+        data: { description },
       })
       .catch((err) => {
-        console.log(err);
         if (err instanceof PrismaClientKnownRequestError) {
-          if (err.code === 'P2002') {
-            throw new ConflictException(
-              `group with name '${name}' already exists`,
-            );
-          }
           if (err.code === 'P2025') {
             throw new NotFoundException(
-              `group with name '${currentName}' does not exist`,
+              `group with name '${name}' does not exist`,
             );
           }
         }

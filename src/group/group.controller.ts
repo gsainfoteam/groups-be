@@ -28,7 +28,7 @@ import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  // 테스트 필요
+  // 테스트 완료
   @Get()
   @UseGuards(UserGuard)
   async getGroupList(
