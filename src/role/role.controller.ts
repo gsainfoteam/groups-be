@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  ParseUUIDPipe,
   Post,
   Put,
   UseGuards,
@@ -29,7 +28,7 @@ import { CreateRoleDto } from './dto/req/createRole.dto';
 
 @ApiTags('Role')
 @ApiBearerAuth('access-token')
-@Controller('group/:groupUuid/role')
+@Controller('group/:groupName/role')
 @UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class RoleController {
@@ -39,9 +38,9 @@ export class RoleController {
   @ApiOkResponse({ type: GetRoleListResDto })
   @Get()
   async getRoles(
-    @Param('groupUuid', ParseUUIDPipe) groupUuid: string,
+    @Param('groupName') groupName: string,
   ): Promise<GetRoleListResDto> {
-    return this.roleService.getRoles(groupUuid);
+    return this.roleService.getRoles(groupName);
   }
 
   @ApiOperation({
@@ -55,10 +54,10 @@ export class RoleController {
   })
   @Post()
   async createRole(
-    @Param('groupUuid', ParseUUIDPipe) groupUuid: string,
+    @Param('groupName') groupName: string,
     @Body() createRoleDto: CreateRoleDto,
   ): Promise<void> {
-    return this.roleService.createRole(groupUuid, createRoleDto);
+    return this.roleService.createRole(groupName, createRoleDto);
   }
 
   @ApiOperation({
@@ -73,11 +72,11 @@ export class RoleController {
   })
   @Put(':id')
   async updateRole(
-    @Param('groupUuid', ParseUUIDPipe) groupUuid: string,
+    @Param('groupName') groupName: string,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: CreateRoleDto,
   ): Promise<void> {
-    return this.roleService.updateRole(groupUuid, id, updateRoleDto);
+    return this.roleService.updateRole(groupName, id, updateRoleDto);
   }
 
   @ApiOperation({ summary: 'Delete role', description: 'Delete a role' })
@@ -88,9 +87,9 @@ export class RoleController {
   })
   @Delete(':id')
   async deleteRole(
-    @Param('groupUuid', ParseUUIDPipe) groupUuid: string,
+    @Param('groupName') groupName: string,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    return this.roleService.deleteRole(groupUuid, id);
+    return this.roleService.deleteRole(groupName, id);
   }
 }
