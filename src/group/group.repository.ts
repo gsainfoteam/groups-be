@@ -121,20 +121,20 @@ export class GroupRepository {
   }
 
   // user-role part
-  async addUserRole({ user_uuid, group_uuid, role_id }: CreateUserRoleDto): Promise<void> {
-    const exists = await this.groupExists(group_uuid);
+  async addUserRole({ userUuid, groupName, roleId }: CreateUserRoleDto): Promise<void> {
+    const exists = await this.groupExists(groupName);
     if (!exists) {
-      throw new NotFoundException(`Group with UUID ${group_uuid} does not exist.`);
+      throw new NotFoundException(`Group with UUID ${groupName} does not exist.`);
     }
     try {
       await this.prismaService.userRole.create({
         data: {
-          userUuid: user_uuid,
-          groupUuid: group_uuid,
-          roleId: role_id,
+          userUuid: userUuid,
+          groupName: groupName,
+          roleId: roleId,
         },
       });
-      this.logger.log(`UserRole [${user_uuid}, ${group_uuid}, ${role_id}] created`);
+      this.logger.log(`UserRole [${userUuid}, ${groupName}, ${roleId}] created`);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -151,7 +151,7 @@ export class GroupRepository {
     const roles = await this.prismaService.userRole.findMany({
       where: {
         userUuid: user_uuid,
-        groupUuid: group_uuid,
+        groupName: group_uuid,
       },
       select: {
         roleId: true,
@@ -168,7 +168,7 @@ export class GroupRepository {
   async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
     const users = await this.prismaService.userRole.findMany({
       where: {
-        groupUuid: group_uuid,
+        groupName: group_uuid,
         roleId: role_id,
       },
       select: {
@@ -191,7 +191,7 @@ export class GroupRepository {
 
     await this.prismaService.userRole.deleteMany({
       where: {
-        groupUuid: groupUuid,
+        groupName: groupUuid,
       },
     });
   }
@@ -211,7 +211,7 @@ export class GroupRepository {
     }
     await this.prismaService.userRole.deleteMany({
       where: {
-        groupUuid: groupUuid,
+        groupName: groupUuid,
         userUuid: userUuid,
       },
     });
@@ -221,7 +221,7 @@ export class GroupRepository {
   async groupExists(groupUuid: string): Promise<boolean> {
     const group = await this.prismaService.group.findUnique({
       where: {
-        uuid: groupUuid,
+        name: groupUuid,
       },
     });
     return !!group;

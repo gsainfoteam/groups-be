@@ -57,11 +57,11 @@ export class GroupController {
   // user-role part
   @Post('/:groupname/member/:uuid/role/:id')
   async addUserRole(
-    @Param('groupname') group_uuid: string,
-    @Param('uuid') user_uuid: string,
-    @Param('id') role_id: number,
+    @Param('groupname') groupName: string,
+    @Param('uuid') userUuid: string,
+    @Param('id') roleId: number,
   ) {
-    return this.groupService.addUserRole({ user_uuid, group_uuid, role_id });
+    return this.groupService.addUserRole({ userUuid, groupName, roleId });
   }
 
   @Get('/:groupname/member/:uuid/role')
