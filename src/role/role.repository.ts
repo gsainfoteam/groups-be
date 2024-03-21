@@ -19,11 +19,11 @@ export class RoleRepository {
    * @param param0 object containing the group uuid
    * @returns the list of roles for the group
    */
-  async getRoles({ uuid }: Pick<Group, 'uuid'>): Promise<Role[]> {
-    this.logger.log(`Retrieving roles for group ${uuid}`);
+  async getRoles({ name }: Pick<Group, 'name'>): Promise<Role[]> {
+    this.logger.log(`Retrieving roles for group ${name}`);
     return this.prismaService.role.findMany({
       where: {
-        groupUuid: uuid,
+        groupName: name,
       },
     });
   }
@@ -35,19 +35,19 @@ export class RoleRepository {
    */
   async createRole({
     name,
-    groupUuid,
+    groupName,
     authoities,
     externalAuthoities,
-  }: Pick<Role, 'name' | 'groupUuid'> &
+  }: Pick<Role, 'name' | 'groupName'> &
     Partial<Pick<Role, 'authoities' | 'externalAuthoities'>>): Promise<Role> {
-    this.logger.log(`Creating role ${name} for group ${groupUuid}`);
+    this.logger.log(`Creating role ${name} for group ${groupName}`);
     return this.prismaService.role
       .create({
         data: {
           id:
-            (await this.prismaService.role.count({ where: { groupUuid } })) + 1,
+            (await this.prismaService.role.count({ where: { groupName } })) + 1,
           name,
-          groupUuid,
+          groupName,
           authoities,
           externalAuthoities,
         },
@@ -55,7 +55,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.debug(`Role already exists for group ${groupUuid}`);
+            this.logger.debug(`Role already exists for group ${groupName}`);
             throw new ConflictException('Role already exists');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -73,17 +73,17 @@ export class RoleRepository {
    */
   async updateRole({
     id,
-    groupUuid,
+    groupName,
     authoities,
     externalAuthoities,
-  }: Pick<Role, 'groupUuid' | 'id'> &
+  }: Pick<Role, 'groupName' | 'id'> &
     Partial<Pick<Role, 'authoities' | 'externalAuthoities'>>): Promise<Role> {
     return this.prismaService.role
       .update({
         where: {
-          id_groupUuid: {
+          id_groupName: {
             id,
-            groupUuid,
+            groupName,
           },
         },
         data: {
@@ -94,7 +94,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Role not found for group ${groupUuid}`);
+            this.logger.debug(`Role not found for group ${groupName}`);
             throw new NotFoundException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -112,21 +112,21 @@ export class RoleRepository {
    */
   async deleteRole({
     id,
-    groupUuid,
-  }: Pick<Role, 'groupUuid' | 'id'>): Promise<Role> {
+    groupName,
+  }: Pick<Role, 'groupName' | 'id'>): Promise<Role> {
     return this.prismaService.role
       .delete({
         where: {
-          id_groupUuid: {
+          id_groupName: {
             id,
-            groupUuid,
+            groupName,
           },
         },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Role not found for group ${groupUuid}`);
+            this.logger.debug(`Role not found for group ${groupName}`);
             throw new NotFoundException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);

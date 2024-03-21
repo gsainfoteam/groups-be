@@ -8,51 +8,50 @@ datasource db {
 }
 
 model User {
-  uuid String @id
+  uuid      String   @id @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
   groups UserGroup[]
-  roles UserRole[]
+  roles  UserRole[]
 
   @@map("user")
 }
 
 model Group {
-  uuid String @id @default(uuid())
-  name String @unique
+  name        String   @id
   description String?
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  users UserGroup[]
-  roles Role[]
+  users     UserGroup[]
+  roles     Role[]
   userRoles UserRole[]
 
   @@map("group")
 }
 
 model UserGroup {
-  userUuid String @map("user_uuid")
-  User    User    @relation(fields: [userUuid], references: [uuid])
-  groupUuid String @map("group_uuid")
-  Group   Group   @relation(fields: [groupUuid], references: [uuid])
+  userUuid  String   @map("user_uuid") @db.Uuid
+  User      User     @relation(fields: [userUuid], references: [uuid])
+  groupName String   @map("group_name")
+  Group     Group    @relation(fields: [groupName], references: [name])
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@id([userUuid, groupUuid])
+  @@id([userUuid, groupName])
   @@map("user_group")
 }
 
 model Role {
-  id Int 
-  name String
-  groupUuid String @map("group_uuid")
-  Group   Group   @relation(fields: [groupUuid], references: [uuid])
-  authoities Authoity[] @map("authoities")
-  externalAuthoities String[] @map("external_authoities")
+  id                 Int
+  name               String
+  groupName          String     @map("group_name")
+  Group              Group      @relation(fields: [groupName], references: [name])
+  authoities         Authoity[] @map("authoities")
+  externalAuthoities String[]   @map("external_authoities")
 
   userRoles UserRole[]
 
-  @@id([id, groupUuid])
-  @@unique([name, groupUuid])
+  @@id([id, groupName])
+  @@unique([name, groupName])
 }
 
 enum Authoity {
@@ -64,13 +63,13 @@ enum Authoity {
 }
 
 model UserRole {
-  userUuid String @map("user_uuid")
-  User    User    @relation(fields: [userUuid], references: [uuid])
-  groupUuid String @map("group_uuid")
-  Group   Group   @relation(fields: [groupUuid], references: [uuid])
-  roleId Int @map("role_id")
-  Role    Role    @relation(fields: [roleId, groupUuid], references: [id, groupUuid])
+  userUuid  String @map("user_uuid") @db.Uuid
+  User      User   @relation(fields: [userUuid], references: [uuid])
+  groupName String @map("group_name")
+  Group     Group  @relation(fields: [groupName], references: [name])
+  roleId    Int    @map("role_id")
+  Role      Role   @relation(fields: [roleId, groupName], references: [id, groupName])
 
-  @@id([userUuid, groupUuid])
+  @@id([userUuid, groupName])
   @@map("user_role")
 }
