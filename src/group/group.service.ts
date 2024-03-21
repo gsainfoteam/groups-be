@@ -52,5 +52,8 @@ export class GroupService {
     await this.groupRepository.deleteUserRoles(userUuid);
   }
 
+  async deleteGroupMemberRoles(groupUuid: string, userUuid: string): Promise<void> {
+    await this.groupRepository.deleteGroupMemberRoles(groupUuid, userUuid);
+  }
   
 }

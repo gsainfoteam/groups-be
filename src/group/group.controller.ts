@@ -94,4 +94,12 @@ export class GroupController {
     return this.groupService.deleteUserRoles(userUuid);
   }
 
+  @Delete('/group/:groupname/member/:uuid/delete')
+  async deleteGroupMemberRoles(
+    @Param('groupname') groupUuid: string,
+    @Param('uuid') userUuid: string,
+  ) {
+    return this.groupService.deleteGroupMemberRoles(groupUuid, userUuid);
+  }
+
 }

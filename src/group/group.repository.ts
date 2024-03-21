@@ -204,6 +204,20 @@ export class GroupRepository {
     });
   }
 
+  async deleteGroupMemberRoles(groupUuid: string, userUuid: string): Promise<void> {
+    const exists = await this.groupExists(groupUuid);
+    if (!exists) {
+      throw new NotFoundException(`Group with UUID ${groupUuid} does not exist.`);
+    }
+    await this.prismaService.userRole.deleteMany({
+      where: {
+        groupUuid: groupUuid,
+        userUuid: userUuid,
+      },
+    });
+  }
+  
+
   async groupExists(groupUuid: string): Promise<boolean> {
     const group = await this.prismaService.group.findUnique({
       where: {
