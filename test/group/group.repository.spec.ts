@@ -61,7 +61,7 @@ describe('create user role', () => {
 
   it('should add a userRole to the database using existing data', async () => {
     const testGroupName = "TestGroup2"; 
-    const testUserUuid = "266aa207-4b69-455b-9e53-df8cd2351f36"; 
+    const testUserUuid = "e9f3ea37-a636-466c-b4cd-4ae52f4cac8c"; 
     const testRoleId = 2; 
 
     // add userRole 
