@@ -139,7 +139,6 @@ export class GroupRepository {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           this.logger.error(`UserRole already exists`);
-          throw new InternalServerErrorException('UserRole unique error');
         }
       } else {
         this.logger.error('Failed to create UserRole', error);

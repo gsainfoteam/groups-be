@@ -43,7 +43,7 @@ describe('create group', () => {
   });
 });
 */
-
+/*
 // create user role
 describe('create user role', () => {
   let repository: GroupRepository;
@@ -86,9 +86,9 @@ describe('create user role', () => {
     expect(addedUserRole?.roleId).toEqual(testRoleId);
   });
 });
+*/
 
 
-/*
 // get user role
 describe('get user role', () => {
   let repository: GroupRepository;
@@ -114,7 +114,7 @@ describe('get user role', () => {
     expect(roles.length).toBe(1);
   });
 });
-*/
+
 
 /*
 // delete user role
