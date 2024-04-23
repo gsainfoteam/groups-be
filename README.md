@@ -25,7 +25,7 @@ check if the user in the group
 
 ## Endpoints
 
-GET /group - don't need access token
+GET /group - don't need access token  
 GET /group/:groupname  
 POST /group  
 PATCH /group  
