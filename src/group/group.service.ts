@@ -13,31 +13,43 @@ export class GroupService {
     return this.groupRepository.getGroupList({ type }, userUuid);
   }
 
-  async getGroup(name: string) {
-    return this.groupRepository.getGroup(name);
+  async getGroup(name: string, userUuid: string) {
+    return this.groupRepository.getGroup(name, userUuid);
   }
 
-  async createGroup(body: CreateGroupDto) {
-    return this.groupRepository.createGroup(body);
+  async createGroup(body: CreateGroupDto, userUuid: string) {
+    return this.groupRepository.createGroup(body, userUuid);
   }
 
-  async updateGroup(name: string, body: UpdateGroupDto) {
-    return this.groupRepository.updateGroup(name, body);
+  async updateGroup(name: string, body: UpdateGroupDto, userUuid: string) {
+    return this.groupRepository.updateGroup(name, body, userUuid);
   }
 
-  async deleteGroup(name: string) {
-    return this.groupRepository.deleteGroup(name);
+  async deleteGroup(name: string, userUuid: string) {
+    return this.groupRepository.deleteGroup(name, userUuid);
   }
 
-  async getGroupMember(name: string) {
-    return this.groupRepository.getGroupMember(name);
+  async getGroupMember(name: string, userUuid: string) {
+    return this.groupRepository.getGroupMember(name, userUuid);
   }
 
-  async addGroupMember(groupName: string, body: AddGroupMemberDto) {
-    return this.groupRepository.addGroupMember(groupName, body);
+  async addGroupMember(
+    groupName: string,
+    body: AddGroupMemberDto,
+    userUuid: string,
+  ) {
+    return this.groupRepository.addGroupMember(groupName, body, userUuid);
   }
 
-  async deleteGroupMember(groupName: string, userUuid: string) {
-    return this.groupRepository.deleteGroupMember(groupName, userUuid);
+  async deleteGroupMember(
+    groupName: string,
+    deleteUserUuid: string,
+    userUuid: string,
+  ) {
+    return this.groupRepository.deleteGroupMember(
+      groupName,
+      deleteUserUuid,
+      userUuid,
+    );
   }
 }

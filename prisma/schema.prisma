@@ -55,6 +55,8 @@ model Role {
 }
 
 enum Authoity {
+  MEMBER_UPDATE
+  MEMBER_DELETE
   ROLE_CREATE
   ROLE_UPDATE
   ROLE_DELETE
