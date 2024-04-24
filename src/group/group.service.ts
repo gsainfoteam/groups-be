@@ -6,6 +6,7 @@ import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
 import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 import { Role } from '@prisma/client';
+import { DeleteUserRoleDto } from './dto/req/deleteUserRole.dto';
 
 @Injectable()
 export class GroupService {
@@ -71,13 +72,11 @@ export class GroupService {
   }
 
   async deleteUserRole(
-    targetUuid: string,
-    roleId: number,
-    groupName: string,
+    { deleteUserUuid, groupName, roleId }: DeleteUserRoleDto,
     userUuid: string,
   ): Promise<void> {
     await this.groupRepository.deleteUserRole(
-      targetUuid,
+      deleteUserUuid,
       roleId,
       groupName,
       userUuid,
