@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -8,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
-import { GetGroupRequestDto } from './dto/req/getGroupRequest.dto';
 import { Group } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -50,7 +49,7 @@ export class GroupRepository {
     }
   }
 
-  async getGroup({ name }: GetGroupRequestDto): Promise<Group> {
+  async getGroup(name: string) {
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
@@ -58,6 +57,13 @@ export class GroupRepository {
         },
       })
       .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new NotFoundException(
+              `group with name '${name}' does not exist`,
+            );
+          }
+        }
         this.logger.error('getGroup');
         this.logger.debug(err);
         throw new InternalServerErrorException('database error');
@@ -73,7 +79,7 @@ export class GroupRepository {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
             throw new ConflictException(
-              `group with name "${name}" already exists`,
+              `group with name '${name}' already exists`,
             );
           }
         }
@@ -86,14 +92,14 @@ export class GroupRepository {
   async updateGroup(name: string, { description }: UpdateGroupDto) {
     return this.prismaService.group
       .update({
-        where: { name: name },
-        data: { name: name, description: description },
+        where: { name },
+        data: { description },
       })
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
-          if (err.code === 'P2002') {
-            throw new ConflictException(
-              `group with name "${name}" already exists`,
+          if (err.code === 'P2025') {
+            throw new NotFoundException(
+              `group with name '${name}' does not exist`,
             );
           }
         }
@@ -103,7 +109,7 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup({ name }: DeleteGroupDto) {
+  async deleteGroup(name: string) {
     return this.prismaService.group
       .delete({
         where: { name: name },
@@ -111,7 +117,9 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new ForbiddenException();
+            throw new NotFoundException(
+              `group with name '${name}' does not exist`,
+            );
           }
         }
         this.logger.error('deleteNotice');
@@ -119,7 +127,79 @@ export class GroupRepository {
         throw new InternalServerErrorException('Database error');
       });
   }
+  
+  async getGroupMember(name: string) {
+    return this.prismaService.user
+      .findMany({
+        where: {
+          groups: {
+            some: {
+              groupName: name,
+            },
+          },
+        },
+      })
+      .catch((err) => {
+        this.logger.error('getGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
+  }
 
+  async addGroupMember(
+    groupName: string,
+    { uuid: newUserUuid }: AddGroupMemberDto,
+  ) {
+    return this.prismaService.userGroup
+      .create({
+        data: {
+          userUuid: newUserUuid,
+          groupName,
+        },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') {
+            throw new ConflictException(
+              `User already exists in group '${groupName}'`,
+            );
+          }
+          if (err.code === 'P2003') {
+            throw new NotFoundException(
+              `group with name '${groupName}' does not exist`,
+            );
+          }
+        }
+        this.logger.error('addGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
+  }
+
+  async deleteGroupMember(groupName: string, userUuid: string) {
+    return this.prismaService.userGroup
+      .delete({
+        where: {
+          userUuid_groupName: {
+            userUuid,
+            groupName,
+          },
+        },
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new NotFoundException(
+              `user does not exist in group '${groupName}' or group with name '${groupName}' does not exist`,
+            );
+          }
+        }
+        this.logger.error('deleteGroupMember');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('Database error');
+      });
+  }
+  
   async addUserRole({ userUuid, groupName, roleId }: CreateUserRoleDto): Promise<void> {
     const exists = await this.groupExists(groupName);
     if (!exists) {
@@ -225,5 +305,4 @@ export class GroupRepository {
     });
     return !!group;
   }
-  
 }
