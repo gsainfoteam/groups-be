@@ -54,7 +54,6 @@ export class GroupController {
     return this.groupService.deleteGroup(name);
   }
 
-  // user-role part
   @Post('/:groupname/member/:uuid/role/:id')
   async addUserRole(
     @Param('groupname') groupName: string,

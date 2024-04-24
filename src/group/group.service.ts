@@ -31,7 +31,6 @@ export class GroupService {
     return this.groupRepository.deleteGroup({ name });
   }
 
-  // user-role part
   async addUserRole(createUserRoleDto: CreateUserRoleDto): Promise<void> {
     return this.groupRepository.addUserRole(createUserRoleDto);
   }

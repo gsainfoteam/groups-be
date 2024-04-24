@@ -120,7 +120,6 @@ export class GroupRepository {
       });
   }
 
-  // user-role part
   async addUserRole({ userUuid, groupName, roleId }: CreateUserRoleDto): Promise<void> {
     const exists = await this.groupExists(groupName);
     if (!exists) {
