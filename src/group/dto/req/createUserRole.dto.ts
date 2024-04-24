@@ -4,7 +4,7 @@ import { IsUUID, IsInt } from 'class-validator';
 export class CreateUserRoleDto {
   @ApiProperty({ description: 'User UUID' })
   @IsUUID()
-  userUuid: string;
+  createUserUuid: string;
 
   @ApiProperty({ description: 'Group UUID' })
   groupName: string;

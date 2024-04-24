@@ -5,6 +5,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
 import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class GroupService {
@@ -54,30 +55,32 @@ export class GroupService {
     );
   }
 
-  async addUserRole(createUserRoleDto: CreateUserRoleDto): Promise<void> {
-    return this.groupRepository.addUserRole(createUserRoleDto);
-  }
-
-  async getUserRoles(user_uuid: string, group_uuid: string): Promise<number[]> {
-    return this.groupRepository.getUserRoles(user_uuid, group_uuid);
-  }
-
-  async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
-    return this.groupRepository.getUsersByRole(group_uuid, role_id);
-  }
-
-  async deleteGroupRoles(groupUuid: string): Promise<void> {
-    await this.groupRepository.deleteGroupRoles(groupUuid);
-  }
-
-  async deleteUserRoles(userUuid: string): Promise<void> {
-    await this.groupRepository.deleteUserRoles(userUuid);
-  }
-
-  async deleteGroupMemberRoles(
-    groupUuid: string,
+  async addUserRole(
+    createUserRoleDto: CreateUserRoleDto,
     userUuid: string,
   ): Promise<void> {
-    await this.groupRepository.deleteGroupMemberRoles(groupUuid, userUuid);
+    return this.groupRepository.addUserRole(createUserRoleDto, userUuid);
+  }
+
+  async getUserRoles(
+    targetUuid: string,
+    groupName: string,
+    userUuid: string,
+  ): Promise<Role[]> {
+    return this.groupRepository.getUserRoles(targetUuid, groupName, userUuid);
+  }
+
+  async deleteUserRole(
+    targetUuid: string,
+    roleId: number,
+    groupName: string,
+    userUuid: string,
+  ): Promise<void> {
+    await this.groupRepository.deleteUserRole(
+      targetUuid,
+      roleId,
+      groupName,
+      userUuid,
+    );
   }
 }

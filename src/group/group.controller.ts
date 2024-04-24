@@ -103,46 +103,47 @@ export class GroupController {
     );
   }
 
+  @Get('/:groupname/member/:uuid/role')
+  @UseGuards(UserGuard)
+  async getUserRoles(
+    @Param('groupname') groupName: string,
+    @Param('uuid') target: string,
+    @GetUser() user: User,
+  ) {
+    return this.groupService.getUserRoles(target, groupName, user.uuid);
+  }
+
   @Post('/:groupname/member/:uuid/role/:id')
+  @UseGuards(UserGuard)
   async addUserRole(
     @Param('groupname') groupName: string,
     @Param('uuid') userUuid: string,
     @Param('id') roleId: number,
+    @GetUser() user: User,
   ) {
-    return this.groupService.addUserRole({ userUuid, groupName, roleId });
+    return this.groupService.addUserRole(
+      {
+        createUserUuid: userUuid,
+        groupName,
+        roleId,
+      },
+      user.uuid,
+    );
   }
 
-  @Get('/:groupname/member/:uuid/role')
-  async getUserRoles(
-    @Param('groupname') group_uuid: string,
-    @Param('uuid') user_uuid: string,
-  ) {
-    return this.groupService.getUserRoles(user_uuid, group_uuid);
-  }
-
-  @Get('/:groupname/role/:id')
-  async getUsersByRole(
-    @Param('groupname') group_uuid: string,
-    @Param('id') role_id: number,
-  ) {
-    return this.groupService.getUsersByRole(group_uuid, role_id);
-  }
-
-  @Delete('/group/:groupname/delete')
-  async deleteGroupRoles(@Param('groupname') groupUuid: string) {
-    return this.groupService.deleteGroupRoles(groupUuid);
-  }
-
-  @Delete('/member/:uuid/delete')
-  async deleteUserRoles(@Param('uuid') userUuid: string) {
-    return this.groupService.deleteUserRoles(userUuid);
-  }
-
-  @Delete('/group/:groupname/member/:uuid/delete')
-  async deleteGroupMemberRoles(
-    @Param('groupname') groupUuid: string,
+  @Delete('/:groupname/member/:uuid/role/:id')
+  @UseGuards(UserGuard)
+  async deleteUserRole(
+    @Param('groupname') groupName: string,
     @Param('uuid') userUuid: string,
+    @Param('id') roleId: number,
+    @GetUser() user: User,
   ) {
-    return this.groupService.deleteGroupMemberRoles(groupUuid, userUuid);
+    return this.groupService.deleteUserRole(
+      userUuid,
+      roleId,
+      groupName,
+      user.uuid,
+    );
   }
 }

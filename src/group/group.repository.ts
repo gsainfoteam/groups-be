@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
-import { Authoity, Group } from '@prisma/client';
+import { Authoity, Group, Role } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
@@ -312,23 +312,41 @@ export class GroupRepository {
       });
   }
 
-  async addUserRole({
-    userUuid,
-    groupName,
-    roleId,
-  }: CreateUserRoleDto): Promise<void> {
-    const exists = await this.groupExists(groupName);
-    if (!exists) {
-      throw new NotFoundException(
-        `Group with UUID ${groupName} does not exist.`,
-      );
-    }
+  async addUserRole(
+    { createUserUuid, groupName, roleId }: CreateUserRoleDto,
+    userUuid: string,
+  ): Promise<void> {
     try {
       await this.prismaService.userRole.create({
         data: {
-          userUuid: userUuid,
-          groupName: groupName,
-          roleId: roleId,
+          User: {
+            connect: {
+              uuid: createUserUuid,
+            },
+          },
+          Group: {
+            connect: {
+              name: groupName,
+              userRoles: {
+                some: {
+                  userUuid,
+                  Role: {
+                    authoities: {
+                      has: Authoity.MEMBER_UPDATE,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          Role: {
+            connect: {
+              id_groupName: {
+                id: roleId,
+                groupName,
+              },
+            },
+          },
         },
       });
       this.logger.log(
@@ -346,93 +364,58 @@ export class GroupRepository {
     }
   }
 
-  async getUserRoles(user_uuid: string, group_uuid: string): Promise<number[]> {
-    const roles = await this.prismaService.userRole.findMany({
+  async getUserRoles(
+    targetUuid: string,
+    groupName: string,
+    userUuid: string,
+  ): Promise<Role[]> {
+    return this.prismaService.role.findMany({
       where: {
-        userUuid: user_uuid,
-        groupName: group_uuid,
-      },
-      select: {
-        roleId: true,
-      },
-    });
-
-    if (!roles.length) {
-      throw new NotFoundException(
-        `No roles found for user ${user_uuid} in group ${group_uuid}`,
-      );
-    }
-
-    return roles.map((role) => role.roleId);
-  }
-
-  async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
-    const users = await this.prismaService.userRole.findMany({
-      where: {
-        groupName: group_uuid,
-        roleId: role_id,
-      },
-      select: {
-        userUuid: true,
-      },
-    });
-
-    if (!users.length) {
-      throw new NotFoundException(
-        `No users found with role ${role_id} in group ${group_uuid}`,
-      );
-    }
-
-    return users.map((user) => user.userUuid);
-  }
-
-  async deleteGroupRoles(groupUuid: string): Promise<void> {
-    const exists = await this.groupExists(groupUuid);
-    if (!exists) {
-      throw new NotFoundException(
-        `Group with UUID ${groupUuid} does not exist.`,
-      );
-    }
-
-    await this.prismaService.userRole.deleteMany({
-      where: {
-        groupName: groupUuid,
+        userRoles: {
+          some: {
+            userUuid: targetUuid,
+            Group: {
+              name: groupName,
+              users: {
+                some: {
+                  userUuid,
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
 
-  async deleteUserRoles(userUuid: string): Promise<void> {
-    await this.prismaService.userRole.deleteMany({
-      where: {
-        userUuid: userUuid,
-      },
-    });
-  }
-
-  async deleteGroupMemberRoles(
-    groupUuid: string,
+  async deleteUserRole(
+    targetUuid: string,
+    roleId: number,
+    groupName: string,
     userUuid: string,
   ): Promise<void> {
-    const exists = await this.groupExists(groupUuid);
-    if (!exists) {
-      throw new NotFoundException(
-        `Group with UUID ${groupUuid} does not exist.`,
-      );
-    }
     await this.prismaService.userRole.deleteMany({
       where: {
-        groupName: groupUuid,
-        userUuid: userUuid,
+        userUuid: targetUuid,
+        Role: {
+          id: roleId,
+        },
+        Group: {
+          name: groupName,
+          userRoles: {
+            some: {
+              User: {
+                uuid: userUuid,
+              },
+              Role: {
+                authoities: {
+                  has: Authoity.MEMBER_DELETE,
+                },
+              },
+            },
+          },
+        },
       },
     });
-  }
-
-  async groupExists(groupUuid: string): Promise<boolean> {
-    const group = await this.prismaService.group.findUnique({
-      where: {
-        name: groupUuid,
-      },
-    });
-    return !!group;
   }
 }

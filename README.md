@@ -35,6 +35,7 @@ POST /group/:groupname/member
 DELETE /group/:groupname/member/:uuid  
 GET /group/:groupname/member/:uuid/role  
 POST /group/:groupname/member/:uuid/role/:id  
+DELETE /group/:groupname/member/:uuid/role/:id
 GET /group/:groupname/role  
 POST /group/:groupname/role  
 UPDATE /group/:groupname/role  
