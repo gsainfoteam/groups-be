@@ -25,6 +25,8 @@ import { UserGuard } from 'src/user/guard/user.guard';
 import { GetRoleListResDto } from './dto/res/getRoleRes.dto';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
+import { GetUser } from 'src/user/decorator/getUser.decorator';
+import { User } from '@prisma/client';
 
 @ApiTags('Role')
 @ApiBearerAuth('access-token')
@@ -39,8 +41,9 @@ export class RoleController {
   @Get()
   async getRoles(
     @Param('groupName') groupName: string,
+    @GetUser() user: User,
   ): Promise<GetRoleListResDto> {
-    return this.roleService.getRoles(groupName);
+    return this.roleService.getRoles(groupName, user.uuid);
   }
 
   @ApiOperation({
@@ -56,8 +59,9 @@ export class RoleController {
   async createRole(
     @Param('groupName') groupName: string,
     @Body() createRoleDto: CreateRoleDto,
+    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.createRole(groupName, createRoleDto);
+    return this.roleService.createRole(groupName, createRoleDto, user.uuid);
   }
 
   @ApiOperation({
@@ -75,8 +79,9 @@ export class RoleController {
     @Param('groupName') groupName: string,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: CreateRoleDto,
+    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.updateRole(groupName, id, updateRoleDto);
+    return this.roleService.updateRole(groupName, id, updateRoleDto, user.uuid);
   }
 
   @ApiOperation({ summary: 'Delete role', description: 'Delete a role' })
@@ -89,7 +94,8 @@ export class RoleController {
   async deleteRole(
     @Param('groupName') groupName: string,
     @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.deleteRole(groupName, id);
+    return this.roleService.deleteRole(groupName, id, user.uuid);
   }
 }

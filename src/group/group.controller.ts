@@ -102,7 +102,7 @@ export class GroupController {
       user.uuid,
     );
   }
-  
+
   @Post('/:groupname/member/:uuid/role/:id')
   async addUserRole(
     @Param('groupname') groupName: string,
@@ -129,16 +129,12 @@ export class GroupController {
   }
 
   @Delete('/group/:groupname/delete')
-  async deleteGroupRoles(
-    @Param('groupname') groupUuid: string,
-  ) {
+  async deleteGroupRoles(@Param('groupname') groupUuid: string) {
     return this.groupService.deleteGroupRoles(groupUuid);
   }
 
   @Delete('/member/:uuid/delete')
-  async deleteUserRoles(
-    @Param('uuid') userUuid: string,
-  ) {
+  async deleteUserRoles(@Param('uuid') userUuid: string) {
     return this.groupService.deleteUserRoles(userUuid);
   }
 

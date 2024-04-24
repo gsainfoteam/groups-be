@@ -12,7 +12,6 @@ import { Authoity, Group } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { DeleteGroupDto } from './dto/req/deleteGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
 import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
 
@@ -312,11 +311,17 @@ export class GroupRepository {
         throw new InternalServerErrorException('Database error');
       });
   }
-  
-  async addUserRole({ userUuid, groupName, roleId }: CreateUserRoleDto): Promise<void> {
+
+  async addUserRole({
+    userUuid,
+    groupName,
+    roleId,
+  }: CreateUserRoleDto): Promise<void> {
     const exists = await this.groupExists(groupName);
     if (!exists) {
-      throw new NotFoundException(`Group with UUID ${groupName} does not exist.`);
+      throw new NotFoundException(
+        `Group with UUID ${groupName} does not exist.`,
+      );
     }
     try {
       await this.prismaService.userRole.create({
@@ -326,7 +331,9 @@ export class GroupRepository {
           roleId: roleId,
         },
       });
-      this.logger.log(`UserRole [${userUuid}, ${groupName}, ${roleId}] created`);
+      this.logger.log(
+        `UserRole [${userUuid}, ${groupName}, ${roleId}] created`,
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -351,10 +358,12 @@ export class GroupRepository {
     });
 
     if (!roles.length) {
-      throw new NotFoundException(`No roles found for user ${user_uuid} in group ${group_uuid}`);
+      throw new NotFoundException(
+        `No roles found for user ${user_uuid} in group ${group_uuid}`,
+      );
     }
 
-    return roles.map(role => role.roleId);
+    return roles.map((role) => role.roleId);
   }
 
   async getUsersByRole(group_uuid: string, role_id: number): Promise<string[]> {
@@ -369,16 +378,20 @@ export class GroupRepository {
     });
 
     if (!users.length) {
-      throw new NotFoundException(`No users found with role ${role_id} in group ${group_uuid}`);
+      throw new NotFoundException(
+        `No users found with role ${role_id} in group ${group_uuid}`,
+      );
     }
 
-    return users.map(user => user.userUuid);
+    return users.map((user) => user.userUuid);
   }
 
   async deleteGroupRoles(groupUuid: string): Promise<void> {
     const exists = await this.groupExists(groupUuid);
     if (!exists) {
-      throw new NotFoundException(`Group with UUID ${groupUuid} does not exist.`);
+      throw new NotFoundException(
+        `Group with UUID ${groupUuid} does not exist.`,
+      );
     }
 
     await this.prismaService.userRole.deleteMany({
@@ -387,7 +400,7 @@ export class GroupRepository {
       },
     });
   }
-  
+
   async deleteUserRoles(userUuid: string): Promise<void> {
     await this.prismaService.userRole.deleteMany({
       where: {
@@ -396,10 +409,15 @@ export class GroupRepository {
     });
   }
 
-  async deleteGroupMemberRoles(groupUuid: string, userUuid: string): Promise<void> {
+  async deleteGroupMemberRoles(
+    groupUuid: string,
+    userUuid: string,
+  ): Promise<void> {
     const exists = await this.groupExists(groupUuid);
     if (!exists) {
-      throw new NotFoundException(`Group with UUID ${groupUuid} does not exist.`);
+      throw new NotFoundException(
+        `Group with UUID ${groupUuid} does not exist.`,
+      );
     }
     await this.prismaService.userRole.deleteMany({
       where: {
@@ -408,7 +426,6 @@ export class GroupRepository {
       },
     });
   }
-  
 
   async groupExists(groupUuid: string): Promise<boolean> {
     const group = await this.prismaService.group.findUnique({
