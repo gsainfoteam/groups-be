@@ -34,7 +34,7 @@ model UserGroup {
   userUuid  String   @map("user_uuid") @db.Uuid
   User      User     @relation(fields: [userUuid], references: [uuid])
   groupName String   @map("group_name")
-  Group     Group    @relation(fields: [groupName], references: [name])
+  Group     Group    @relation(fields: [groupName], references: [name], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
 
   @@id([userUuid, groupName])
@@ -45,7 +45,7 @@ model Role {
   id                 Int
   name               String
   groupName          String     @map("group_name")
-  Group              Group      @relation(fields: [groupName], references: [name])
+  Group              Group      @relation(fields: [groupName], references: [name], onDelete: Cascade)
   authoities         Authoity[] @map("authoities")
   externalAuthoities String[]   @map("external_authoities")
 
@@ -69,9 +69,9 @@ model UserRole {
   userUuid  String @map("user_uuid") @db.Uuid
   User      User   @relation(fields: [userUuid], references: [uuid])
   groupName String @map("group_name")
-  Group     Group  @relation(fields: [groupName], references: [name])
+  Group     Group  @relation(fields: [groupName], references: [name], onDelete: Cascade)
   roleId    Int    @map("role_id")
-  Role      Role   @relation(fields: [roleId, groupName], references: [id, groupName])
+  Role      Role   @relation(fields: [roleId, groupName], references: [id, groupName], onDelete: Cascade)
 
   @@id([userUuid, groupName])
   @@map("user_role")
