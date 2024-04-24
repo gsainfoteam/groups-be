@@ -85,4 +85,51 @@ export class GroupController {
   ) {
     return this.groupService.deleteGroupMember(groupName, userUuid);
   }
+  
+  @Post('/:groupname/member/:uuid/role/:id')
+  async addUserRole(
+    @Param('groupname') groupName: string,
+    @Param('uuid') userUuid: string,
+    @Param('id') roleId: number,
+  ) {
+    return this.groupService.addUserRole({ userUuid, groupName, roleId });
+  }
+
+  @Get('/:groupname/member/:uuid/role')
+  async getUserRoles(
+    @Param('groupname') group_uuid: string,
+    @Param('uuid') user_uuid: string,
+  ) {
+    return this.groupService.getUserRoles(user_uuid, group_uuid);
+  }
+
+  @Get('/:groupname/role/:id')
+  async getUsersByRole(
+    @Param('groupname') group_uuid: string,
+    @Param('id') role_id: number,
+  ) {
+    return this.groupService.getUsersByRole(group_uuid, role_id);
+  }
+
+  @Delete('/group/:groupname/delete')
+  async deleteGroupRoles(
+    @Param('groupname') groupUuid: string,
+  ) {
+    return this.groupService.deleteGroupRoles(groupUuid);
+  }
+
+  @Delete('/member/:uuid/delete')
+  async deleteUserRoles(
+    @Param('uuid') userUuid: string,
+  ) {
+    return this.groupService.deleteUserRoles(userUuid);
+  }
+
+  @Delete('/group/:groupname/member/:uuid/delete')
+  async deleteGroupMemberRoles(
+    @Param('groupname') groupUuid: string,
+    @Param('uuid') userUuid: string,
+  ) {
+    return this.groupService.deleteGroupMemberRoles(groupUuid, userUuid);
+  }
 }
