@@ -28,14 +28,15 @@ check if the user in the group
 GET /group - don't need access token  
 GET /group/:groupname  
 POST /group  
-PATCH /group  
-DELETE /group  
+PATCH /group/:name
+DELETE /group/:name
 GET /group/:groupname/member  
 POST /group/:groupname/member  
 DELETE /group/:groupname/member/:uuid  
 GET /group/:groupname/member/:uuid/role  
 POST /group/:groupname/member/:uuid/role/:id  
+DELETE /group/:groupname/member/:uuid/role/:id
 GET /group/:groupname/role  
 POST /group/:groupname/role  
-UPDATE /group/:groupname/role  
-DELETE /group/:groupname/role
+UPDATE /group/:groupname/role/:id
+DELETE /group/:groupname/role/:id

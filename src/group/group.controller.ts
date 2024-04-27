@@ -40,96 +40,112 @@ export class GroupController {
 
   // 테스트 완료
   @Get(':name')
-  async getGroup(@Param('name') name: string) {
-    return this.groupService.getGroup(name);
+  @UseGuards(UserGuard)
+  async getGroup(@Param('name') name: string, @GetUser() user: User) {
+    return this.groupService.getGroup(name, user.uuid);
   }
 
   // 테스트 완료
   @Post()
-  async createGroup(@Body() body: CreateGroupDto) {
-    return this.groupService.createGroup(body);
+  @UseGuards(UserGuard)
+  async createGroup(@Body() body: CreateGroupDto, @GetUser() user: User) {
+    return this.groupService.createGroup(body, user.uuid);
   }
 
   // 테스트 완료
   @Patch(':name')
-  async updateGroup(@Param('name') name: string, @Body() body: UpdateGroupDto) {
-    return this.groupService.updateGroup(name, body);
+  @UseGuards(UserGuard)
+  async updateGroup(
+    @Param('name') name: string,
+    @Body() body: UpdateGroupDto,
+    @GetUser() user: User,
+  ) {
+    return this.groupService.updateGroup(name, body, user.uuid);
   }
 
   // 테스트 완료
   @Delete(':name')
-  async deleteGroup(@Param('name') name: string) {
-    return this.groupService.deleteGroup(name);
+  @UseGuards(UserGuard)
+  async deleteGroup(@Param('name') name: string, @GetUser() user: User) {
+    return this.groupService.deleteGroup(name, user.uuid);
   }
 
   // 테스트 완료
   @Get(':name/member')
-  async getGroupMember(@Param('name') name: string) {
-    return this.groupService.getGroupMember(name);
+  @UseGuards(UserGuard)
+  async getGroupMember(@Param('name') name: string, @GetUser() user: User) {
+    return this.groupService.getGroupMember(name, user.uuid);
   }
 
   // 테스트 완료
   @Post(':name/member')
+  @UseGuards(UserGuard)
   async addGroupMember(
     @Param('name') groupName: string,
     @Body() body: AddGroupMemberDto,
+    @GetUser() user: User,
   ) {
-    return this.groupService.addGroupMember(groupName, body);
+    return this.groupService.addGroupMember(groupName, body, user.uuid);
   }
 
   // 테스트 완료
   @Delete(':name/member/:uuid')
+  @UseGuards(UserGuard)
   async deleteGroupMemeber(
     @Param('name') groupName: string,
-    @Param('uuid', new ParseUUIDPipe()) userUuid: string,
+    @Param('uuid', new ParseUUIDPipe()) deleteUserUuid: string,
+    @GetUser() user: User,
   ) {
-    return this.groupService.deleteGroupMember(groupName, userUuid);
+    return this.groupService.deleteGroupMember(
+      groupName,
+      deleteUserUuid,
+      user.uuid,
+    );
   }
-  
-  @Post('/:groupname/member/:uuid/role/:id')
+
+  @Get('/:groupName/member/:uuid/role')
+  @UseGuards(UserGuard)
+  async getUserRoles(
+    @Param('groupName') groupName: string,
+    @Param('uuid') target: string,
+    @GetUser() user: User,
+  ) {
+    return this.groupService.getUserRoles(target, groupName, user.uuid);
+  }
+
+  @Post('/:groupName/member/:uuid/role/:id')
+  @UseGuards(UserGuard)
   async addUserRole(
-    @Param('groupname') groupName: string,
+    @Param('groupName') groupName: string,
     @Param('uuid') userUuid: string,
     @Param('id') roleId: number,
+    @GetUser() user: User,
   ) {
-    return this.groupService.addUserRole({ userUuid, groupName, roleId });
+    return this.groupService.addUserRole(
+      {
+        createUserUuid: userUuid,
+        groupName,
+        roleId,
+      },
+      user.uuid,
+    );
   }
 
-  @Get('/:groupname/member/:uuid/role')
-  async getUserRoles(
-    @Param('groupname') group_uuid: string,
-    @Param('uuid') user_uuid: string,
-  ) {
-    return this.groupService.getUserRoles(user_uuid, group_uuid);
-  }
-
-  @Get('/:groupname/role/:id')
-  async getUsersByRole(
-    @Param('groupname') group_uuid: string,
-    @Param('id') role_id: number,
-  ) {
-    return this.groupService.getUsersByRole(group_uuid, role_id);
-  }
-
-  @Delete('/group/:groupname/delete')
-  async deleteGroupRoles(
-    @Param('groupname') groupUuid: string,
-  ) {
-    return this.groupService.deleteGroupRoles(groupUuid);
-  }
-
-  @Delete('/member/:uuid/delete')
-  async deleteUserRoles(
+  @Delete('/:groupName/member/:uuid/role/:id')
+  @UseGuards(UserGuard)
+  async deleteUserRole(
+    @Param('groupName') groupName: string,
     @Param('uuid') userUuid: string,
+    @Param('id') roleId: number,
+    @GetUser() user: User,
   ) {
-    return this.groupService.deleteUserRoles(userUuid);
-  }
-
-  @Delete('/group/:groupname/member/:uuid/delete')
-  async deleteGroupMemberRoles(
-    @Param('groupname') groupUuid: string,
-    @Param('uuid') userUuid: string,
-  ) {
-    return this.groupService.deleteGroupMemberRoles(groupUuid, userUuid);
+    return this.groupService.deleteUserRole(
+      {
+        deleteUserUuid: userUuid,
+        groupName,
+        roleId,
+      },
+      user.uuid,
+    );
   }
 }
