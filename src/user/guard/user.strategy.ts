@@ -16,7 +16,6 @@ export class UserStrategy extends PassportStrategy(Strategy, 'user') {
    * @returns User type, it will be contained to the request object
    */
   async validate(token: string): Promise<User> {
-    console.log('validate');
     return this.userService.validateUser(token);
   }
 }

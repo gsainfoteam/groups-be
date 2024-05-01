@@ -12,7 +12,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
 import { UserGuard } from 'src/user/guard/user.guard';
 import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
@@ -39,6 +39,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Get(':name')
   @UseGuards(UserGuard)
   async getGroup(@Param('name') name: string, @GetUser() user: User) {
@@ -46,6 +47,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Post()
   @UseGuards(UserGuard)
   async createGroup(@Body() body: CreateGroupDto, @GetUser() user: User) {
@@ -53,6 +55,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Patch(':name')
   @UseGuards(UserGuard)
   async updateGroup(
@@ -64,6 +67,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Delete(':name')
   @UseGuards(UserGuard)
   async deleteGroup(@Param('name') name: string, @GetUser() user: User) {
@@ -71,6 +75,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Get(':name/member')
   @UseGuards(UserGuard)
   async getGroupMember(@Param('name') name: string, @GetUser() user: User) {
@@ -78,6 +83,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Post(':name/member')
   @UseGuards(UserGuard)
   async addGroupMember(
@@ -89,6 +95,7 @@ export class GroupController {
   }
 
   // 테스트 완료
+  @ApiBearerAuth('access-token')
   @Delete(':name/member/:uuid')
   @UseGuards(UserGuard)
   async deleteGroupMemeber(
@@ -103,6 +110,7 @@ export class GroupController {
     );
   }
 
+  @ApiBearerAuth('access-token')
   @Get('/:groupName/member/:uuid/role')
   @UseGuards(UserGuard)
   async getUserRoles(
@@ -113,6 +121,7 @@ export class GroupController {
     return this.groupService.getUserRoles(target, groupName, user.uuid);
   }
 
+  @ApiBearerAuth('access-token')
   @Post('/:groupName/member/:uuid/role/:id')
   @UseGuards(UserGuard)
   async addUserRole(
@@ -131,6 +140,7 @@ export class GroupController {
     );
   }
 
+  @ApiBearerAuth('access-token')
   @Delete('/:groupName/member/:uuid/role/:id')
   @UseGuards(UserGuard)
   async deleteUserRole(
