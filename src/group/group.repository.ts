@@ -24,6 +24,7 @@ export class GroupRepository {
     { type }: GetGroupListRequestDto,
     userUuid?: string,
   ): Promise<Group[]> {
+    this.logger.log('getGroupList');
     if (type === 'included') {
       if (!userUuid) {
         throw new ForbiddenException('User is not logged in');
@@ -53,6 +54,7 @@ export class GroupRepository {
   }
 
   async getGroup(name: string, userUuid: string) {
+    this.logger.log('getGroup');
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
@@ -79,6 +81,7 @@ export class GroupRepository {
   }
 
   async createGroup({ name, description }: CreateGroupDto, userUuid: string) {
+    this.logger.log('createGroup');
     return this.prismaService.group
       .create({
         data: {
@@ -135,6 +138,7 @@ export class GroupRepository {
     { description }: UpdateGroupDto,
     userUuid: string,
   ) {
+    this.logger.log('updateGroup');
     return this.prismaService.group
       .update({
         where: {
@@ -167,6 +171,7 @@ export class GroupRepository {
   }
 
   async deleteGroup(name: string, userUuid: string) {
+    this.logger.log('deleteGroup');
     return this.prismaService.group
       .delete({
         where: {
@@ -198,6 +203,7 @@ export class GroupRepository {
   }
 
   async getGroupMember(name: string, userUuid: string) {
+    this.logger.log('getGroupMember');
     return this.prismaService.user
       .findMany({
         where: {
@@ -232,6 +238,7 @@ export class GroupRepository {
     { uuid: newUserUuid }: AddGroupMemberDto,
     userUuid: string,
   ) {
+    this.logger.log('addGroupMember');
     return this.prismaService.userGroup
       .create({
         data: {
@@ -279,6 +286,7 @@ export class GroupRepository {
     deleteUserUuid: string,
     userUuid: string,
   ) {
+    this.logger.log('deleteGroupMember');
     return this.prismaService.userGroup
       .delete({
         where: {
@@ -316,6 +324,7 @@ export class GroupRepository {
     { createUserUuid, groupName, roleId }: CreateUserRoleDto,
     userUuid: string,
   ): Promise<void> {
+    this.logger.log('addUserRole');
     try {
       await this.prismaService.userRole.create({
         data: {
@@ -369,6 +378,7 @@ export class GroupRepository {
     groupName: string,
     userUuid: string,
   ): Promise<Role[]> {
+    this.logger.log('getUserRoles');
     return this.prismaService.role.findMany({
       where: {
         userRoles: {
@@ -394,6 +404,7 @@ export class GroupRepository {
     groupName: string,
     userUuid: string,
   ): Promise<void> {
+    this.logger.log('deleteUserRole');
     await this.prismaService.userRole.deleteMany({
       where: {
         userUuid: targetUuid,
