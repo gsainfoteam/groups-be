@@ -17,6 +17,7 @@ export class UserService {
    * @returns User type
    */
   async validateUser(accessToken: string): Promise<User> {
+    console.log('here');
     this.logger.log('Validating user');
     const userInfo = await this.idpService.getUserInfo(accessToken);
     const user = await this.userRepository.getUserByUuid({
