@@ -5,11 +5,10 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserInfo, UserInfoResponse } from './types/userInfo.type';
+import { UserInfoResponse } from './types/userInfo.type';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { objectToCamel } from 'ts-case-convert';
 
 @Injectable()
 export class IdpService {
@@ -27,7 +26,7 @@ export class IdpService {
    * @param accessToken it is the idp access token
    * @returns object of the UserInfo type
    */
-  async getUserInfo(accessToken: string): Promise<UserInfo> {
+  async getUserInfo(accessToken: string): Promise<UserInfoResponse> {
     this.logger.log('Fetching user info from IDP');
     const url = this.idpUrl + '/userinfo';
     const userInfoResponse = await firstValueFrom(
@@ -52,6 +51,6 @@ export class IdpService {
           }),
         ),
     );
-    return objectToCamel(userInfoResponse.data);
+    return userInfoResponse.data;
   }
 }

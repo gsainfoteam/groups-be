@@ -20,11 +20,11 @@ export class UserService {
     this.logger.log('Validating user');
     const userInfo = await this.idpService.getUserInfo(accessToken);
     const user = await this.userRepository.getUserByUuid({
-      uuid: userInfo.userUuid,
+      uuid: userInfo.uuid,
     });
     if (!user) {
       this.logger.log('User not found, creating user');
-      return this.userRepository.createUser({ uuid: userInfo.userUuid });
+      return this.userRepository.createUser({ uuid: userInfo.uuid });
     }
     return user;
   }
