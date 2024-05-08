@@ -6,7 +6,12 @@ import { UserGuard } from 'src/user/guard/user.guard';
 
 describe('GroupController (e2e)', () => {
   let app: INestApplication;
-
+  /*
+  데이터베이스에 있어야 하는 값들
+  Group : TestTeam
+  User : d75f9a3b-b110-437e-9287-eaaf5965849d (인증 역할)
+       : 9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd (테스트 역할)
+  */
   async function initializeApp(overrideGuardFunction?: (context: ExecutionContext) => boolean) {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
