@@ -27,6 +27,7 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
 import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
+import { UpdateRoleDto } from './dto/req/updateRole.dto';
 
 @ApiTags('Role')
 @ApiBearerAuth('access-token')
@@ -78,7 +79,7 @@ export class RoleController {
   async updateRole(
     @Param('groupName') groupName: string,
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateRoleDto: CreateRoleDto,
+    @Body() updateRoleDto: UpdateRoleDto,
     @GetUser() user: User,
   ): Promise<void> {
     return this.roleService.updateRole(groupName, id, updateRoleDto, user.uuid);

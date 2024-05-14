@@ -3,9 +3,12 @@ import { AppModule } from '../src/app.module';
 import * as request from 'supertest';
 import { INestApplication, ExecutionContext } from '@nestjs/common';
 import { UserGuard } from 'src/user/guard/user.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('GroupController (e2e)', () => {
   let app: INestApplication;
+  let prismaService: PrismaService;
   /*
   데이터베이스에 있어야 하는 값들
   Group : TestTeam
@@ -28,6 +31,7 @@ describe('GroupController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    prismaService = app.get<PrismaService>(PrismaService);
     return app;
   }
 
@@ -281,6 +285,42 @@ describe('GroupController (e2e)', () => {
           .expect(201)
         // role 부분의 출력이 없기에 그냥 오류 없는 것만 감지
       });
+
+      it('이미 있는 user role을 추가할 때 처리할 수 있는가.', async () => {
+        app = await initializeApp();
+        const groupName = 'TestTeam';
+        const newRole = {
+          name: 'NewRole',
+          authorities: ['ROLE_CREATE'],
+          externalAuthorities: ['ZIGGLE_WRITE_NOTICE']
+        };
+
+        await request(app.getHttpServer())
+          .post(`/group/${groupName}/role`)
+          .send(newRole)
+          .expect(409)
+          .then(response => {
+            expect(response.body.message).toContain("Role already exists");
+          });
+      });
+
+      it('없는 group에 role을 추가할 수 있는가.', async () => {
+        app = await initializeApp();
+        const groupName = 'notExistTeam';
+        const newRole = {
+          name: 'NewRole',
+          authorities: ['ROLE_CREATE'],
+          externalAuthorities: ['ZIGGLE_WRITE_NOTICE']
+        };
+
+        await request(app.getHttpServer())
+          .post(`/group/${groupName}/role`)
+          .send(newRole)
+          .expect(403)
+          .then(response => {
+            expect(response.body.message).toContain("Group not found");
+          });
+      });
     });
   });
 
@@ -290,13 +330,30 @@ describe('GroupController (e2e)', () => {
       const roleId = 2;
       const updateRoleDto = {
         authorities: ['ROLE_UPDATE'],
-        externalAuthorities: ['ZIGGLE_MANAGE_TASKS']
+        externalAuthorities: ['ZIGGLE_MANAGE_TASKS'],
       };
 
       await request(app.getHttpServer())
         .put(`/group/${groupName}/role/${roleId}`)
         .send(updateRoleDto)
         .expect(200)
+    });
+
+    it('없는 group을 update할 때 처리할 수 있는가.', async () => {
+      const groupName = 'TestTeam1';
+      const roleId = 1;
+      const updateRoleDto = {
+        authorities: ['ROLE_UPDATE'],
+        externalAuthorities: ['ZIGGLE_MANAGE_TASKS'],
+      };
+
+      await request(app.getHttpServer())
+        .put(`/group/${groupName}/role/${roleId}`)
+        .send(updateRoleDto)
+        .expect(403)
+        .then(response => {
+          expect(response.body.message).toContain("Group not found");
+        });
     });
   });
 
@@ -336,6 +393,19 @@ describe('GroupController (e2e)', () => {
         .delete(`/group/${groupName}/role/${roleId}`)
         .expect(200)
       // role 부분의 출력이 없기에 그냥 오류 없는 것만 감지
+    });
+
+    it('없는 user-role을 삭제할 때 처리할 수 있는가.', async () => {
+      app = await initializeApp();
+      const groupName = 'TestTeam';
+      const roleId = 2;
+
+      await request(app.getHttpServer())
+        .delete(`/group/${groupName}/role/${roleId}`)
+        .expect(403)
+        .then(response => {
+          expect(response.body.message).toContain("Role not found");
+        });
     });
   });
 
