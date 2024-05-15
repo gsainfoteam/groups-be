@@ -12,11 +12,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOAuth2,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -29,7 +29,7 @@ import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 
 @ApiTags('Role')
-@ApiBearerAuth('access-token')
+@ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
 @Controller('group/:groupName/role')
 @UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
