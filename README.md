@@ -8,7 +8,7 @@ GIST에 동아리와 같은 그룹을 만들고, 인원을 관리하는 시스�
 
 ## DataBase Structure
 
-ERD: https://dbdocs.io/siwonpada/vapor_auth_be
+ERD: [https://dbdocs.io/siwonpada/vapor_auth_be](https://dbdocs.io/INFOTEAM%20GIST/vapor_auth_be)
 
 ## Activated Urls.
 
