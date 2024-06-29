@@ -3,6 +3,8 @@ Project vapor_auth_be {
 }
 
 Enum Authority {
+    MEMBER_UPDATE
+    MEMBER_DELETE
     ROLE_CREATE
     ROLE_UPDATE
     ROLE_DELETE
@@ -13,12 +15,12 @@ Enum Authority {
 Table role {
     id int [increment]
     name string
-    group_uuid string
+    group_name string
     external_authority string[]
     authority Authority
 
     Indexes {
-        (name, group_uuid, id) [pk]
+        (name, group_name) [pk]
     }
 }
 
@@ -29,7 +31,7 @@ Table user {
 
 Table user_group {
     user_uuid string [ref: > user.uuid]
-    group_uuid string [ref: > group.uuid]
+    group_name string [ref: > group.name]
     created_at timestamp
 
     Indexes {
@@ -39,17 +41,16 @@ Table user_group {
 
 Table user_role {
     user_uuid string [ref: > user.uuid]
-    group_uuid string [ref: > group.uuid]
+    group_name string [ref: > group.name]
     role_id int [ref: > role.id]
 
     Indexes {
-        (user_uuid, group_uuid) [pk]
+        (user_uuid, group_name) [pk]
     }
 }
 
 Table group {
-    uuid string [pk]
-    name string [unique]
+    name string [pk, unique]
     description string
     created_at timestamp
 }
