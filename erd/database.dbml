@@ -38,7 +38,7 @@ Table user_group {
     created_at timestamp
 
     Indexes {
-        (user_uuid, group_uuid) [pk]
+        (user_uuid, group_name) [pk]
     }
 }
 
