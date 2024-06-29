@@ -1,5 +1,8 @@
 Project vapor_auth_be {
     database_type: "postgres"
+    note: '''
+    This is the database schema for the vapor_auth_be project.
+    '''
 }
 
 Enum Authority {
