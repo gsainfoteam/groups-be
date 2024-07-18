@@ -247,7 +247,7 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new ForbiddenException("User doesn't have permission");
+            throw new ForbiddenException('record not exist');
           }
         }
         this.logger.error('getGroupMember');
@@ -334,7 +334,7 @@ export class GroupRepository {
       .catch((err) => {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2025') {
-            throw new ForbiddenException("User doesn't have permission");
+            throw new ForbiddenException('record not exist');
           }
         }
         this.logger.error('deleteGroupMember');
@@ -428,28 +428,38 @@ export class GroupRepository {
     userUuid: string,
   ): Promise<void> {
     this.logger.log('deleteUserRole');
-    await this.prismaService.userRole.deleteMany({
-      where: {
-        userUuid: targetUuid,
-        Role: {
-          id: roleId,
-        },
-        Group: {
-          name: groupName,
-          userRoles: {
-            some: {
-              User: {
-                uuid: userUuid,
-              },
-              Role: {
-                authorities: {
-                  has: Authority.MEMBER_DELETE,
+    try {
+      await this.prismaService.userRole.deleteMany({
+        where: {
+          userUuid: targetUuid,
+          Role: {
+            id: roleId,
+          },
+          Group: {
+            name: groupName,
+            userRoles: {
+              some: {
+                User: {
+                  uuid: userUuid,
+                },
+                Role: {
+                  authoities: {
+                    has: Authoity.MEMBER_DELETE,
+                  },
                 },
               },
             },
           },
         },
-      },
-    });
+      });
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new NotFoundException('User role not found');
+        }
+      }
+      this.logger.error(`Failed to delete user role: ${err.message}`);
+      throw new InternalServerErrorException('Failed to delete user role');
+    }
   }
 }
