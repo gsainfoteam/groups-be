@@ -443,8 +443,8 @@ export class GroupRepository {
                   uuid: userUuid,
                 },
                 Role: {
-                  authoities: {
-                    has: Authoity.MEMBER_DELETE,
+                  authorities: {
+                    has: Authority.MEMBER_DELETE,
                   },
                 },
               },
