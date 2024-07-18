@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Authoity" AS ENUM ('ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE', 'GROUP_UPDATE', 'GROUP_DELETE');
+CREATE TYPE "Authority" AS ENUM ('MEMBER_UPDATE', 'MEMBER_DELETE', 'ROLE_CREATE', 'ROLE_UPDATE', 'ROLE_DELETE', 'GROUP_UPDATE', 'GROUP_DELETE');
 
 -- CreateTable
 CREATE TABLE "user" (
@@ -14,6 +14,7 @@ CREATE TABLE "group" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "president_uuid" UUID NOT NULL,
 
     CONSTRAINT "group_pkey" PRIMARY KEY ("name")
 );
@@ -32,8 +33,8 @@ CREATE TABLE "Role" (
     "id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "group_name" TEXT NOT NULL,
-    "authoities" "Authoity"[],
-    "external_authoities" TEXT[],
+    "authorities" "Authority"[],
+    "external_authorities" TEXT[],
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id","group_name")
 );
@@ -51,19 +52,22 @@ CREATE TABLE "user_role" (
 CREATE UNIQUE INDEX "Role_name_group_name_key" ON "Role"("name", "group_name");
 
 -- AddForeignKey
+ALTER TABLE "group" ADD CONSTRAINT "group_president_uuid_fkey" FOREIGN KEY ("president_uuid") REFERENCES "user"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "user_group" ADD CONSTRAINT "user_group_user_uuid_fkey" FOREIGN KEY ("user_uuid") REFERENCES "user"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_group" ADD CONSTRAINT "user_group_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_group" ADD CONSTRAINT "user_group_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Role" ADD CONSTRAINT "Role_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Role" ADD CONSTRAINT "Role_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_role" ADD CONSTRAINT "user_role_user_uuid_fkey" FOREIGN KEY ("user_uuid") REFERENCES "user"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_role" ADD CONSTRAINT "user_role_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_group_name_fkey" FOREIGN KEY ("group_name") REFERENCES "group"("name") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_role" ADD CONSTRAINT "user_role_role_id_group_name_fkey" FOREIGN KEY ("role_id", "group_name") REFERENCES "Role"("id", "group_name") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_role_id_group_name_fkey" FOREIGN KEY ("role_id", "group_name") REFERENCES "Role"("id", "group_name") ON DELETE CASCADE ON UPDATE CASCADE;

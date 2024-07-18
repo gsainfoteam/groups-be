@@ -12,8 +12,12 @@ import { DeleteUserRoleDto } from './dto/req/deleteUserRole.dto';
 export class GroupService {
   constructor(private readonly groupRepository: GroupRepository) {}
 
-  async getGroupList({ type }: GetGroupListRequestDto, userUuid?: string) {
-    return this.groupRepository.getGroupList({ type }, userUuid);
+  async getGroupList({ type }: GetGroupListRequestDto, userUuid: string) {
+    if (type === 'included') {
+      return this.groupRepository.getIncludedGroupList(userUuid);
+    } else if (type === 'all') {
+      return this.groupRepository.getAllGroupList(userUuid);
+    }
   }
 
   async getGroup(name: string, userUuid: string) {

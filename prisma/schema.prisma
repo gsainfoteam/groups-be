@@ -13,6 +13,7 @@ model User {
 
   groups UserGroup[]
   roles  UserRole[]
+  ownedGroups Group[]
 
   @@map("user")
 }
@@ -21,6 +22,9 @@ model Group {
   name        String   @id
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
+  presidentUuid String @db.Uuid @map("president_uuid")
+
+  president User @relation(fields: [presidentUuid], references: [uuid])
 
   users     UserGroup[]
   roles     Role[]
@@ -45,8 +49,8 @@ model Role {
   name               String
   groupName          String     @map("group_name")
   Group              Group      @relation(fields: [groupName], references: [name], onDelete: Cascade)
-  authoities         Authoity[] @map("authoities")
-  externalAuthoities String[]   @map("external_authoities")
+  authorities         Authority[] @map("authorities")
+  externalAuthorities String[]   @map("external_authorities")
 
   userRoles UserRole[]
 
@@ -54,7 +58,7 @@ model Role {
   @@unique([name, groupName])
 }
 
-enum Authoity {
+enum Authority {
   MEMBER_UPDATE
   MEMBER_DELETE
   ROLE_CREATE

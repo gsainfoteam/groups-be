@@ -34,9 +34,9 @@ export class GroupController {
   @UseGuards(UserGuard)
   async getGroupList(
     @Query() getGroupListRequestDto: GetGroupListRequestDto,
-    @GetUser() user?: User,
+    @GetUser() user: User,
   ) {
-    return this.groupService.getGroupList(getGroupListRequestDto, user?.uuid);
+    return this.groupService.getGroupList(getGroupListRequestDto, user.uuid);
   }
 
   // 테스트 완료

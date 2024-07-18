@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { Authoity, Group, Role } from '@prisma/client';
+import { Authority, Group, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -47,10 +47,10 @@ export class RoleRepository {
     {
       name,
       groupName,
-      authoities,
-      externalAuthoities,
+      authorities,
+      externalAuthorities,
     }: Pick<Role, 'name' | 'groupName'> &
-      Partial<Pick<Role, 'authoities' | 'externalAuthoities'>>,
+      Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
     userUuid: string,
   ): Promise<Role> {
     this.logger.log(`Creating role ${name} for group ${groupName}`);
@@ -60,8 +60,8 @@ export class RoleRepository {
           id:
             (await this.prismaService.role.count({ where: { groupName } })) + 1,
           name,
-          authoities,
-          externalAuthoities,
+          authorities,
+          externalAuthorities,
           Group: {
             connect: {
               name: groupName,
@@ -69,8 +69,8 @@ export class RoleRepository {
                 some: {
                   userUuid,
                   Role: {
-                    authoities: {
-                      has: Authoity.ROLE_CREATE,
+                    authorities: {
+                      has: Authority.ROLE_CREATE,
                     },
                   },
                 },
@@ -106,10 +106,10 @@ export class RoleRepository {
     {
       id,
       groupName,
-      authoities,
-      externalAuthoities,
+      authorities,
+      externalAuthorities,
     }: Pick<Role, 'groupName' | 'id'> &
-      Partial<Pick<Role, 'authoities' | 'externalAuthoities'>>,
+      Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
     userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
@@ -124,8 +124,8 @@ export class RoleRepository {
               some: {
                 userUuid,
                 Role: {
-                  authoities: {
-                    has: Authoity.ROLE_UPDATE,
+                  authorities: {
+                    has: Authority.ROLE_UPDATE,
                   },
                 },
               },
@@ -133,8 +133,8 @@ export class RoleRepository {
           },
         },
         data: {
-          authoities,
-          externalAuthoities,
+          authorities,
+          externalAuthorities,
         },
       })
       .catch((error) => {
@@ -172,8 +172,8 @@ export class RoleRepository {
               some: {
                 userUuid,
                 Role: {
-                  authoities: {
-                    has: Authoity.ROLE_DELETE,
+                  authorities: {
+                    has: Authority.ROLE_DELETE,
                   },
                 },
               },
