@@ -7,7 +7,7 @@ async function bootstrap() {
   // swagger config
   const config = new DocumentBuilder()
     .setTitle('Vapor-auth API')
-    .setDescription('The Vapor-auth API description')
+    .setDescription('The Vapor-auth API')
     .setVersion('1.0')
     .addBearerAuth(
       {
