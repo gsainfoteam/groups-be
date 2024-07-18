@@ -18,7 +18,7 @@ export class IdpService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.idpUrl = this.configService.getOrThrow<string>('IDP_URL');
+    this.idpUrl = this.configService.getOrThrow<string>('IDP_URL') + '/oauth';
   }
 
   /**

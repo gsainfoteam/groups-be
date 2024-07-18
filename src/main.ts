@@ -41,7 +41,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      oauth2RedirectUrl: `${process.env.CURRENT_URL}/api/oauth2-redirect.html`,
+      oauth2RedirectUrl: `${process.env.BASE_URL}/api/oauth2-redirect.html`,
     },
   });
   // start server
