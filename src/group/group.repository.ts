@@ -348,8 +348,9 @@ export class GroupRepository {
     userUuid: string,
   ): Promise<void> {
     this.logger.log('addUserRole');
-    try {
-      await this.prismaService.userRole.create({
+
+    await this.prismaService.userRole
+      .create({
         data: {
           User: {
             connect: {
@@ -380,20 +381,19 @@ export class GroupRepository {
             },
           },
         },
-      });
-      this.logger.log(
-        `UserRole [${userUuid}, ${groupName}, ${roleId}] created`,
-      );
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          this.logger.error(`UserRole already exists`);
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') {
+            this.logger.error(`UserRole already exists`);
+            throw new ConflictException();
+          }
         }
-      } else {
-        this.logger.error('Failed to create UserRole', error);
-        throw error;
-      }
-    }
+        this.logger.error('Failed to create UserRole', err);
+        throw new InternalServerErrorException('Database error');
+      });
+
+    this.logger.log(`UserRole [${userUuid}, ${groupName}, ${roleId}] created`);
   }
 
   async getUserRoles(
@@ -402,23 +402,29 @@ export class GroupRepository {
     userUuid: string,
   ): Promise<Role[]> {
     this.logger.log('getUserRoles');
-    return this.prismaService.role.findMany({
-      where: {
-        userRoles: {
-          some: {
-            userUuid: targetUuid,
-            Group: {
-              name: groupName,
-              users: {
-                some: {
-                  userUuid,
+    return this.prismaService.role
+      .findMany({
+        where: {
+          userRoles: {
+            some: {
+              userUuid: targetUuid,
+              Group: {
+                name: groupName,
+                users: {
+                  some: {
+                    userUuid,
+                  },
                 },
               },
             },
           },
         },
-      },
-    });
+      })
+      .catch((err) => {
+        this.logger.error('getUserRoles');
+        this.logger.debug(err);
+        throw new InternalServerErrorException('database error');
+      });
   }
 
   async deleteUserRole(
@@ -428,8 +434,9 @@ export class GroupRepository {
     userUuid: string,
   ): Promise<void> {
     this.logger.log('deleteUserRole');
-    try {
-      await this.prismaService.userRole.deleteMany({
+
+    await this.prismaService.userRole
+      .deleteMany({
         where: {
           userUuid: targetUuid,
           Role: {
@@ -451,15 +458,15 @@ export class GroupRepository {
             },
           },
         },
-      });
-    } catch (err) {
-      if (err instanceof PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') {
-          throw new NotFoundException('User role not found');
+      })
+      .catch((err) => {
+        if (err instanceof PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new NotFoundException('User role not found');
+          }
         }
-      }
-      this.logger.error(`Failed to delete user role: ${err.message}`);
-      throw new InternalServerErrorException('Failed to delete user role');
-    }
+        this.logger.error(`Failed to delete user role: ${err.message}`);
+        throw new InternalServerErrorException('Failed to delete user role');
+      });
   }
 }
