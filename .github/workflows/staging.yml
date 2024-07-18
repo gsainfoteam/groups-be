@@ -67,7 +67,7 @@ jobs:
           ECR_REPOSITORY: ${{ needs.build.outputs.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ needs.build.outputs.IMAGE_TAG }}
         run: |
-          sed -i "s|image:.*|image: $ECR_REGISTRY\/$ECR_REPOSITORY:$IMAGE_TAG|g" infoteam/service/vapor/auth-stg.yaml
+          sed -i "s|image:.*|image: $ECR_REGISTRY\/$ECR_REPOSITORY:$IMAGE_TAG|g" infoteam/service/vapor/auth.stg.yaml
 
       - name: Commit and Push
         env:
