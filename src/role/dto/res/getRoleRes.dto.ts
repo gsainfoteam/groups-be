@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Authoity, Role } from '@prisma/client';
+import { Authority, Role } from '@prisma/client';
 
 export class GetRoleResDto implements Omit<Role, 'groupName'> {
   @ApiProperty({
@@ -18,13 +18,13 @@ export class GetRoleResDto implements Omit<Role, 'groupName'> {
     description: 'List of authorities',
     example: ['ROLE_CREATE'],
   })
-  authoities: Authoity[];
+  authorities: Authority[];
 
   @ApiProperty({
     description: 'List of external authorities',
     example: ['ZIGGLE_NOTICE_CREATE'],
   })
-  externalAuthoities: string[];
+  externalAuthorities: string[];
 }
 
 export class GetRoleListResDto {
