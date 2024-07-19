@@ -2,6 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider            = "prisma-dbml-generator"
+  projectName         = "vapor-auth"
+  projectDatabaseType = "PostgreSQL"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -11,18 +17,18 @@ model User {
   uuid      String   @id @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
-  groups UserGroup[]
-  roles  UserRole[]
+  groups      UserGroup[]
+  roles       UserRole[]
   ownedGroups Group[]
 
   @@map("user")
 }
 
 model Group {
-  name        String   @id
-  description String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  presidentUuid String @db.Uuid @map("president_uuid")
+  name          String   @id
+  description   String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  presidentUuid String   @map("president_uuid") @db.Uuid
 
   president User @relation(fields: [presidentUuid], references: [uuid])
 
@@ -45,12 +51,12 @@ model UserGroup {
 }
 
 model Role {
-  id                 Int
-  name               String
-  groupName          String     @map("group_name")
-  Group              Group      @relation(fields: [groupName], references: [name], onDelete: Cascade)
+  id                  Int
+  name                String
+  groupName           String      @map("group_name")
+  Group               Group       @relation(fields: [groupName], references: [name], onDelete: Cascade)
   authorities         Authority[] @map("authorities")
-  externalAuthorities String[]   @map("external_authorities")
+  externalAuthorities String[]    @map("external_authorities")
 
   userRoles UserRole[]
 

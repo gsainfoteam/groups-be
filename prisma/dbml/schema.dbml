@@ -1,0 +1,91 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Project "vapor-auth" {
+  database_type: 'PostgreSQL'
+  Note: ''
+}
+
+Table user {
+  uuid String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  groups user_group [not null]
+  roles user_role [not null]
+  ownedGroups group [not null]
+}
+
+Table group {
+  name String [pk]
+  description String
+  createdAt DateTime [default: `now()`, not null]
+  presidentUuid String [not null]
+  president user [not null]
+  users user_group [not null]
+  roles Role [not null]
+  userRoles user_role [not null]
+}
+
+Table user_group {
+  userUuid String [not null]
+  User user [not null]
+  groupName String [not null]
+  Group group [not null]
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (userUuid, groupName) [pk]
+  }
+}
+
+Table Role {
+  id Int [not null]
+  name String [not null]
+  groupName String [not null]
+  Group group [not null]
+  authorities Authority[] [not null]
+  externalAuthorities String[] [not null]
+  userRoles user_role [not null]
+
+  indexes {
+    (id, groupName) [pk]
+    (name, groupName) [unique]
+  }
+}
+
+Table user_role {
+  userUuid String [not null]
+  User user [not null]
+  groupName String [not null]
+  Group group [not null]
+  roleId Int [not null]
+  Role Role [not null]
+
+  indexes {
+    (userUuid, groupName) [pk]
+  }
+}
+
+Enum Authority {
+  MEMBER_UPDATE
+  MEMBER_DELETE
+  ROLE_CREATE
+  ROLE_UPDATE
+  ROLE_DELETE
+  GROUP_UPDATE
+  GROUP_DELETE
+}
+
+Ref: group.presidentUuid > user.uuid
+
+Ref: user_group.userUuid > user.uuid
+
+Ref: user_group.groupName > group.name [delete: Cascade]
+
+Ref: Role.groupName > group.name [delete: Cascade]
+
+Ref: user_role.userUuid > user.uuid
+
+Ref: user_role.groupName > group.name [delete: Cascade]
+
+Ref: user_role.(roleId, groupName) > Role.(id, groupName) [delete: Cascade]
