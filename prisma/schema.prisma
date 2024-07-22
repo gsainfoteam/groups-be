@@ -4,7 +4,7 @@ generator client {
 
 generator dbml {
   provider            = "prisma-dbml-generator"
-  projectName         = "vapor-auth"
+  projectName         = "vapor_auth_be"
   projectDatabaseType = "PostgreSQL"
 }
 

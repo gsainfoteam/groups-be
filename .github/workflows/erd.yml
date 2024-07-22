@@ -19,7 +19,7 @@ jobs:
         run: sudo npm install -g prisma-dbml-generator
 
       - name: Generate dbml
-        run: prisma generate
+        run: npx prisma generate
 
       - name: Install dbdocs
         run: sudo npm install -g dbdocs
