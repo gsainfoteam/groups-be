@@ -9,14 +9,6 @@ async function bootstrap() {
     .setTitle('Vapor-auth API')
     .setDescription('The Vapor-auth API')
     .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        in: 'header',
-      },
-      'access-token',
-    )
     .addOAuth2(
       {
         type: 'oauth2',
