@@ -2,7 +2,7 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
-Project "vapor-auth" {
+Project "vapor_auth_be" {
   database_type: 'PostgreSQL'
   Note: ''
 }
