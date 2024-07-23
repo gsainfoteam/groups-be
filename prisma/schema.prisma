@@ -13,6 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Authority {
+  MEMBER_UPDATE
+  MEMBER_DELETE
+  ROLE_CREATE
+  ROLE_UPDATE
+  ROLE_DELETE
+  GROUP_UPDATE
+  GROUP_DELETE
+}
+
 model User {
   uuid      String   @id @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
@@ -62,16 +72,6 @@ model Role {
 
   @@id([id, groupName])
   @@unique([name, groupName])
-}
-
-enum Authority {
-  MEMBER_UPDATE
-  MEMBER_DELETE
-  ROLE_CREATE
-  ROLE_UPDATE
-  ROLE_DELETE
-  GROUP_UPDATE
-  GROUP_DELETE
 }
 
 model UserRole {
