@@ -35,7 +35,8 @@ model User {
 }
 
 model Group {
-  name          String   @id
+  uuid          String   @id @db.Uuid
+  name          String   @unique
   description   String?
   createdAt     DateTime @default(now()) @map("created_at")
   presidentUuid String   @map("president_uuid") @db.Uuid
@@ -52,36 +53,36 @@ model Group {
 model UserGroup {
   userUuid  String   @map("user_uuid") @db.Uuid
   User      User     @relation(fields: [userUuid], references: [uuid])
-  groupName String   @map("group_name")
-  Group     Group    @relation(fields: [groupName], references: [name], onDelete: Cascade)
+  groupUuid String   @map("group_uuid") @db.Uuid
+  Group     Group    @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@id([userUuid, groupName])
+  @@id([userUuid, groupUuid])
   @@map("user_group")
 }
 
 model Role {
   id                  Int
   name                String
-  groupName           String      @map("group_name")
-  Group               Group       @relation(fields: [groupName], references: [name], onDelete: Cascade)
+  groupUuid           String      @map("group_uuid") @db.Uuid
+  Group               Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
   authorities         Authority[] @map("authorities")
   externalAuthorities String[]    @map("external_authorities")
 
   userRoles UserRole[]
 
-  @@id([id, groupName])
-  @@unique([name, groupName])
+  @@id([id, groupUuid])
+  @@unique([name, groupUuid])
 }
 
 model UserRole {
   userUuid  String @map("user_uuid") @db.Uuid
   User      User   @relation(fields: [userUuid], references: [uuid])
-  groupName String @map("group_name")
-  Group     Group  @relation(fields: [groupName], references: [name], onDelete: Cascade)
+  groupUuid String @map("group_uuid") @db.Uuid
+  Group     Group  @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
   roleId    Int    @map("role_id")
-  Role      Role   @relation(fields: [roleId, groupName], references: [id, groupName], onDelete: Cascade)
+  Role      Role   @relation(fields: [roleId, groupUuid], references: [id, groupUuid], onDelete: Cascade)
 
-  @@id([userUuid, groupName])
+  @@id([userUuid, groupUuid])
   @@map("user_role")
 }
