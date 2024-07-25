@@ -9,5 +9,6 @@
     "libvips",
     "nestjs",
     "noreply"
-  ]
+  ],
+  "git.branchProtection": ["main"]
 }
