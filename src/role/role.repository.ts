@@ -28,7 +28,7 @@ export class RoleRepository {
       where: {
         Group: {
           name,
-          users: {
+          UserGroup: {
             some: {
               userUuid,
             },
@@ -46,26 +46,26 @@ export class RoleRepository {
   async createRole(
     {
       name,
-      groupName,
+      groupUuid,
       authorities,
       externalAuthorities,
-    }: Pick<Role, 'name' | 'groupName'> &
+    }: Pick<Role, 'name' | 'groupUuid'> &
       Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
     userUuid: string,
   ): Promise<Role> {
-    this.logger.log(`Creating role ${name} for group ${groupName}`);
+    this.logger.log(`Creating role ${name} for group ${groupUuid}`);
     return this.prismaService.role
       .create({
         data: {
           id:
-            (await this.prismaService.role.count({ where: { groupName } })) + 1,
+            (await this.prismaService.role.count({ where: { groupUuid } })) + 1,
           name,
           authorities,
           externalAuthorities,
           Group: {
             connect: {
-              name: groupName,
-              userRoles: {
+              uuid: groupUuid,
+              UserRole: {
                 some: {
                   userUuid,
                   Role: {
@@ -82,11 +82,11 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.debug(`Role already exists for group ${groupName}`);
+            this.logger.debug(`Role already exists for group ${groupUuid}`);
             throw new ConflictException('Role already exists');
           }
           if (error.code === 'P2025') {
-            this.logger.debug(`Group ${groupName} not found`);
+            this.logger.debug(`Group ${groupUuid} not found`);
             throw new ForbiddenException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -105,22 +105,22 @@ export class RoleRepository {
   async updateRole(
     {
       id,
-      groupName,
+      groupUuid,
       authorities,
       externalAuthorities,
-    }: Pick<Role, 'groupName' | 'id'> &
+    }: Pick<Role, 'groupUuid' | 'id'> &
       Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
     userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
       .update({
         where: {
-          id_groupName: {
+          id_groupUuid: {
             id,
-            groupName,
+            groupUuid,
           },
           Group: {
-            userRoles: {
+            UserRole: {
               some: {
                 userUuid,
                 Role: {
@@ -140,7 +140,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Group ${groupName} not found`);
+            this.logger.debug(`Group ${groupUuid} not found`);
             throw new ForbiddenException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -157,18 +157,18 @@ export class RoleRepository {
    * @returns the deleted role
    */
   async deleteRole(
-    { id, groupName }: Pick<Role, 'groupName' | 'id'>,
+    { id, groupUuid }: Pick<Role, 'groupUuid' | 'id'>,
     userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
       .delete({
         where: {
-          id_groupName: {
+          id_groupUuid: {
             id,
-            groupName,
+            groupUuid,
           },
           Group: {
-            userRoles: {
+            UserRole: {
               some: {
                 userUuid,
                 Role: {
@@ -184,7 +184,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Role not found for group ${groupName}`);
+            this.logger.debug(`Role not found for group ${groupUuid}`);
             throw new ForbiddenException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);

@@ -4,7 +4,7 @@ import { GroupRepository } from './group.repository';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
-import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMember.dto';
 import { Role } from '@prisma/client';
 import { DeleteUserRoleDto } from './dto/req/deleteUserRole.dto';
 

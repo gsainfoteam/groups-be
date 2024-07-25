@@ -8,7 +8,7 @@ export class CreateUserRoleDto {
 
   @ApiProperty({ description: 'Group UUID' })
   @IsString()
-  groupName: string;
+  groupUuid: string;
 
   @ApiProperty({ description: 'Role ID' })
   @IsInt()

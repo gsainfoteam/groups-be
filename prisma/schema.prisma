@@ -27,25 +27,25 @@ model User {
   uuid      String   @id @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
-  groups      UserGroup[]
-  roles       UserRole[]
-  ownedGroups Group[]
+  UserGroup  UserGroup[]
+  UserRole   UserRole[]
+  OwnedGroup Group[]
 
   @@map("user")
 }
 
 model Group {
-  uuid          String   @id @db.Uuid
+  uuid          String   @id @default(uuid()) @db.Uuid
   name          String   @unique
   description   String?
   createdAt     DateTime @default(now()) @map("created_at")
   presidentUuid String   @map("president_uuid") @db.Uuid
 
-  president User @relation(fields: [presidentUuid], references: [uuid])
+  President User @relation(fields: [presidentUuid], references: [uuid])
 
-  users     UserGroup[]
-  roles     Role[]
-  userRoles UserRole[]
+  UserGroup UserGroup[]
+  Role      Role[]
+  UserRole  UserRole[]
 
   @@map("group")
 }
@@ -69,7 +69,7 @@ model Role {
   authorities         Authority[] @map("authorities")
   externalAuthorities String[]    @map("external_authorities")
 
-  userRoles UserRole[]
+  userRole UserRole[]
 
   @@id([id, groupUuid])
   @@unique([name, groupUuid])
