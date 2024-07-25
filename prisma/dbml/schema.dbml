@@ -16,7 +16,8 @@ Table user {
 }
 
 Table group {
-  name String [pk]
+  uuid String [pk]
+  name String [unique, not null]
   description String
   createdAt DateTime [default: `now()`, not null]
   presidentUuid String [not null]
@@ -29,40 +30,40 @@ Table group {
 Table user_group {
   userUuid String [not null]
   User user [not null]
-  groupName String [not null]
+  groupUuid String [not null]
   Group group [not null]
   createdAt DateTime [default: `now()`, not null]
 
   indexes {
-    (userUuid, groupName) [pk]
+    (userUuid, groupUuid) [pk]
   }
 }
 
 Table Role {
   id Int [not null]
   name String [not null]
-  groupName String [not null]
+  groupUuid String [not null]
   Group group [not null]
   authorities Authority[] [not null]
   externalAuthorities String[] [not null]
   userRoles user_role [not null]
 
   indexes {
-    (id, groupName) [pk]
-    (name, groupName) [unique]
+    (id, groupUuid) [pk]
+    (name, groupUuid) [unique]
   }
 }
 
 Table user_role {
   userUuid String [not null]
   User user [not null]
-  groupName String [not null]
+  groupUuid String [not null]
   Group group [not null]
   roleId Int [not null]
   Role Role [not null]
 
   indexes {
-    (userUuid, groupName) [pk]
+    (userUuid, groupUuid) [pk]
   }
 }
 
@@ -80,12 +81,12 @@ Ref: group.presidentUuid > user.uuid
 
 Ref: user_group.userUuid > user.uuid
 
-Ref: user_group.groupName > group.name [delete: Cascade]
+Ref: user_group.groupUuid > group.uuid [delete: Cascade]
 
-Ref: Role.groupName > group.name [delete: Cascade]
+Ref: Role.groupUuid > group.uuid [delete: Cascade]
 
 Ref: user_role.userUuid > user.uuid
 
-Ref: user_role.groupName > group.name [delete: Cascade]
+Ref: user_role.groupUuid > group.uuid [delete: Cascade]
 
-Ref: user_role.(roleId, groupName) > Role.(id, groupName) [delete: Cascade]
+Ref: user_role.(roleId, groupUuid) > Role.(id, groupUuid) [delete: Cascade]
