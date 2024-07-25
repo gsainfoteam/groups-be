@@ -5,7 +5,7 @@ on:
     paths:
       - 'prisma/schema.prisma'
     branches:
-      - master
+      - main
 
 jobs:
   build:
