@@ -20,7 +20,7 @@ import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMember.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
@@ -114,10 +114,10 @@ export class GroupController {
     return this.groupService.getUserRoles(target, groupName, user.uuid);
   }
 
-  @Post('/:groupName/member/:uuid/role/:id')
+  @Post('/:groupUuid/member/:uuid/role/:id')
   @UseGuards(UserGuard)
   async addUserRole(
-    @Param('groupName') groupName: string,
+    @Param('groupUuid') groupUuid: string,
     @Param('uuid') userUuid: string,
     @Param('id') roleId: number,
     @GetUser() user: User,
@@ -125,7 +125,7 @@ export class GroupController {
     return this.groupService.addUserRole(
       {
         createUserUuid: userUuid,
-        groupName,
+        groupUuid,
         roleId,
       },
       user.uuid,

@@ -10,9 +10,9 @@ Project "vapor_auth_be" {
 Table user {
   uuid String [pk]
   createdAt DateTime [default: `now()`, not null]
-  groups user_group [not null]
-  roles user_role [not null]
-  ownedGroups group [not null]
+  UserGroup user_group [not null]
+  UserRole user_role [not null]
+  OwnedGroup group [not null]
 }
 
 Table group {
@@ -21,10 +21,10 @@ Table group {
   description String
   createdAt DateTime [default: `now()`, not null]
   presidentUuid String [not null]
-  president user [not null]
-  users user_group [not null]
-  roles Role [not null]
-  userRoles user_role [not null]
+  President user [not null]
+  UserGroup user_group [not null]
+  Role Role [not null]
+  UserRole user_role [not null]
 }
 
 Table user_group {
@@ -46,7 +46,7 @@ Table Role {
   Group group [not null]
   authorities Authority[] [not null]
   externalAuthorities String[] [not null]
-  userRoles user_role [not null]
+  userRole user_role [not null]
 
   indexes {
     (id, groupUuid) [pk]

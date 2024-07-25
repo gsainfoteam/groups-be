@@ -12,7 +12,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
-import { AddGroupMemberDto } from './dto/req/addGroupMemeber.dto';
+import { AddGroupMemberDto } from './dto/req/addGroupMember.dto';
 import { GroupFullContent } from './types/GroupListResponseType';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class GroupRepository {
     return this.prismaService.group
       .findMany({
         where: {
-          users: {
+          UserGroup: {
             some: {
               userUuid: userUuid,
             },
@@ -39,7 +39,7 @@ export class GroupRepository {
         include: {
           _count: {
             select: {
-              users: true,
+              UserGroup: true,
             },
           },
         },
@@ -63,7 +63,7 @@ export class GroupRepository {
         include: {
           _count: {
             select: {
-              users: true,
+              UserGroup: true,
             },
           },
         },
@@ -81,7 +81,7 @@ export class GroupRepository {
       .findUniqueOrThrow({
         where: {
           name: name,
-          users: {
+          UserGroup: {
             some: {
               userUuid,
             },
@@ -109,33 +109,32 @@ export class GroupRepository {
         data: {
           name,
           description,
-          users: {
+          President: {
+            connect: {
+              uuid: userUuid,
+            },
+          },
+          UserGroup: {
             create: {
               userUuid,
             },
           },
-          presidentUuid: userUuid,
-          userRoles: {
+          Role: {
             create: {
-              User: {
-                connect: {
-                  uuid: userUuid,
-                },
-              },
-              Role: {
+              id: 1,
+              name: 'admin',
+              authorities: [
+                Authority.GROUP_UPDATE,
+                Authority.GROUP_DELETE,
+                Authority.MEMBER_UPDATE,
+                Authority.MEMBER_DELETE,
+                Authority.ROLE_CREATE,
+                Authority.ROLE_UPDATE,
+                Authority.ROLE_DELETE,
+              ],
+              userRole: {
                 create: {
-                  id: 1,
-                  name: 'admin',
-                  groupName: name,
-                  authorities: [
-                    Authority.MEMBER_UPDATE,
-                    Authority.MEMBER_DELETE,
-                    Authority.GROUP_DELETE,
-                    Authority.GROUP_UPDATE,
-                    Authority.ROLE_DELETE,
-                    Authority.ROLE_UPDATE,
-                    Authority.ROLE_CREATE,
-                  ],
+                  userUuid,
                 },
               },
             },
@@ -166,7 +165,7 @@ export class GroupRepository {
       .update({
         where: {
           name,
-          userRoles: {
+          UserRole: {
             some: {
               userUuid,
               Role: {
@@ -199,7 +198,7 @@ export class GroupRepository {
       .delete({
         where: {
           name: name,
-          userRoles: {
+          UserRole: {
             some: {
               userUuid,
               Role: {
@@ -230,11 +229,11 @@ export class GroupRepository {
     return this.prismaService.user
       .findMany({
         where: {
-          groups: {
+          UserGroup: {
             some: {
               Group: {
                 name,
-                users: {
+                UserGroup: {
                   some: {
                     userUuid,
                   },
@@ -273,7 +272,7 @@ export class GroupRepository {
           Group: {
             connect: {
               name,
-              userRoles: {
+              UserRole: {
                 some: {
                   userUuid,
                   Role: {
@@ -305,7 +304,7 @@ export class GroupRepository {
   }
 
   async deleteGroupMember(
-    groupName: string,
+    groupUuid: string,
     deleteUserUuid: string,
     userUuid: string,
   ) {
@@ -313,12 +312,12 @@ export class GroupRepository {
     return this.prismaService.userGroup
       .delete({
         where: {
-          userUuid_groupName: {
+          userUuid_groupUuid: {
             userUuid: deleteUserUuid,
-            groupName,
+            groupUuid,
           },
           Group: {
-            userRoles: {
+            UserRole: {
               some: {
                 userUuid,
                 Role: {
@@ -344,7 +343,7 @@ export class GroupRepository {
   }
 
   async addUserRole(
-    { createUserUuid, groupName, roleId }: CreateUserRoleDto,
+    { createUserUuid, groupUuid, roleId }: CreateUserRoleDto,
     userUuid: string,
   ): Promise<void> {
     this.logger.log('addUserRole');
@@ -359,8 +358,8 @@ export class GroupRepository {
           },
           Group: {
             connect: {
-              name: groupName,
-              userRoles: {
+              uuid: groupUuid,
+              UserRole: {
                 some: {
                   userUuid,
                   Role: {
@@ -374,9 +373,9 @@ export class GroupRepository {
           },
           Role: {
             connect: {
-              id_groupName: {
+              id_groupUuid: {
                 id: roleId,
-                groupName,
+                groupUuid,
               },
             },
           },
@@ -393,7 +392,7 @@ export class GroupRepository {
         throw new InternalServerErrorException('Database error');
       });
 
-    this.logger.log(`UserRole [${userUuid}, ${groupName}, ${roleId}] created`);
+    this.logger.log(`UserRole [${userUuid}, ${groupUuid}, ${roleId}] created`);
   }
 
   async getUserRoles(
@@ -405,12 +404,12 @@ export class GroupRepository {
     return this.prismaService.role
       .findMany({
         where: {
-          userRoles: {
+          userRole: {
             some: {
               userUuid: targetUuid,
               Group: {
                 name: groupName,
-                users: {
+                UserGroup: {
                   some: {
                     userUuid,
                   },
@@ -444,7 +443,7 @@ export class GroupRepository {
           },
           Group: {
             name: groupName,
-            userRoles: {
+            UserRole: {
               some: {
                 User: {
                   uuid: userUuid,

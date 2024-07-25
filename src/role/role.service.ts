@@ -16,12 +16,12 @@ export class RoleService {
    * @returns the list of roles for the group
    */
   async getRoles(
-    groupName: string,
+    groupUuid: string,
     userUuid: string,
   ): Promise<GetRoleListResDto> {
-    this.logger.log(`Retrieving roles for group ${groupName}`);
+    this.logger.log(`Retrieving roles for group ${groupUuid}`);
     return {
-      list: await this.roleRepository.getRoles({ name: groupName }, userUuid),
+      list: await this.roleRepository.getRoles({ name: groupUuid }, userUuid),
     };
   }
 
@@ -33,13 +33,13 @@ export class RoleService {
    * @returns the created role
    */
   async createRole(
-    groupName: string,
+    groupUuid: string,
     createRoleDto: CreateRoleDto,
     userUuid: string,
   ): Promise<void> {
     this.logger.log(`Creating role`);
     await this.roleRepository.createRole(
-      { groupName, ...createRoleDto },
+      { groupUuid, ...createRoleDto },
       userUuid,
     );
   }
@@ -52,14 +52,14 @@ export class RoleService {
    * @param userUuid the uuid of the user
    */
   async updateRole(
-    groupName: string,
+    groupUuid: string,
     id: number,
     updateRoleDto: UpdateRoleDto,
     userUuid: string,
   ): Promise<void> {
     this.logger.log(`Updating role`);
     await this.roleRepository.updateRole(
-      { id, groupName, ...updateRoleDto },
+      { id, groupUuid, ...updateRoleDto },
       userUuid,
     );
   }
@@ -71,11 +71,11 @@ export class RoleService {
    * @param userUuid the uuid of the user
    */
   async deleteRole(
-    groupName: string,
+    groupUuid: string,
     id: number,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`Deleting role ${id} for group ${groupName}`);
-    await this.roleRepository.deleteRole({ groupName, id }, userUuid);
+    this.logger.log(`Deleting role ${id} for group ${groupUuid}`);
+    await this.roleRepository.deleteRole({ groupUuid, id }, userUuid);
   }
 }
