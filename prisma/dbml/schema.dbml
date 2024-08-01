@@ -2,7 +2,7 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
-Project "vapor_auth_be" {
+Project "groups" {
   database_type: 'PostgreSQL'
   Note: ''
 }
