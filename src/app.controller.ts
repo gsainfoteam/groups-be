@@ -7,7 +7,6 @@ import {
 } from '@nestjs/swagger';
 
 @Controller()
-@ApiTags('health-check')
 export class AppController {
   @ApiOperation({
     summary: 'Health check',
