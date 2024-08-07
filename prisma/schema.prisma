@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Grant {
+  APPROVE
+  REJECT
+}
+
 enum Authority {
   MEMBER_UPDATE
   MEMBER_DELETE
@@ -21,6 +26,18 @@ enum Authority {
   ROLE_DELETE
   GROUP_UPDATE
   GROUP_DELETE
+}
+
+model Client {
+  uuid     String @id @default(uuid()) @db.Uuid
+  name     String @unique
+  password String
+  grant    Grant  @default(REJECT)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("client")
 }
 
 model User {
@@ -73,6 +90,7 @@ model Role {
 
   @@id([id, groupUuid])
   @@unique([name, groupUuid])
+  @@map("role")
 }
 
 model UserRole {
