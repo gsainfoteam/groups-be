@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Client } from '@prisma/client';
+import { Client, Grant } from '@prisma/client';
 
 export class ClientResDto implements Client {
   @ApiProperty()
@@ -16,4 +16,9 @@ export class ClientResDto implements Client {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty({
+    enum: Grant,
+  })
+  grant: Grant;
 }

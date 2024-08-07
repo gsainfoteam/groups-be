@@ -11,14 +11,16 @@ GIST에 동아리와 같은 그룹을 만들고, 인원을 관리하는 시스�
 
 본 문서에서 다루는 주체는 하나가 아닌 여러 개가 존재한다.  
 따라서 이들을 정리할 필요가 있다.  
-먼저, 본 프로젝트는 groups라고 명명한다. 또한 [Infoteam-IdP](https://github.com/gsainfoteam/idp-be)는 IdP라고 명명한다. 마지막으로, 이 프로젝트를 이용하여 다른 기능을 제공하는 주체를 서비스라고 명명한다.
+먼저, 본 프로젝트는 groups라고 명명한다. 또한 [Infoteam-IdP](https://github.com/gsainfoteam/idp-be)는 IdP라고 명명한다. 마지막으로, 이 프로젝트를 이용하여 다른 기능을 제공하는 주체를 client 라고 명명한다.
 
 ### 프로젝트에서 사용되는 Token에 관한 정리
 
 본 프로젝트에서는 IdP에서 발급하는 access token를 IdP token, groups에서 사용자가 포함되어 있는 그룹을 인증하기 위한 token을 group certificate token (줄여서 group cert token) 이라고 명명한다.  
-또한, IdP를 발급하는 주체에 따라서 groups에서 발급한 token을 groups IdP token, 서비스에서 발급한 token을 service IdP token이라고 한다.
+이때, IdP를 발급하는 주체에 따라서 groups에서 발급한 token을 groups IdP token, client 에서 발급한 token을 client IdP token이라고 한다.
+또한, groups 로그인을 위해서 발급하는 토큰을 groups token 이라고 하자.
 
-따라서 본 프로젝트에서는 groups IdP token, service IdP token, group cert token, 총 3개의 토큰이 다루어진다.
+따라서 본 프로젝트에서는 groups IdP token, service IdP token, group cert token, groups token 총 4개의 토큰이 다루어진다.  
+하지만, client를 구분하지 않는 IdP token의 특성 상, service IdP token과 group IdP token은 서로 같다는 것에 유의하자.  
 
 ## API DOCS
 

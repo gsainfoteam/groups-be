@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // load config service
+  const configService = app.get(ConfigService);
   // swagger config
   const config = new DocumentBuilder()
     .setTitle('Vapor-auth API')
@@ -17,8 +20,8 @@ async function bootstrap() {
         bearerFormat: 'token',
         flows: {
           authorizationCode: {
-            authorizationUrl: 'https://stg.idp.gistory.me/authorize',
-            tokenUrl: 'https://api.stg.idp.gistory.me/oauth/token',
+            authorizationUrl: configService.get('IDP_AUTH_URL'),
+            tokenUrl: configService.get('IDP_TOKEN_URL'),
             scopes: {
               openid: 'openid',
               email: 'email',
