@@ -4,10 +4,11 @@ import { GroupService } from './group.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { GroupRepository } from './group.repository';
 
 @Module({
   imports: [PrismaModule, AuthModule, RedisModule],
   controllers: [GroupController],
-  providers: [GroupService],
+  providers: [GroupService, GroupRepository],
 })
 export class GroupModule {}

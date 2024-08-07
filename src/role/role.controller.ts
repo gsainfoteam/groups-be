@@ -27,7 +27,7 @@ import { User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { RoleListResDto } from './dto/res/RoleRes.dto';
+import { RoleListResDto } from './dto/res/roleRes.dto';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')

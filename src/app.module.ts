@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { GroupModule } from './group/group.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     AuthModule,
     UserModule,
     GroupModule,
+    RoleModule,
   ],
   controllers: [AppController],
 })
