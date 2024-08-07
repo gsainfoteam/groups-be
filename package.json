@@ -24,6 +24,7 @@
     "libvips": "8.14.3"
   },
   "dependencies": {
+    "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
@@ -37,6 +38,7 @@
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "ioredis": "^5.4.1",
     "passport-http-bearer": "^1.0.1",
     "passport-oauth2": "^1.8.0",
     "reflect-metadata": "^0.2.0",

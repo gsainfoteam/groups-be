@@ -1,33 +1,30 @@
 import { Controller, Get } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
 } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
+  private readonly apiVersion =
+    this.configService.getOrThrow<string>('API_VERSION');
+  private readonly publishedAt = new Date().toISOString();
+  constructor(private readonly configService: ConfigService) {}
+
   @ApiOperation({
-    summary: 'Health check',
-    description: 'Check if the server is up and running',
+    summary: 'API INFO',
+    description: 'API 서버의 정보를 확인합니다.',
   })
-  @ApiOkResponse({
-    description: 'Server is up and running',
-    content: {
-      'application/json': {
-        examples: {
-          pong: {
-            value: 'pong',
-            description: 'Server is up and running',
-          },
-        },
-      },
-    },
-  })
-  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiOkResponse()
+  @ApiInternalServerErrorResponse()
   @Get()
-  async health(): Promise<string> {
-    return 'pong';
+  async health() {
+    return {
+      name: 'Groups',
+      version: this.apiVersion,
+      publishedAt: this.publishedAt,
+    };
   }
 }

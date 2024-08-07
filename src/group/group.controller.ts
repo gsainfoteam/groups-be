@@ -25,6 +25,7 @@ import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
+import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -81,6 +82,45 @@ export class GroupController {
     description:
       '그룹을 삭제하는 API 입니다. 삭제시 그룹의 모든 정보가 삭제됩니다.',
   })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
   @Delete(':uuid')
-  async deleteGroup(): Promise<void> {}
+  async deleteGroup(
+    @Param('uuid') uuid: string,
+    @GetUser() user: User,
+  ): Promise<void> {
+    this.groupService.deleteGroup(uuid, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Create an invite code',
+    description:
+      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다.',
+  })
+  @ApiCreatedResponse({ type: InviteCodeResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Post(':uuid/invite')
+  async createInviteCode(
+    @Param('uuid') uuid: string,
+    @GetUser() user: User,
+  ): Promise<InviteCodeResDto> {
+    return this.groupService.createInviteCode(uuid, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Join a group',
+    description: '그룹에 가입하는 API 입니다.',
+  })
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Post('join')
+  async joinGroup(
+    @Body('code') code: string,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.joinMember(code, user.uuid);
+  }
 }

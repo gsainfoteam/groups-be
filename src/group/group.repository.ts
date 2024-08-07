@@ -51,6 +51,29 @@ export class GroupRepository {
       });
   }
 
+  async validateAuthority(
+    uuid: string,
+    authorities: Authority[],
+    userUuid: string,
+  ): Promise<Group | null> {
+    this.logger.log(`validateAuthority: ${uuid}, ${authorities}`);
+    return this.prismaService.group.findUnique({
+      where: {
+        uuid,
+        UserRole: {
+          some: {
+            userUuid,
+            Role: {
+              authorities: {
+                hasSome: authorities,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async createGroup(
     {
       name,
@@ -101,5 +124,24 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+  }
+
+  async deleteGroup(uuid: string): Promise<void> {
+    this.logger.log(`deleteGroup: ${uuid}`);
+    await this.prismaService.group.delete({
+      where: {
+        uuid,
+      },
+    });
+  }
+
+  async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
+    this.logger.log(`addUserToGroup: ${uuid}`);
+    await this.prismaService.userGroup.create({
+      data: {
+        userUuid,
+        groupUuid: uuid,
+      },
+    });
   }
 }
