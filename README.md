@@ -24,7 +24,7 @@ GIST에 동아리와 같은 그룹을 만들고, 인원을 관리하는 시스�
 
 API docs는 swagger로 구현이 되었으며, 각 문서는 아래의 페이지에서 확인할 수 있다.
 
-prod: <https://api.groups.gistory.me/api>
+prod: <https://api.groups.gistory.me/api>  
 stg: <https://api.stg.groups.gistory.me/api>
 
 ## DataBase Structure
