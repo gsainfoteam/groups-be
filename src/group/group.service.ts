@@ -1,89 +1,86 @@
-import { Injectable } from '@nestjs/common';
-import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { GroupRepository } from './group.repository';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
-import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { CreateUserRoleDto } from './dto/req/createUserRole.dto';
-import { AddGroupMemberDto } from './dto/req/addGroupMember.dto';
-import { Role } from '@prisma/client';
-import { DeleteUserRoleDto } from './dto/req/deleteUserRole.dto';
+import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import { Redis } from 'ioredis';
+import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
+import * as crypto from 'crypto';
+import { Authority } from '@prisma/client';
 
 @Injectable()
 export class GroupService {
-  constructor(private readonly groupRepository: GroupRepository) {}
+  private readonly logger = new Logger(GroupService.name);
+  private readonly inviteCodePrefix = 'inviteCode';
+  constructor(
+    private readonly groupRepository: GroupRepository,
+    @InjectRedis() private readonly redis: Redis,
+  ) {}
 
-  async getGroupList({ type }: GetGroupListRequestDto, userUuid: string) {
-    if (type === 'included') {
-      return this.groupRepository.getIncludedGroupList(userUuid);
-    } else if (type === 'all') {
-      return this.groupRepository.getAllGroupList(userUuid);
+  async getGroupList(userUuid: string): Promise<GroupListResDto> {
+    this.logger.log(`getGroupList`);
+    return { list: await this.groupRepository.getGroupList(userUuid) };
+  }
+
+  async getGroup(uuid: string, userUuid: string): Promise<GroupResDto> {
+    this.logger.log(`getGroup: ${uuid}`);
+    return this.groupRepository.getGroup(uuid, userUuid);
+  }
+
+  async createGroup(
+    createGroupDto: CreateGroupDto,
+    userUuid: string,
+  ): Promise<void> {
+    this.logger.log(`createGroup: ${createGroupDto.name}`);
+    await this.groupRepository.createGroup(createGroupDto, userUuid);
+  }
+
+  async deleteGroup(uuid: string, userUuid: string): Promise<void> {
+    this.logger.log(`deleteGroup: ${uuid}`);
+    if (
+      !(await this.groupRepository.validateAuthority(
+        uuid,
+        [Authority.GROUP_DELETE],
+        userUuid,
+      ))
+    ) {
+      throw new ForbiddenException(
+        'You do not have permission to delete group',
+      );
     }
+    await this.groupRepository.deleteGroup(uuid);
   }
 
-  async getGroup(name: string, userUuid: string) {
-    return this.groupRepository.getGroup(name, userUuid);
-  }
-
-  async createGroup(body: CreateGroupDto, userUuid: string) {
-    return this.groupRepository.createGroup(body, userUuid);
-  }
-
-  async updateGroup(name: string, body: UpdateGroupDto, userUuid: string) {
-    return this.groupRepository.updateGroup(name, body, userUuid);
-  }
-
-  async deleteGroup(name: string, userUuid: string) {
-    return this.groupRepository.deleteGroup(name, userUuid);
-  }
-
-  async getGroupMember(name: string, userUuid: string) {
-    return this.groupRepository.getGroupMember(name, userUuid);
-  }
-
-  async addGroupMember(
-    groupName: string,
-    body: AddGroupMemberDto,
+  async createInviteCode(
+    uuid: string,
     userUuid: string,
-  ) {
-    return this.groupRepository.addGroupMember(groupName, body, userUuid);
+  ): Promise<InviteCodeResDto> {
+    this.logger.log(`createInviteCode: ${uuid}`);
+    if (
+      !(await this.groupRepository.validateAuthority(
+        uuid,
+        [Authority.MEMBER_UPDATE],
+        userUuid,
+      ))
+    ) {
+      throw new ForbiddenException(
+        'You do not have permission to create an invite code',
+      );
+    }
+    const code = crypto
+      .randomBytes(32)
+      .toString('base64')
+      .replace(/[+\/=]/g, '');
+    await this.redis.set(`${this.inviteCodePrefix}:${code}`, uuid);
+    return { code };
   }
 
-  async deleteGroupMember(
-    groupName: string,
-    deleteUserUuid: string,
-    userUuid: string,
-  ) {
-    return this.groupRepository.deleteGroupMember(
-      groupName,
-      deleteUserUuid,
-      userUuid,
-    );
-  }
-
-  async addUserRole(
-    createUserRoleDto: CreateUserRoleDto,
-    userUuid: string,
-  ): Promise<void> {
-    return this.groupRepository.addUserRole(createUserRoleDto, userUuid);
-  }
-
-  async getUserRoles(
-    targetUuid: string,
-    groupName: string,
-    userUuid: string,
-  ): Promise<Role[]> {
-    return this.groupRepository.getUserRoles(targetUuid, groupName, userUuid);
-  }
-
-  async deleteUserRole(
-    { deleteUserUuid, groupName, roleId }: DeleteUserRoleDto,
-    userUuid: string,
-  ): Promise<void> {
-    await this.groupRepository.deleteUserRole(
-      deleteUserUuid,
-      roleId,
-      groupName,
-      userUuid,
-    );
+  async joinMember(code: string, userUuid: string): Promise<void> {
+    this.logger.log(`updateMember: ${code}`);
+    const uuid = await this.redis.get(`${this.inviteCodePrefix}:${code}`);
+    if (!uuid) {
+      throw new ForbiddenException('Invalid invite code');
+    }
+    await this.groupRepository.addUserToGroup(uuid, userUuid);
   }
 }

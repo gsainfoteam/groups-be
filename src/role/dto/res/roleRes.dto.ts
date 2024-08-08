@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Authority, Role } from '@prisma/client';
 
-export class GetRoleResDto implements Role {
+export class RoleResDto implements Role {
   @ApiProperty({
     description: 'Unique identifier of the role',
     example: 1,
@@ -25,18 +25,12 @@ export class GetRoleResDto implements Role {
     example: ['ROLE_CREATE'],
   })
   authorities: Authority[];
-
-  @ApiProperty({
-    description: 'List of external authorities',
-    example: ['ZIGGLE_NOTICE_CREATE'],
-  })
-  externalAuthorities: string[];
 }
 
-export class GetRoleListResDto {
+export class RoleListResDto {
   @ApiProperty({
     description: 'List of roles',
-    type: [GetRoleResDto],
+    type: [RoleResDto],
   })
-  list: GetRoleResDto[];
+  list: RoleResDto[];
 }

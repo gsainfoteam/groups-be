@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { GroupService } from './group.service';
 import { GroupController } from './group.controller';
-import { GroupRepository } from './group.repository';
+import { GroupService } from './group.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { UserModule } from 'src/user/user.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { GroupRepository } from './group.repository';
 
 @Module({
-  imports: [PrismaModule, UserModule],
-  providers: [GroupService, GroupRepository],
+  imports: [PrismaModule, AuthModule, RedisModule],
   controllers: [GroupController],
+  providers: [GroupService, GroupRepository],
 })
 export class GroupModule {}

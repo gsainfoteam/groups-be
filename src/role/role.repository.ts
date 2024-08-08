@@ -48,9 +48,7 @@ export class RoleRepository {
       name,
       groupUuid,
       authorities,
-      externalAuthorities,
-    }: Pick<Role, 'name' | 'groupUuid'> &
-      Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
+    }: Pick<Role, 'name' | 'groupUuid'> & Partial<Pick<Role, 'authorities'>>,
     userUuid: string,
   ): Promise<Role> {
     this.logger.log(`Creating role ${name} for group ${groupUuid}`);
@@ -61,7 +59,6 @@ export class RoleRepository {
             (await this.prismaService.role.count({ where: { groupUuid } })) + 1,
           name,
           authorities,
-          externalAuthorities,
           Group: {
             connect: {
               uuid: groupUuid,
@@ -107,9 +104,7 @@ export class RoleRepository {
       id,
       groupUuid,
       authorities,
-      externalAuthorities,
-    }: Pick<Role, 'groupUuid' | 'id'> &
-      Partial<Pick<Role, 'authorities' | 'externalAuthorities'>>,
+    }: Pick<Role, 'groupUuid' | 'id'> & Partial<Pick<Role, 'authorities'>>,
     userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
@@ -134,7 +129,6 @@ export class RoleRepository {
         },
         data: {
           authorities,
-          externalAuthorities,
         },
       })
       .catch((error) => {

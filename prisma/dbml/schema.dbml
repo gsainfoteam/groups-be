@@ -14,10 +14,34 @@ Table client {
   grant Grant [not null, default: 'REJECT']
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  ExternalAuthority client_authority [not null]
+}
+
+Table client_authority {
+  clientUuid String [not null]
+  Client client [not null]
+  authority String [not null]
+
+  indexes {
+    (clientUuid, authority) [pk]
+  }
+}
+
+Table role_authority {
+  roleId Int [not null]
+  roleGroupUuid String [not null]
+  Role role [not null]
+  authority String [not null]
+
+  indexes {
+    (roleId, roleGroupUuid, authority) [pk]
+  }
 }
 
 Table user {
   uuid String [pk]
+  name String [not null]
+  email String [unique, not null]
   createdAt DateTime [default: `now()`, not null]
   UserGroup user_group [not null]
   UserRole user_role [not null]
@@ -54,8 +78,8 @@ Table role {
   groupUuid String [not null]
   Group group [not null]
   authorities Authority[] [not null]
-  externalAuthorities String[] [not null]
   userRole user_role [not null]
+  RoleExternalAuthority role_authority [not null]
 
   indexes {
     (id, groupUuid) [pk]
@@ -90,6 +114,10 @@ Enum Authority {
   GROUP_UPDATE
   GROUP_DELETE
 }
+
+Ref: client_authority.clientUuid > client.uuid
+
+Ref: role_authority.(roleId, roleGroupUuid) > role.(id, groupUuid)
 
 Ref: group.presidentUuid > user.uuid
 

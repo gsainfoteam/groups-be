@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RoleRepository } from './role.repository';
-import { GetRoleListResDto } from './dto/res/getRoleRes.dto';
 import { CreateRoleDto } from './dto/req/createRole.dto';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
+import { RoleListResDto } from './dto/res/roleRes.dto';
 
 @Injectable()
 export class RoleService {
@@ -15,10 +15,7 @@ export class RoleService {
    * @param userUuid the uuid of the user
    * @returns the list of roles for the group
    */
-  async getRoles(
-    groupUuid: string,
-    userUuid: string,
-  ): Promise<GetRoleListResDto> {
+  async getRoles(groupUuid: string, userUuid: string): Promise<RoleListResDto> {
     this.logger.log(`Retrieving roles for group ${groupUuid}`);
     return {
       list: await this.roleRepository.getRoles({ name: groupUuid }, userUuid),

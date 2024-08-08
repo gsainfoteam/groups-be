@@ -37,11 +37,34 @@ model Client {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  ExternalAuthority ExternalAuthority[]
+
   @@map("client")
+}
+
+model ExternalAuthority {
+  clientUuid String @map("client_uuid") @db.Uuid
+  Client     Client @relation(fields: [clientUuid], references: [uuid])
+  authority  String
+
+  @@id([clientUuid, authority])
+  @@map("client_authority")
+}
+
+model RoleExternalAuthority {
+  roleId        Int    @map("role_id")
+  roleGroupUuid String @map("role_group_uuid") @db.Uuid
+  Role          Role   @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
+  authority     String
+
+  @@id([roleId, roleGroupUuid, authority])
+  @@map("role_authority")
 }
 
 model User {
   uuid      String   @id @db.Uuid
+  name      String
+  email     String   @unique
   createdAt DateTime @default(now()) @map("created_at")
 
   UserGroup  UserGroup[]
@@ -79,14 +102,14 @@ model UserGroup {
 }
 
 model Role {
-  id                  Int
-  name                String
-  groupUuid           String      @map("group_uuid") @db.Uuid
-  Group               Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  authorities         Authority[] @map("authorities")
-  externalAuthorities String[]    @map("external_authorities")
+  id          Int
+  name        String
+  groupUuid   String      @map("group_uuid") @db.Uuid
+  Group       Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
+  authorities Authority[] @map("authorities")
 
-  userRole UserRole[]
+  userRole              UserRole[]
+  RoleExternalAuthority RoleExternalAuthority[]
 
   @@id([id, groupUuid])
   @@unique([name, groupUuid])

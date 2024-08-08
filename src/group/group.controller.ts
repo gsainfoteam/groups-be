@@ -4,149 +4,123 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
-  Patch,
   Post,
-  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiOAuth2, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
-import { UserGuard } from 'src/user/guard/user.guard';
-import { GetGroupListRequestDto } from './dto/req/getGroupListRequest.dto';
-import { GetUser } from 'src/user/decorator/getUser.decorator';
-import { User } from '@prisma/client';
+import {
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiOAuth2,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
-import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { AddGroupMemberDto } from './dto/req/addGroupMember.dto';
+import { GetUser } from 'src/auth/decorator/getUser.decorator';
+import { User } from '@prisma/client';
+import { GroupsGuard } from 'src/auth/guard/groups.guard';
+import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
+import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 
 @ApiTags('group')
-@ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
+@ApiOAuth2(['openid', 'email', 'profile'])
 @Controller('group')
+@UseGuards(GroupsGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  // 테스트 완료
+  @ApiOperation({
+    summary: 'Get all groups',
+    description: '자신이 속한 모든 그룹을 가져오는 API 입니다.',
+  })
+  @ApiOkResponse({ type: [GroupListResDto] })
+  @ApiInternalServerErrorResponse()
   @Get()
-  @UseGuards(UserGuard)
-  async getGroupList(
-    @Query() getGroupListRequestDto: GetGroupListRequestDto,
+  async getGroupList(@GetUser() user: User): Promise<GroupListResDto> {
+    return this.groupService.getGroupList(user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Get a group',
+    description: '특정 그룹을 가져오는 API 입니다.',
+  })
+  @ApiOkResponse({ type: GroupResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get(':uuid')
+  async getGroup(
+    @Param('uuid') uuid: string,
     @GetUser() user: User,
-  ) {
-    return this.groupService.getGroupList(getGroupListRequestDto, user.uuid);
+  ): Promise<GroupResDto> {
+    return this.groupService.getGroup(uuid, user.uuid);
   }
 
-  // 테스트 완료
-  @Get(':name')
-  @UseGuards(UserGuard)
-  async getGroup(@Param('name') name: string, @GetUser() user: User) {
-    return this.groupService.getGroup(name, user.uuid);
-  }
-
-  // 테스트 완료
+  @ApiOperation({
+    summary: 'Create a group',
+    description:
+      '그룹을 만드는 API 입니다. 이를 통해 만들어지 그룹의 장과, 그룹의 모든 권한은 그룹을 만든 사람에게 부여됩니다.',
+  })
+  @ApiCreatedResponse()
+  @ApiConflictResponse()
+  @ApiInternalServerErrorResponse()
   @Post()
-  @UseGuards(UserGuard)
-  async createGroup(@Body() body: CreateGroupDto, @GetUser() user: User) {
+  async createGroup(
+    @Body() body: CreateGroupDto,
+    @GetUser() user: User,
+  ): Promise<void> {
     return this.groupService.createGroup(body, user.uuid);
   }
 
-  // 테스트 완료
-  @Patch(':name')
-  @UseGuards(UserGuard)
-  async updateGroup(
-    @Param('name') name: string,
-    @Body() body: UpdateGroupDto,
+  @ApiOperation({
+    summary: 'Delete a group',
+    description:
+      '그룹을 삭제하는 API 입니다. 삭제시 그룹의 모든 정보가 삭제됩니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Delete(':uuid')
+  async deleteGroup(
+    @Param('uuid') uuid: string,
     @GetUser() user: User,
-  ) {
-    return this.groupService.updateGroup(name, body, user.uuid);
+  ): Promise<void> {
+    this.groupService.deleteGroup(uuid, user.uuid);
   }
 
-  // 테스트 완료
-  @Delete(':name')
-  @UseGuards(UserGuard)
-  async deleteGroup(@Param('name') name: string, @GetUser() user: User) {
-    return this.groupService.deleteGroup(name, user.uuid);
-  }
-
-  // 테스트 완료
-  @Get(':name/member')
-  @UseGuards(UserGuard)
-  async getGroupMember(@Param('name') name: string, @GetUser() user: User) {
-    return this.groupService.getGroupMember(name, user.uuid);
-  }
-
-  // 테스트 완료
-  @Post(':name/member')
-  @UseGuards(UserGuard)
-  async addGroupMember(
-    @Param('name') groupName: string,
-    @Body() body: AddGroupMemberDto,
+  @ApiOperation({
+    summary: 'Create an invite code',
+    description:
+      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다.',
+  })
+  @ApiCreatedResponse({ type: InviteCodeResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Post(':uuid/invite')
+  async createInviteCode(
+    @Param('uuid') uuid: string,
     @GetUser() user: User,
-  ) {
-    return this.groupService.addGroupMember(groupName, body, user.uuid);
+  ): Promise<InviteCodeResDto> {
+    return this.groupService.createInviteCode(uuid, user.uuid);
   }
 
-  // 테스트 완료
-  @Delete(':name/member/:uuid')
-  @UseGuards(UserGuard)
-  async deleteGroupMemeber(
-    @Param('name') groupName: string,
-    @Param('uuid', new ParseUUIDPipe()) deleteUserUuid: string,
+  @ApiOperation({
+    summary: 'Join a group',
+    description: '그룹에 가입하는 API 입니다.',
+  })
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Post('join')
+  async joinGroup(
+    @Body('code') code: string,
     @GetUser() user: User,
-  ) {
-    return this.groupService.deleteGroupMember(
-      groupName,
-      deleteUserUuid,
-      user.uuid,
-    );
-  }
-
-  @Get('/:groupName/member/:uuid/role')
-  @UseGuards(UserGuard)
-  async getUserRoles(
-    @Param('groupName') groupName: string,
-    @Param('uuid') target: string,
-    @GetUser() user: User,
-  ) {
-    return this.groupService.getUserRoles(target, groupName, user.uuid);
-  }
-
-  @Post('/:groupUuid/member/:uuid/role/:id')
-  @UseGuards(UserGuard)
-  async addUserRole(
-    @Param('groupUuid') groupUuid: string,
-    @Param('uuid') userUuid: string,
-    @Param('id') roleId: number,
-    @GetUser() user: User,
-  ) {
-    return this.groupService.addUserRole(
-      {
-        createUserUuid: userUuid,
-        groupUuid,
-        roleId,
-      },
-      user.uuid,
-    );
-  }
-
-  @Delete('/:groupName/member/:uuid/role/:id')
-  @UseGuards(UserGuard)
-  async deleteUserRole(
-    @Param('groupName') groupName: string,
-    @Param('uuid') userUuid: string,
-    @Param('id') roleId: number,
-    @GetUser() user: User,
-  ) {
-    return this.groupService.deleteUserRole(
-      {
-        deleteUserUuid: userUuid,
-        groupName,
-        roleId,
-      },
-      user.uuid,
-    );
+  ): Promise<void> {
+    return this.groupService.joinMember(code, user.uuid);
   }
 }

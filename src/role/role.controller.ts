@@ -21,35 +21,39 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserGuard } from 'src/user/guard/user.guard';
-import { GetRoleListResDto } from './dto/res/getRoleRes.dto';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
-import { GetUser } from 'src/user/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
+import { GroupsGuard } from 'src/auth/guard/groups.guard';
+import { GetUser } from 'src/auth/decorator/getUser.decorator';
+import { RoleListResDto } from './dto/res/roleRes.dto';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
 @Controller('group/:groupUuid/role')
-@UseGuards(UserGuard)
+@UseGuards(GroupsGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @ApiOperation({ summary: 'Get roles', description: 'Get roles for a group' })
-  @ApiOkResponse({ type: GetRoleListResDto })
+  @ApiOperation({
+    summary: 'Get roles',
+    description: '그룹 내의 모든 Role을 가져옵니다.',
+  })
+  @ApiOkResponse({ type: RoleListResDto })
+  @ApiInternalServerErrorResponse({})
   @Get()
   async getRoles(
     @Param('groupUuid') groupUuid: string,
     @GetUser() user: User,
-  ): Promise<GetRoleListResDto> {
+  ): Promise<RoleListResDto> {
     return this.roleService.getRoles(groupUuid, user.uuid);
   }
 
   @ApiOperation({
     summary: 'Create role',
-    description: 'Create a role for a group',
+    description: '그룹 내의 Role을 생성합니다.',
   })
   @ApiCreatedResponse({ description: 'Role created' })
   @ApiConflictResponse({ description: 'Role already exists' })
@@ -68,7 +72,7 @@ export class RoleController {
   @ApiOperation({
     summary: 'Update role',
     description:
-      'Update a role, it is not appending the authorities, but replacing it',
+      '그룹 내의 Role을 수정합니다. authorities를 수정할 경우, authorities를 전부 다시 넣어주어야 합니다.',
   })
   @ApiOkResponse({ description: 'Role updated' })
   @ApiNotFoundResponse({ description: 'Role not found' })
@@ -85,7 +89,10 @@ export class RoleController {
     return this.roleService.updateRole(groupUuid, id, updateRoleDto, user.uuid);
   }
 
-  @ApiOperation({ summary: 'Delete role', description: 'Delete a role' })
+  @ApiOperation({
+    summary: 'Delete role',
+    description: '그룹 내 역할을 삭제합니다.',
+  })
   @ApiOkResponse({ description: 'Role deleted' })
   @ApiNotFoundResponse({ description: 'Role not found' })
   @ApiInternalServerErrorResponse({
