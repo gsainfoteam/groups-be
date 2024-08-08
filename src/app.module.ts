@@ -20,7 +20,7 @@ import { RoleModule } from './role/role.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'single',
-        url: configService.get('REDIS_URL'),
+        url: configService.getOrThrow<string>('REDIS_URL'),
       }),
     }),
     IdpModule,
