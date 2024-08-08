@@ -1,4 +1,3 @@
-import { RedisHealthIndicator } from '@nestjs-modules/ioredis';
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
@@ -20,7 +19,6 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly http: HttpHealthIndicator,
     private readonly prisma: PrismaHealthIndicator,
-    private readonly redis: RedisHealthIndicator,
     private readonly memory: MemoryHealthIndicator,
   ) {}
 
@@ -35,7 +33,6 @@ export class HealthController {
         ),
       () => this.prisma.pingCheck('database', this.prismaService),
       () => this.memory.checkRSS('memory_rss', 1024 * 1024 * 150),
-      () => this.redis.isHealthy('redis'),
     ]);
   }
 }
