@@ -3,9 +3,17 @@ import { HealthController } from './health.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TerminusModule } from '@nestjs/terminus';
 import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { RedisIndicator } from './indicator/redis.indicator';
 
 @Module({
-  imports: [PrismaModule, TerminusModule, ConfigModule],
+  imports: [
+    PrismaModule,
+    TerminusModule.forRoot({ errorLogStyle: 'pretty' }),
+    ConfigModule,
+    RedisModule,
+  ],
+  providers: [RedisIndicator],
   controllers: [HealthController],
 })
 export class HealthModule {}

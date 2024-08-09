@@ -9,6 +9,7 @@ import {
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RedisIndicator } from './indicator/redis.indicator';
 
 @ApiTags('health')
 @Controller('health')
@@ -20,6 +21,7 @@ export class HealthController {
     private readonly http: HttpHealthIndicator,
     private readonly prisma: PrismaHealthIndicator,
     private readonly memory: MemoryHealthIndicator,
+    private readonly redis: RedisIndicator,
   ) {}
 
   @Get()
@@ -33,6 +35,7 @@ export class HealthController {
         ),
       () => this.prisma.pingCheck('database', this.prismaService),
       () => this.memory.checkRSS('memory_rss', 1024 * 1024 * 150),
+      () => this.redis.isHealthy('redis'),
     ]);
   }
 }

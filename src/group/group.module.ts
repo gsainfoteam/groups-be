@@ -5,22 +5,10 @@ import { GroupRepository } from './group.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/user.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    ConfigModule,
-    PrismaModule,
-    UserModule,
-    RedisModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'single',
-        url: configService.getOrThrow<string>('REDIS_URL'),
-      }),
-    }),
-  ],
+  imports: [ConfigModule, PrismaModule, UserModule, RedisModule],
   providers: [GroupService, GroupRepository],
   controllers: [GroupController],
 })
