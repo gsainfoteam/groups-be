@@ -5,10 +5,13 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { ClientRepository } from './client.repository';
+import { ClientStrategy } from './strategy/client.strategy';
+import { ClientGuard } from './guard/client.guard';
 
 @Module({
   imports: [PrismaModule, HttpModule, ConfigModule],
   controllers: [ClientController],
-  providers: [ClientService, ClientRepository],
+  providers: [ClientService, ClientRepository, ClientStrategy, ClientGuard],
+  exports: [ClientGuard],
 })
 export class ClientModule {}

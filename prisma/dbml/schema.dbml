@@ -21,6 +21,7 @@ Table client_authority {
   clientUuid String [not null]
   Client client [not null]
   authority String [not null]
+  RoleExternalAuthority role_authority [not null]
 
   indexes {
     (clientUuid, authority) [pk]
@@ -31,10 +32,12 @@ Table role_authority {
   roleId Int [not null]
   roleGroupUuid String [not null]
   Role role [not null]
+  clientUuid String [not null]
   authority String [not null]
+  ExternalAuthority client_authority [not null]
 
   indexes {
-    (roleId, roleGroupUuid, authority) [pk]
+    (roleId, roleGroupUuid, clientUuid, authority) [pk]
   }
 }
 
@@ -96,7 +99,7 @@ Table user_role {
   Role role [not null]
 
   indexes {
-    (userUuid, groupUuid) [pk]
+    (userUuid, groupUuid, roleId) [pk]
   }
 }
 
@@ -111,6 +114,8 @@ Enum Authority {
   ROLE_CREATE
   ROLE_UPDATE
   ROLE_DELETE
+  ROLE_GRANT
+  ROLE_REVOKE
   GROUP_UPDATE
   GROUP_DELETE
 }
@@ -118,6 +123,8 @@ Enum Authority {
 Ref: client_authority.clientUuid > client.uuid
 
 Ref: role_authority.(roleId, roleGroupUuid) > role.(id, groupUuid)
+
+Ref: role_authority.(clientUuid, authority) > client_authority.(clientUuid, authority)
 
 Ref: group.presidentUuid > user.uuid
 

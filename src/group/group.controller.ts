@@ -4,7 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -122,5 +125,55 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<void> {
     return this.groupService.joinMember(code, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'delete a member',
+    description: '그룹에 멤버를 추방하는 API 입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Delete(':uuid/member/:targetUuid')
+  async removeMember(
+    @Param('uuid') uuid: string,
+    @Param('targetUuid') targetUuid: string,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.removeMember(uuid, targetUuid, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'grant a role',
+    description: '그룹의 멤버의 역할을 추가하는 API 입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Patch(':uuid/member/:targetUuid/role')
+  async grantRoleToUser(
+    @Param('uuid') uuid: string,
+    @Param('targetUuid') targetUuid: string,
+    @Query('roleId', ParseIntPipe) roleId: number,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.grantRole(uuid, targetUuid, roleId, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Delete a role',
+    description: '그룹의 멤버의 역할을 삭제하는 API 입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Delete(':uuid/member/:targetUuid/role')
+  async revokeRoleFromUser(
+    @Param('uuid') uuid: string,
+    @Param('targetUuid') targetUuid: string,
+    @Query('roleId', ParseIntPipe) roleId: number,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.revokeRole(uuid, targetUuid, roleId, user.uuid);
   }
 }

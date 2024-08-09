@@ -4,6 +4,7 @@ import {
   Delete,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,11 +16,15 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ClientService } from './client.service';
 import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ClientResDto } from './dto/res/clientRes.dto';
 import { DeleteClientDto } from './dto/req/deleteClient.dto';
+import { ClientGuard } from './guard/client.guard';
+import { GetClient } from './decorator/getClient.decorator';
+import { Client } from '@prisma/client';
 
 @ApiTags('client')
 @Controller('client')
@@ -66,5 +71,39 @@ export class ClientController {
     @Body() { password }: DeleteClientDto,
   ): Promise<void> {
     await this.clientService.delete(uuid, password);
+  }
+
+  @ApiOperation({
+    summary: 'Add authority to a client',
+    description: 'Add authority to a client by uuid',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Post('authority')
+  @UseGuards(ClientGuard)
+  async addAuthority(
+    @GetClient() client: Client,
+    @Body('authority') authority: string,
+  ): Promise<void> {
+    await this.clientService.addAuthority(client.uuid, authority);
+  }
+
+  @ApiOperation({
+    summary: 'Remove authority from a client',
+    description: 'Remove authority from a client by uuid',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Delete('authority')
+  @UseGuards(ClientGuard)
+  async removeAuthority(
+    @GetClient() client: Client,
+    @Body('authority') authority: string,
+  ): Promise<void> {
+    await this.clientService.removeAuthority(client.uuid, authority);
   }
 }

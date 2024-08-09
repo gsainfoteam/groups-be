@@ -54,6 +54,16 @@ export class ClientService {
     await this.clientRepository.deleteByUuid(uuid);
   }
 
+  async addAuthority(uuid: string, authority: string): Promise<void> {
+    this.logger.log(`adding authority: ${authority} to client: ${uuid}`);
+    await this.clientRepository.addAuthority(uuid, authority);
+  }
+
+  async removeAuthority(uuid: string, authority: string): Promise<void> {
+    this.logger.log(`removing authority: ${authority} from client: ${uuid}`);
+    await this.clientRepository.removeAuthority(uuid, authority);
+  }
+
   /**
    * validate the client
    * @param uuid uuid of the client to validate

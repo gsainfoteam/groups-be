@@ -137,11 +137,93 @@ export class GroupRepository {
 
   async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
     this.logger.log(`addUserToGroup: ${uuid}`);
-    await this.prismaService.userGroup.create({
-      data: {
-        userUuid,
-        groupUuid: uuid,
-      },
-    });
+    await this.prismaService.userGroup
+      .create({
+        data: {
+          userUuid,
+          groupUuid: uuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('Group not found');
+          }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
+    this.logger.log(`removeUserFromGroup: ${uuid}`);
+    await this.prismaService.userGroup
+      .deleteMany({
+        where: {
+          userUuid: targetUuid,
+          groupUuid: uuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('User not found');
+          }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async addRoleToUser(
+    uuid: string,
+    roleId: number,
+    targetUuid: string,
+  ): Promise<void> {
+    this.logger.log(`addRoleToUser: ${uuid}`);
+    await this.prismaService.userRole
+      .create({
+        data: {
+          groupUuid: uuid,
+          userUuid: targetUuid,
+          roleId,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('User not found');
+          }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async removeRoleFromUser(
+    uuid: string,
+    roleId: number,
+    targetUuid: string,
+  ): Promise<void> {
+    this.logger.log(`removeRoleFromUser: ${uuid}`);
+    await this.prismaService.userRole
+      .delete({
+        where: {
+          userUuid_groupUuid_roleId: {
+            userUuid: targetUuid,
+            roleId,
+            groupUuid: uuid,
+          },
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('User not found');
+          }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
   }
 }

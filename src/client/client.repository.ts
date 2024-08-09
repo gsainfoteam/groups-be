@@ -80,4 +80,56 @@ export class ClientRepository {
         throw new InternalServerErrorException('unknown error');
       });
   }
+
+  async addAuthority(uuid: string, authority: string): Promise<void> {
+    this.logger.log(`adding authority: ${authority} to client: ${uuid}`);
+    await this.prismaService.client
+      .update({
+        where: { uuid },
+        data: {
+          ExternalAuthority: {
+            create: {
+              authority,
+            },
+          },
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            this.logger.debug(`client not found`);
+            throw new ForbiddenException('client not found');
+          }
+          this.logger.error(`unknown database error`);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        this.logger.error(`unknown error`);
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async removeAuthority(uuid: string, authority: string): Promise<void> {
+    this.logger.log(`removing authority: ${authority} from client: ${uuid}`);
+    await this.prismaService.externalAuthority
+      .delete({
+        where: {
+          clientUuid_authority: {
+            authority,
+            clientUuid: uuid,
+          },
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            this.logger.debug(`client not found`);
+            throw new ForbiddenException('client not found');
+          }
+          this.logger.error(`unknown database error`);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        this.logger.error(`unknown error`);
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
 }

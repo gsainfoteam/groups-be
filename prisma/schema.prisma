@@ -24,6 +24,8 @@ enum Authority {
   ROLE_CREATE
   ROLE_UPDATE
   ROLE_DELETE
+  ROLE_GRANT
+  ROLE_REVOKE
   GROUP_UPDATE
   GROUP_DELETE
 }
@@ -47,17 +49,21 @@ model ExternalAuthority {
   Client     Client @relation(fields: [clientUuid], references: [uuid])
   authority  String
 
+  RoleExternalAuthority RoleExternalAuthority[]
+
   @@id([clientUuid, authority])
   @@map("client_authority")
 }
 
 model RoleExternalAuthority {
-  roleId        Int    @map("role_id")
-  roleGroupUuid String @map("role_group_uuid") @db.Uuid
-  Role          Role   @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
-  authority     String
+  roleId            Int               @map("role_id")
+  roleGroupUuid     String            @map("role_group_uuid") @db.Uuid
+  Role              Role              @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
+  clientUuid        String            @map("client_uuid") @db.Uuid
+  authority         String
+  ExternalAuthority ExternalAuthority @relation(fields: [clientUuid, authority], references: [clientUuid, authority])
 
-  @@id([roleId, roleGroupUuid, authority])
+  @@id([roleId, roleGroupUuid, clientUuid, authority])
   @@map("role_authority")
 }
 
@@ -124,6 +130,6 @@ model UserRole {
   roleId    Int    @map("role_id")
   Role      Role   @relation(fields: [roleId, groupUuid], references: [id, groupUuid], onDelete: Cascade)
 
-  @@id([userUuid, groupUuid])
+  @@id([userUuid, groupUuid, roleId])
   @@map("user_role")
 }
