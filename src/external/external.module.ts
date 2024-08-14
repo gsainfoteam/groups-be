@@ -7,6 +7,8 @@ import { IdpModule } from 'src/idp/idp.module';
 import { UserModule } from 'src/user/user.module';
 import { ExternalService } from './external.service';
 import { ExternalController } from './external.controller';
+import { ExternalGuard } from './guard/external.guard';
+import { ExternalStrategy } from './strategy/external.strategy';
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { ExternalController } from './external.controller';
       }),
     }),
   ],
-  providers: [ExternalService],
+  providers: [ExternalService, ExternalGuard, ExternalStrategy],
   controllers: [ExternalController],
 })
 export class ExternalModule {}
