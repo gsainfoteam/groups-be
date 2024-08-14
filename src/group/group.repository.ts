@@ -41,6 +41,7 @@ export class GroupRepository {
           },
         },
         include: {
+          President: true,
           _count: {
             select: {
               UserGroup: true,
