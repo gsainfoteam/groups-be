@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { CertService } from './cert.service';
 import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -10,15 +9,16 @@ import {
 import { ClientGuard } from 'src/client/guard/client.guard';
 import { GetClient } from 'src/client/decorator/getClient.decorator';
 import { Client } from '@prisma/client';
-import { CreateCertTokenDto } from './dto/req/createCertToken.dto';
-import { CertTokenResDto } from './dto/res/certTokenRes.dto';
-import { CertGuard } from './guard/cert.guard';
-import { CertInfoResDto } from './dto/res/certInfoRes.dto';
+import { ExternalGuard } from './guard/external.guard';
+import { ExternalTokenResDto } from './dto/res/externalTokenRes.dto';
+import { ExternalInfoResDto } from './dto/res/externalInfoRes.dto';
+import { CreateExternalTokenDto } from './dto/req/createExternalToken.dto';
+import { ExternalService } from './external.service';
 
-@Controller('cert')
-@ApiTags('cert')
-export class CertController {
-  constructor(private readonly certService: CertService) {}
+@Controller('external')
+@ApiTags('external')
+export class ExternalController {
+  constructor(private readonly externalService: ExternalService) {}
 
   @ApiOperation({
     summary: 'Create certificate token',
@@ -32,20 +32,20 @@ export class CertController {
   @Post()
   async createCertToken(
     @GetClient() client: Client,
-    @Body() { idpToken }: CreateCertTokenDto,
-  ): Promise<CertTokenResDto> {
-    return this.certService.createCertToken(idpToken, client);
+    @Body() { idpToken }: CreateExternalTokenDto,
+  ): Promise<ExternalTokenResDto> {
+    return this.externalService.createExternalToken(idpToken, client);
   }
 
   @ApiOperation({
     summary: 'Get certificate information',
     description: '해당 유저가 가입된 그룹 들에 관한 정보를 가져옵니다.',
   })
-  @UseGuards(CertGuard)
+  @UseGuards(ExternalGuard)
   @ApiUnauthorizedResponse()
   @ApiInternalServerErrorResponse()
   @Get('info')
-  async getCertInfo(@Req() req: any): Promise<CertInfoResDto> {
-    return this.certService.getCertInfo(req.user);
+  async getCertInfo(@Req() req: any): Promise<ExternalInfoResDto> {
+    return this.externalService.getExternalInfo(req.user);
   }
 }

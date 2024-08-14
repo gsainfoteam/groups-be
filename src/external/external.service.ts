@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CertTokenResDto } from './dto/res/certTokenRes.dto';
 import { Client } from '@prisma/client';
 import { IdpService } from 'src/idp/idp.service';
 import { UserService } from 'src/user/user.service';
 import { GroupService } from 'src/group/group.service';
-import { CertPayload } from './types/certPayload';
-import { CertInfoResDto } from './dto/res/certInfoRes.dto';
+import { ExternalTokenResDto } from './dto/res/externalTokenRes.dto';
+import { ExternalPayload } from './types/certPayload';
+import { ExternalInfoResDto } from './dto/res/externalInfoRes.dto';
 
 @Injectable()
-export class CertService {
+export class ExternalService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly idpService: IdpService,
@@ -17,10 +17,10 @@ export class CertService {
     private readonly groupService: GroupService,
   ) {}
 
-  async createCertToken(
+  async createExternalToken(
     idpToken: string,
     client: Client,
-  ): Promise<CertTokenResDto> {
+  ): Promise<ExternalTokenResDto> {
     const userInfo = await this.idpService.getUserInfo(idpToken);
     const user = await this.userService.getUserInfo(userInfo.uuid);
     return {
@@ -33,7 +33,7 @@ export class CertService {
     };
   }
 
-  async getCertInfo(payload: CertPayload): Promise<CertInfoResDto> {
+  async getExternalInfo(payload: ExternalPayload): Promise<ExternalInfoResDto> {
     return this.groupService.getGroupListWithRole(payload.uuid, payload.aud);
   }
 }

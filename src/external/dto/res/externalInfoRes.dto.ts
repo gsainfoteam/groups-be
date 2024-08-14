@@ -55,6 +55,6 @@ class GroupWithRoleResDto implements GroupWithRole {
   Role: RoleResDto[];
 }
 
-export class CertInfoResDto {
+export class ExternalInfoResDto {
   list: GroupWithRoleResDto[];
 }

@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class CreateCertTokenDto {
+export class CreateExternalTokenDto {
   @IsString()
   idpToken: string;
 }

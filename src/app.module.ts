@@ -9,7 +9,7 @@ import { UserModule } from './user/user.module';
 import { GroupModule } from './group/group.module';
 import { RoleModule } from './role/role.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
-import { CertModule } from './cert/cert.module';
+import { ExternalModule } from './external/external.module';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { CertModule } from './cert/cert.module';
     UserModule,
     GroupModule,
     RoleModule,
-    CertModule,
+    ExternalModule,
   ],
   controllers: [AppController],
 })
