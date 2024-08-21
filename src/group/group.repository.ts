@@ -158,6 +158,7 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException('Group not found');
           }
+          this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');

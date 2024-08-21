@@ -1,11 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { Exclude, Expose } from 'class-transformer';
 import { ExpandedGroup } from 'src/group/types/ExpandedGroup.type';
-
-class CountUserGroupResDto {
-  @ApiProperty()
-  UserGroup: number;
-}
 
 class PresidentResDto implements User {
   @ApiProperty()
@@ -22,6 +18,12 @@ class PresidentResDto implements User {
 }
 
 export class ExpandedGroupResDto implements ExpandedGroup {
+  @Exclude()
+  President: User;
+
+  @Exclude()
+  _count: { UserGroup: number };
+
   @ApiProperty()
   uuid: string;
 
@@ -38,8 +40,18 @@ export class ExpandedGroupResDto implements ExpandedGroup {
   presidentUuid: string;
 
   @ApiProperty({ type: PresidentResDto })
-  President: PresidentResDto;
+  @Expose()
+  get president(): User {
+    return this.President;
+  }
 
-  @ApiProperty({ type: CountUserGroupResDto })
-  _count: CountUserGroupResDto;
+  @ApiProperty()
+  @Expose()
+  get memberCount(): number {
+    return this._count.UserGroup;
+  }
+
+  constructor(partial: Partial<ExpandedGroup>) {
+    Object.assign(this, partial);
+  }
 }

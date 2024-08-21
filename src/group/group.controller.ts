@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -37,6 +39,7 @@ import { JoinDto } from './dto/req/join.dto';
 @Controller('group')
 @UseGuards(GroupsGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
+@UseInterceptors(ClassSerializerInterceptor)
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
@@ -63,7 +66,9 @@ export class GroupController {
     @Param('uuid') uuid: string,
     @GetUser() user: User,
   ): Promise<ExpandedGroupResDto> {
-    return this.groupService.getGroup(uuid, user.uuid);
+    return new ExpandedGroupResDto(
+      await this.groupService.getGroup(uuid, user.uuid),
+    );
   }
 
   @ApiOperation({

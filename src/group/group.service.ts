@@ -7,7 +7,7 @@ import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
 import { Authority } from '@prisma/client';
-import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
+import { ExpandedGroup } from './types/ExpandedGroup.type';
 
 @Injectable()
 export class GroupService {
@@ -23,7 +23,7 @@ export class GroupService {
     return { list: await this.groupRepository.getGroupList(userUuid) };
   }
 
-  async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroupResDto> {
+  async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroup> {
     this.logger.log(`getGroup: ${uuid}`);
     return this.groupRepository.getGroup(uuid, userUuid);
   }
