@@ -30,6 +30,7 @@ import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GroupListResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
+import { JoinDto } from './dto/req/join.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -121,11 +122,8 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @Post('join')
-  async joinGroup(
-    @Body('code') code: string,
-    @GetUser() user: User,
-  ): Promise<void> {
-    return this.groupService.joinMember(code, user.uuid);
+  async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
+    return this.groupService.joinMember(body.code, user.uuid);
   }
 
   @ApiOperation({
