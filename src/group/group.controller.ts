@@ -123,8 +123,13 @@ export class GroupController {
     summary: 'Join a group',
     description: '그룹에 가입하는 API 입니다.',
   })
-  @ApiCreatedResponse()
-  @ApiForbiddenResponse()
+  @ApiCreatedResponse({
+    description: '그룹에 성공적으로 가입되었습니다.',
+  })
+  @ApiForbiddenResponse({
+    description:
+      '옳지 않은 초대 코드입니다. 초대 코드가 만료되었거나, 존재하지 않습니다.',
+  })
   @ApiInternalServerErrorResponse()
   @Post('join')
   async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {

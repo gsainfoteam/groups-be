@@ -53,6 +53,12 @@ export class GroupService {
     await this.groupRepository.deleteGroup(uuid);
   }
 
+  /**
+   * this method creates an invite code for a group, and the expiration time is 14 days.
+   * @param uuid uuid of the group
+   * @param userUuid uuid of the user who is creating the invite code
+   * @returns the invite code
+   */
   async createInviteCode(
     uuid: string,
     userUuid: string,
@@ -73,7 +79,12 @@ export class GroupService {
       .randomBytes(32)
       .toString('base64')
       .replace(/[+\/=]/g, '');
-    await this.redis.set(`${this.inviteCodePrefix}:${code}`, uuid);
+    await this.redis.set(
+      `${this.inviteCodePrefix}:${code}`,
+      uuid,
+      'EX',
+      14 * 24 * 60 * 60,
+    );
     return { code };
   }
 
