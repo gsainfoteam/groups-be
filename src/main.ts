@@ -9,8 +9,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   // swagger config
   const config = new DocumentBuilder()
-    .setTitle('Vapor-auth API')
-    .setDescription('The Vapor-auth API')
+    .setTitle('Groups API')
+    .setDescription('The Groups API')
     .setVersion('1.0')
     .addOAuth2(
       {

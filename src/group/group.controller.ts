@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -27,14 +29,17 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
-import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
+import { GroupListResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
+import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
+import { JoinDto } from './dto/req/join.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
 @Controller('group')
 @UseGuards(GroupsGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
+@UseInterceptors(ClassSerializerInterceptor)
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
@@ -53,15 +58,17 @@ export class GroupController {
     summary: 'Get a group',
     description: '특정 그룹을 가져오는 API 입니다.',
   })
-  @ApiOkResponse({ type: GroupResDto })
+  @ApiOkResponse({ type: ExpandedGroupResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @Get(':uuid')
   async getGroup(
     @Param('uuid') uuid: string,
     @GetUser() user: User,
-  ): Promise<GroupResDto> {
-    return this.groupService.getGroup(uuid, user.uuid);
+  ): Promise<ExpandedGroupResDto> {
+    return new ExpandedGroupResDto(
+      await this.groupService.getGroup(uuid, user.uuid),
+    );
   }
 
   @ApiOperation({
@@ -120,11 +127,8 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @Post('join')
-  async joinGroup(
-    @Body('code') code: string,
-    @GetUser() user: User,
-  ): Promise<void> {
-    return this.groupService.joinMember(code, user.uuid);
+  async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
+    return this.groupService.joinMember(body.code, user.uuid);
   }
 
   @ApiOperation({
