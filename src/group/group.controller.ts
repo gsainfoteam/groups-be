@@ -29,7 +29,7 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
-import { GroupListResDto } from './dto/res/groupRes.dto';
+import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
@@ -47,11 +47,15 @@ export class GroupController {
     summary: 'Get all groups',
     description: '자신이 속한 모든 그룹을 가져오는 API 입니다.',
   })
-  @ApiOkResponse({ type: [GroupListResDto] })
+  @ApiOkResponse({ type: GroupListResDto })
   @ApiInternalServerErrorResponse()
   @Get()
   async getGroupList(@GetUser() user: User): Promise<GroupListResDto> {
-    return this.groupService.getGroupList(user.uuid);
+    return {
+      list: (await this.groupService.getGroupList(user.uuid)).map((group) => {
+        return new GroupResDto(group);
+      }),
+    };
   }
 
   @ApiOperation({
