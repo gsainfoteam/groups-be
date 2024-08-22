@@ -24,7 +24,6 @@ import { ExternalStrategy } from './strategy/external.strategy';
         secret: configService.getOrThrow<string>('EXTERNAL_JWT_SECRET'),
         signOptions: {
           issuer: configService.getOrThrow<string>('EXTERNAL_JWT_ISSUER'),
-          subject: configService.getOrThrow<string>('EXTERNAL_JWT_SUBJECT'),
           expiresIn: configService.getOrThrow<string>(
             'EXTERNAL_JWT_EXPIRES_IN',
           ),

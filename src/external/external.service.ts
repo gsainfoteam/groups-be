@@ -25,8 +25,9 @@ export class ExternalService {
     const user = await this.userService.getUserInfo(userInfo.uuid);
     return {
       token: this.jwtService.sign(
-        { uuid: user.uuid },
+        {},
         {
+          subject: user.uuid,
           audience: client.uuid,
         },
       ),
@@ -34,6 +35,6 @@ export class ExternalService {
   }
 
   async getExternalInfo(payload: ExternalPayload): Promise<ExternalInfoResDto> {
-    return this.groupService.getGroupListWithRole(payload.uuid, payload.aud);
+    return this.groupService.getGroupListWithRole(payload.sub, payload.aud);
   }
 }
