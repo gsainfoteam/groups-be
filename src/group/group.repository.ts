@@ -8,6 +8,7 @@ import {
 import { Authority, Group } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 
 @Injectable()
@@ -22,6 +23,38 @@ export class GroupRepository {
         UserGroup: {
           some: {
             userUuid,
+          },
+        },
+      },
+    });
+  }
+
+  async getGroupListWithRole(
+    userUuid: string,
+    clientUuid: string,
+  ): Promise<GroupWithRole[]> {
+    this.logger.log(`getGroupListWithRole`);
+    return this.prismaService.group.findMany({
+      where: {
+        UserGroup: {
+          some: {
+            userUuid,
+          },
+        },
+      },
+      include: {
+        Role: {
+          where: {
+            userRole: {
+              some: {
+                userUuid,
+              },
+            },
+          },
+          include: {
+            RoleExternalAuthority: {
+              where: clientUuid ? { clientUuid } : undefined,
+            },
           },
         },
       },

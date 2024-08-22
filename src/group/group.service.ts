@@ -7,6 +7,7 @@ import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
 import { Authority } from '@prisma/client';
+import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 
 @Injectable()
@@ -141,5 +142,20 @@ export class GroupService {
       throw new ForbiddenException('You do not have permission to revoke role');
     }
     await this.groupRepository.removeRoleFromUser(uuid, roleId, targetUuid);
+  }
+
+  async getGroupListWithRole(
+    userUuid: string,
+    clientUuid: string,
+  ): Promise<{
+    list: GroupWithRole[];
+  }> {
+    this.logger.log(`getGroupListWithRole`);
+    return {
+      list: await this.groupRepository.getGroupListWithRole(
+        userUuid,
+        clientUuid,
+      ),
+    };
   }
 }

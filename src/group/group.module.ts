@@ -11,5 +11,6 @@ import { ConfigModule } from '@nestjs/config';
   imports: [ConfigModule, PrismaModule, UserModule, RedisModule],
   providers: [GroupService, GroupRepository],
   controllers: [GroupController],
+  exports: [GroupService],
 })
 export class GroupModule {}
