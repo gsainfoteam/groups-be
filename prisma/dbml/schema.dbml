@@ -53,7 +53,7 @@ Table user {
 
 Table group {
   uuid String [pk]
-  name String [unique, not null]
+  name String [not null]
   description String
   createdAt DateTime [default: `now()`, not null]
   verifiedAt DateTime
