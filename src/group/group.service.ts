@@ -12,7 +12,7 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 @Injectable()
 export class GroupService {
   private readonly logger = new Logger(GroupService.name);
-  private readonly inviteCodePrefix = 'inviteCode';
+  private readonly invitationCodePrefix = 'invitationCode';
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
@@ -52,6 +52,12 @@ export class GroupService {
     await this.groupRepository.deleteGroup(uuid);
   }
 
+  /**
+   * this method creates an invite code for a group, and the expiration time is 14 days.
+   * @param uuid uuid of the group
+   * @param userUuid uuid of the user who is creating the invite code
+   * @returns the invite code
+   */
   async createInviteCode(
     uuid: string,
     userUuid: string,
@@ -72,13 +78,18 @@ export class GroupService {
       .randomBytes(32)
       .toString('base64')
       .replace(/[+\/=]/g, '');
-    await this.redis.set(`${this.inviteCodePrefix}:${code}`, uuid);
+    await this.redis.set(
+      `${this.invitationCodePrefix}:${code}`,
+      uuid,
+      'EX',
+      14 * 24 * 60 * 60,
+    );
     return { code };
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
     this.logger.log(`updateMember: ${code}`);
-    const uuid = await this.redis.get(`${this.inviteCodePrefix}:${code}`);
+    const uuid = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
     if (!uuid) {
       throw new ForbiddenException('Invalid invite code');
     }
