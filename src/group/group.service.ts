@@ -13,7 +13,7 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 @Injectable()
 export class GroupService {
   private readonly logger = new Logger(GroupService.name);
-  private readonly inviteCodePrefix = 'inviteCode';
+  private readonly invitationCodePrefix = 'invitationCode';
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
@@ -80,7 +80,7 @@ export class GroupService {
       .toString('base64')
       .replace(/[+\/=]/g, '');
     await this.redis.set(
-      `${this.inviteCodePrefix}:${code}`,
+      `${this.invitationCodePrefix}:${code}`,
       uuid,
       'EX',
       14 * 24 * 60 * 60,
@@ -90,7 +90,7 @@ export class GroupService {
 
   async joinMember(code: string, userUuid: string): Promise<void> {
     this.logger.log(`updateMember: ${code}`);
-    const uuid = await this.redis.get(`${this.inviteCodePrefix}:${code}`);
+    const uuid = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
     if (!uuid) {
       throw new ForbiddenException('Invalid invite code');
     }
