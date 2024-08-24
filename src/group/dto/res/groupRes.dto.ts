@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Group } from '@prisma/client';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 export class GroupResDto implements Group {
   @ApiProperty()
@@ -26,6 +26,9 @@ export class GroupResDto implements Group {
   get verified(): boolean {
     return this.verifiedAt !== null;
   }
+
+  @Exclude()
+  deletedAt: Date | null;
 
   constructor(partial: Partial<GroupResDto>) {
     Object.assign(this, partial);

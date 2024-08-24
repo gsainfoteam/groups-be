@@ -24,6 +24,9 @@ export class ExpandedGroupResDto implements ExpandedGroup {
   @Exclude()
   _count: { UserGroup: number };
 
+  @Exclude()
+  deletedAt: Date | null;
+
   @ApiProperty()
   uuid: string;
 
