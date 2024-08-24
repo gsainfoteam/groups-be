@@ -64,8 +64,8 @@ export class GroupRepository {
     });
   }
 
-  async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroup> {
-    this.logger.log(`getGroup: ${uuid}`);
+  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+    this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
@@ -91,6 +91,23 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new NotFoundException('Group not found');
           }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async getGroupByName(name: string): Promise<Group | null> {
+    this.logger.log(`getGroupByName ${name}`);
+    return this.prismaService.group
+      .findFirst({
+        where: {
+          deletedAt: null,
+          name,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
