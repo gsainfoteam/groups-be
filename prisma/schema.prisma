@@ -87,6 +87,7 @@ model Group {
   createdAt     DateTime  @default(now()) @map("created_at")
   verifiedAt    DateTime? @map("verified_at")
   presidentUuid String    @map("president_uuid") @db.Uuid
+  deletedAt     DateTime? @map("deleted_at")
 
   President User @relation(fields: [presidentUuid], references: [uuid])
 

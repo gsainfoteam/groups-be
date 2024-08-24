@@ -58,6 +58,7 @@ Table group {
   createdAt DateTime [default: `now()`, not null]
   verifiedAt DateTime
   presidentUuid String [not null]
+  deletedAt DateTime
   President user [not null]
   UserGroup user_group [not null]
   Role role [not null]
