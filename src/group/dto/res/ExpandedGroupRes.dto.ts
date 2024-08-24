@@ -51,6 +51,15 @@ export class ExpandedGroupResDto implements ExpandedGroup {
     return this._count.UserGroup;
   }
 
+  @ApiProperty()
+  verifiedAt: Date | null;
+
+  @ApiProperty()
+  @Expose()
+  get verified(): boolean {
+    return this.verifiedAt !== null;
+  }
+
   constructor(partial: Partial<ExpandedGroup>) {
     Object.assign(this, partial);
   }

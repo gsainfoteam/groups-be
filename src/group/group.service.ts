@@ -1,12 +1,11 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { GroupRepository } from './group.repository';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
-import { GroupListResDto } from './dto/res/groupRes.dto';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Authority } from '@prisma/client';
+import { Authority, Group } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 
@@ -19,9 +18,9 @@ export class GroupService {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async getGroupList(userUuid: string): Promise<GroupListResDto> {
+  async getGroupList(userUuid: string): Promise<Group[]> {
     this.logger.log(`getGroupList`);
-    return { list: await this.groupRepository.getGroupList(userUuid) };
+    return this.groupRepository.getGroupList(userUuid);
   }
 
   async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroup> {

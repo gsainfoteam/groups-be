@@ -51,6 +51,9 @@ class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty()
   presidentUuid: string;
 
+  @ApiProperty()
+  verifiedAt: Date | null;
+
   @ApiProperty({ type: RoleResDto, isArray: true })
   Role: RoleResDto[];
 }
