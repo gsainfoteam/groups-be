@@ -47,7 +47,7 @@ export class GroupService {
       await this.groupRepository.createGroup(createGroupDto, userUuid);
     } else {
       throw new ConflictException(
-        `Group with name ${createGroupDto.name} already exists}`,
+        `Group with name ${createGroupDto.name} already exists`,
       );
     }
   }
