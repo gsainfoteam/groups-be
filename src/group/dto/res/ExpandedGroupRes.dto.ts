@@ -27,6 +27,9 @@ export class ExpandedGroupResDto implements ExpandedGroup {
   @Exclude()
   deletedAt: Date | null;
 
+  @Exclude()
+  presidentUuid: string;
+
   @ApiProperty()
   uuid: string;
 
@@ -38,9 +41,6 @@ export class ExpandedGroupResDto implements ExpandedGroup {
 
   @ApiProperty()
   createdAt: Date;
-
-  @ApiProperty()
-  presidentUuid: string;
 
   @ApiProperty({ type: PresidentResDto })
   @Expose()
