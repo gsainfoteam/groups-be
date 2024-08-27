@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Authority, Group } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -20,6 +21,7 @@ export class GroupRepository {
     this.logger.log(`getGroupList`);
     return this.prismaService.group.findMany({
       where: {
+        deletedAt: null,
         UserGroup: {
           some: {
             userUuid,
@@ -36,6 +38,7 @@ export class GroupRepository {
     this.logger.log(`getGroupListWithRole`);
     return this.prismaService.group.findMany({
       where: {
+        deletedAt: null,
         UserGroup: {
           some: {
             userUuid,
@@ -61,11 +64,12 @@ export class GroupRepository {
     });
   }
 
-  async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroup> {
-    this.logger.log(`getGroup: ${uuid}`);
+  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+    this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.prismaService.group
       .findUniqueOrThrow({
         where: {
+          deletedAt: null,
           uuid,
           UserGroup: {
             some: {
@@ -85,8 +89,25 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('Group not found');
+            throw new NotFoundException('Group not found');
           }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async getGroupByName(name: string): Promise<Group | null> {
+    this.logger.log(`getGroupByName ${name}`);
+    return this.prismaService.group
+      .findFirst({
+        where: {
+          deletedAt: null,
+          name,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -170,9 +191,12 @@ export class GroupRepository {
 
   async deleteGroup(uuid: string): Promise<void> {
     this.logger.log(`deleteGroup: ${uuid}`);
-    await this.prismaService.group.delete({
+    await this.prismaService.group.update({
       where: {
         uuid,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
@@ -189,7 +213,7 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('Group not found');
+            throw new NotFoundException('Group not found');
           }
           this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');

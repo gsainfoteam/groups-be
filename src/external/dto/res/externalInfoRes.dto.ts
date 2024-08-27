@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Authority, Role, RoleExternalAuthority } from '@prisma/client';
+import { Exclude } from 'class-transformer';
 import { GroupWithRole } from 'src/group/types/groupWithRole';
 
 class RoleExternalAuthorityResDto implements RoleExternalAuthority {
@@ -56,6 +57,9 @@ class GroupWithRoleResDto implements GroupWithRole {
 
   @ApiProperty({ type: RoleResDto, isArray: true })
   Role: RoleResDto[];
+
+  @Exclude()
+  deletedAt: Date | null;
 }
 
 export class ExternalInfoResDto {

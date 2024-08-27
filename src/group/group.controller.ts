@@ -59,19 +59,19 @@ export class GroupController {
   }
 
   @ApiOperation({
-    summary: 'Get a group',
-    description: '특정 그룹을 가져오는 API 입니다.',
+    summary: 'Get a group by uuid',
+    description: 'uuid를 바탕으로 특정 그룹을 가져오는 API 입니다.',
   })
   @ApiOkResponse({ type: ExpandedGroupResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @Get(':uuid')
-  async getGroup(
+  async getGroupByUuid(
     @Param('uuid') uuid: string,
     @GetUser() user: User,
   ): Promise<ExpandedGroupResDto> {
     return new ExpandedGroupResDto(
-      await this.groupService.getGroup(uuid, user.uuid),
+      await this.groupService.getGroupByUuid(uuid, user.uuid),
     );
   }
 

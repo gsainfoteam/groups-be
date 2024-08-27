@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { GroupRepository } from './group.repository';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { InjectRedis } from '@nestjs-modules/ioredis';
@@ -23,9 +28,9 @@ export class GroupService {
     return this.groupRepository.getGroupList(userUuid);
   }
 
-  async getGroup(uuid: string, userUuid: string): Promise<ExpandedGroup> {
-    this.logger.log(`getGroup: ${uuid}`);
-    return this.groupRepository.getGroup(uuid, userUuid);
+  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+    this.logger.log(`getGroupByUuid: ${uuid}`);
+    return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
 
   async createGroup(
@@ -33,7 +38,18 @@ export class GroupService {
     userUuid: string,
   ): Promise<void> {
     this.logger.log(`createGroup: ${createGroupDto.name}`);
-    await this.groupRepository.createGroup(createGroupDto, userUuid);
+
+    const checkGroupExistence = await this.groupRepository.getGroupByName(
+      createGroupDto.name,
+    );
+
+    if (!checkGroupExistence) {
+      await this.groupRepository.createGroup(createGroupDto, userUuid);
+    } else {
+      throw new ConflictException(
+        `Group with name ${createGroupDto.name} already exists`,
+      );
+    }
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {

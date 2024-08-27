@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Authority, Group, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -84,7 +85,7 @@ export class RoleRepository {
           }
           if (error.code === 'P2025') {
             this.logger.debug(`Group ${groupUuid} not found`);
-            throw new ForbiddenException('Group not found');
+            throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
           throw new InternalServerErrorException('Database error');
@@ -135,7 +136,7 @@ export class RoleRepository {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             this.logger.debug(`Group ${groupUuid} not found`);
-            throw new ForbiddenException('Group not found');
+            throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
           throw new InternalServerErrorException('Database error');
