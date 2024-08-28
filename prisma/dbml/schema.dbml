@@ -59,6 +59,7 @@ Table group {
   verifiedAt DateTime
   presidentUuid String [not null]
   deletedAt DateTime
+  notionPageId String
   President user [not null]
   UserGroup user_group [not null]
   Role role [not null]
