@@ -11,6 +11,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisIndicator } from './indicator/redis.indicator';
 
+// Controller for health check
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
