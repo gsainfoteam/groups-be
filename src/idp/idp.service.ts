@@ -22,7 +22,7 @@ export class IdpService {
   }
 
   /**
-   * Get user info from IDP and the handing exceptions
+   * Get user info from IDP and the handing Axios exceptions
    * @param accessToken it is the idp access token
    * @returns object of the UserInfo type
    */
