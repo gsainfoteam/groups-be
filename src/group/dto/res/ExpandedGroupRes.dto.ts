@@ -63,6 +63,9 @@ export class ExpandedGroupResDto implements ExpandedGroup {
     return this.verifiedAt !== null;
   }
 
+  @ApiProperty()
+  notionPageId: string | null;
+
   constructor(partial: Partial<ExpandedGroup>) {
     Object.assign(this, partial);
   }

@@ -58,6 +58,9 @@ class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty({ type: RoleResDto, isArray: true })
   Role: RoleResDto[];
 
+  @ApiProperty()
+  notionPageId: string | null;
+
   @Exclude()
   deletedAt: Date | null;
 }

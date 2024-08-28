@@ -8,4 +8,8 @@ export class CreateGroupDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  notionPageId?: string;
 }
