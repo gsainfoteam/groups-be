@@ -141,7 +141,9 @@ export class GroupRepository {
     {
       name,
       description,
-    }: Pick<Group, 'name'> & Partial<Pick<Group, 'description'>>,
+      notionPageId,
+    }: Pick<Group, 'name'> &
+      Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
   ): Promise<Group> {
     this.logger.log(`createGroup: ${name}`);
@@ -151,6 +153,7 @@ export class GroupRepository {
           name,
           description,
           presidentUuid: userUuid,
+          notionPageId,
           UserGroup: {
             create: {
               userUuid,
