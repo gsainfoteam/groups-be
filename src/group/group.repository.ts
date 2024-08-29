@@ -97,6 +97,24 @@ export class GroupRepository {
       });
   }
 
+  async checkGroupExistenceByUuid(uuid: string): Promise<Group | null> {
+    this.logger.log(`checkGroupExistenceByUuid ${uuid}`);
+
+    return this.prismaService.group
+      .findUnique({
+        where: {
+          deletedAt: null,
+          uuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
   async getGroupByName(name: string): Promise<Group | null> {
     this.logger.log(`getGroupByName ${name}`);
     return this.prismaService.group
@@ -186,6 +204,51 @@ export class GroupRepository {
           if (error.code === 'P2002') {
             throw new ConflictException('Group name already exists');
           }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async updateGroup(
+    {
+      uuid,
+      name,
+      description,
+      notionPageId,
+    }: Pick<Group, 'uuid'> &
+      Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
+    userUuid: string,
+  ): Promise<void> {
+    this.logger.log(`updateGroup ${uuid}`);
+
+    await this.prismaService.group
+      .update({
+        where: {
+          uuid,
+          UserRole: {
+            some: {
+              userUuid,
+              Role: {
+                authorities: {
+                  has: Authority.GROUP_UPDATE,
+                },
+              },
+            },
+          },
+        },
+        data: {
+          name,
+          description,
+          notionPageId,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+          this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');

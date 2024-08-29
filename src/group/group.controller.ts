@@ -33,6 +33,7 @@ import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -89,6 +90,21 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<void> {
     return this.groupService.createGroup(body, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Update group info',
+    description: '그룹의 정보를 업데이트하는 API입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Patch()
+  async updateGroup(
+    @Body() body: UpdateGroupDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.updateGroup(body, user.uuid);
   }
 
   @ApiOperation({
