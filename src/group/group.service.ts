@@ -72,18 +72,15 @@ export class GroupService {
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
     this.logger.log(`deleteGroup: ${uuid}`);
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.GROUP_DELETE],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException(
-        'You do not have permission to delete group',
-      );
+
+    const checkGroupExistence =
+      await this.groupRepository.checkGroupExistenceByUuid(uuid);
+
+    if (!checkGroupExistence) {
+      throw new NotFoundException('Group not found');
     }
-    await this.groupRepository.deleteGroup(uuid);
+
+    await this.groupRepository.deleteGroup(uuid, userUuid);
   }
 
   /**

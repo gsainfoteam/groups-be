@@ -120,7 +120,7 @@ export class GroupController {
     @Param('uuid') uuid: string,
     @GetUser() user: User,
   ): Promise<void> {
-    this.groupService.deleteGroup(uuid, user.uuid);
+    return this.groupService.deleteGroup(uuid, user.uuid);
   }
 
   @ApiOperation({

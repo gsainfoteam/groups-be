@@ -255,16 +255,38 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup(uuid: string): Promise<void> {
+  async deleteGroup(uuid: string, userUuid: string): Promise<void> {
     this.logger.log(`deleteGroup: ${uuid}`);
-    await this.prismaService.group.update({
-      where: {
-        uuid,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+
+    await this.prismaService.group
+      .update({
+        where: {
+          uuid,
+          UserRole: {
+            some: {
+              userUuid,
+              Role: {
+                authorities: {
+                  has: Authority.GROUP_DELETE,
+                },
+              },
+            },
+          },
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+          this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
   }
 
   async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
