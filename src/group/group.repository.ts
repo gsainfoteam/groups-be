@@ -97,6 +97,24 @@ export class GroupRepository {
       });
   }
 
+  async checkGroupExistenceByUuid(uuid: string): Promise<Group | null> {
+    this.logger.log(`checkGroupExistenceByUuid ${uuid}`);
+
+    return this.prismaService.group
+      .findUnique({
+        where: {
+          deletedAt: null,
+          uuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
   async getGroupByName(name: string): Promise<Group | null> {
     this.logger.log(`getGroupByName ${name}`);
     return this.prismaService.group
@@ -141,7 +159,9 @@ export class GroupRepository {
     {
       name,
       description,
-    }: Pick<Group, 'name'> & Partial<Pick<Group, 'description'>>,
+      notionPageId,
+    }: Pick<Group, 'name'> &
+      Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
   ): Promise<Group> {
     this.logger.log(`createGroup: ${name}`);
@@ -151,6 +171,7 @@ export class GroupRepository {
           name,
           description,
           presidentUuid: userUuid,
+          notionPageId,
           UserGroup: {
             create: {
               userUuid,
@@ -189,16 +210,83 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup(uuid: string): Promise<void> {
+  async updateGroup(
+    {
+      uuid,
+      name,
+      description,
+      notionPageId,
+    }: Pick<Group, 'uuid'> &
+      Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
+    userUuid: string,
+  ): Promise<void> {
+    this.logger.log(`updateGroup ${uuid}`);
+
+    await this.prismaService.group
+      .update({
+        where: {
+          uuid,
+          UserRole: {
+            some: {
+              userUuid,
+              Role: {
+                authorities: {
+                  has: Authority.GROUP_UPDATE,
+                },
+              },
+            },
+          },
+        },
+        data: {
+          name,
+          description,
+          notionPageId,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+          this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async deleteGroup(uuid: string, userUuid: string): Promise<void> {
     this.logger.log(`deleteGroup: ${uuid}`);
-    await this.prismaService.group.update({
-      where: {
-        uuid,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+
+    await this.prismaService.group
+      .update({
+        where: {
+          uuid,
+          UserRole: {
+            some: {
+              userUuid,
+              Role: {
+                authorities: {
+                  has: Authority.GROUP_DELETE,
+                },
+              },
+            },
+          },
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException();
+          }
+          this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
   }
 
   async addUserToGroup(uuid: string, userUuid: string): Promise<void> {

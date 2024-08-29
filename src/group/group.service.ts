@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { GroupRepository } from './group.repository';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
@@ -13,6 +14,7 @@ import * as crypto from 'crypto';
 import { Authority, Group } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @Injectable()
 export class GroupService {
@@ -43,29 +45,42 @@ export class GroupService {
       createGroupDto.name,
     );
 
-    if (!checkGroupExistence) {
-      await this.groupRepository.createGroup(createGroupDto, userUuid);
-    } else {
+    if (checkGroupExistence) {
       throw new ConflictException(
         `Group with name ${createGroupDto.name} already exists`,
       );
     }
+
+    await this.groupRepository.createGroup(createGroupDto, userUuid);
+  }
+
+  async updateGroup(
+    updateGroupDto: UpdateGroupDto,
+    userUuid: string,
+  ): Promise<void> {
+    this.logger.log(`updateGroup: ${updateGroupDto.uuid}`);
+
+    const checkGroupExistence =
+      await this.groupRepository.checkGroupExistenceByUuid(updateGroupDto.uuid);
+
+    if (!checkGroupExistence) {
+      throw new NotFoundException('Group not found');
+    }
+
+    await this.groupRepository.updateGroup(updateGroupDto, userUuid);
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
     this.logger.log(`deleteGroup: ${uuid}`);
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.GROUP_DELETE],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException(
-        'You do not have permission to delete group',
-      );
+
+    const checkGroupExistence =
+      await this.groupRepository.checkGroupExistenceByUuid(uuid);
+
+    if (!checkGroupExistence) {
+      throw new NotFoundException('Group not found');
     }
-    await this.groupRepository.deleteGroup(uuid);
+
+    await this.groupRepository.deleteGroup(uuid, userUuid);
   }
 
   /**

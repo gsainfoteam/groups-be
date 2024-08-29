@@ -33,6 +33,7 @@ import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
+import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -92,6 +93,21 @@ export class GroupController {
   }
 
   @ApiOperation({
+    summary: 'Update group info',
+    description: '그룹의 정보를 업데이트하는 API입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Patch()
+  async updateGroup(
+    @Body() body: UpdateGroupDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.updateGroup(body, user.uuid);
+  }
+
+  @ApiOperation({
     summary: 'Delete a group',
     description:
       '그룹을 삭제하는 API 입니다. 삭제시 그룹의 모든 정보가 삭제됩니다.',
@@ -104,7 +120,7 @@ export class GroupController {
     @Param('uuid') uuid: string,
     @GetUser() user: User,
   ): Promise<void> {
-    this.groupService.deleteGroup(uuid, user.uuid);
+    return this.groupService.deleteGroup(uuid, user.uuid);
   }
 
   @ApiOperation({

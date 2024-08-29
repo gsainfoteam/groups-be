@@ -22,6 +22,9 @@ export class GroupResDto implements Group {
   verifiedAt: Date | null;
 
   @ApiProperty()
+  notionPageId: string | null;
+
+  @ApiProperty()
   @Expose()
   get verified(): boolean {
     return this.verifiedAt !== null;
