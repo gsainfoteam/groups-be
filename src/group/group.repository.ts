@@ -11,6 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
+import { GroupWithUserRole } from './types/groupwithUserRole.type';
 
 @Injectable()
 export class GroupRepository {
@@ -97,7 +98,11 @@ export class GroupRepository {
       });
   }
 
-  async checkGroupExistenceByUuid(uuid: string): Promise<Group | null> {
+  async checkGroupExistenceByUuid(
+    uuid: string,
+    userUuid?: string,
+    authority?: Authority,
+  ): Promise<GroupWithUserRole | null> {
     this.logger.log(`checkGroupExistenceByUuid ${uuid}`);
 
     return this.prismaService.group
@@ -105,6 +110,18 @@ export class GroupRepository {
         where: {
           deletedAt: null,
           uuid,
+        },
+        include: {
+          UserRole: {
+            where: {
+              userUuid,
+              Role: {
+                authorities: {
+                  has: authority,
+                },
+              },
+            },
+          },
         },
       })
       .catch((error) => {
@@ -212,20 +229,19 @@ export class GroupRepository {
 
   async updateGroup(
     {
-      uuid,
       name,
       description,
       notionPageId,
-    }: Pick<Group, 'uuid'> &
-      Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
+    }: Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
+    groupUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`updateGroup ${uuid}`);
+    this.logger.log(`updateGroup ${groupUuid}`);
 
     await this.prismaService.group
       .update({
         where: {
-          uuid,
+          uuid: groupUuid,
           UserRole: {
             some: {
               userUuid,
@@ -249,6 +265,24 @@ export class GroupRepository {
             throw new ForbiddenException();
           }
           this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async addGroupImage(imageKey: string, groupUuid: string): Promise<void> {
+    await this.prismaService.group
+      .update({
+        where: {
+          uuid: groupUuid,
+        },
+        data: {
+          profileImageKey: imageKey,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');

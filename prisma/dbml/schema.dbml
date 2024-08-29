@@ -60,6 +60,7 @@ Table group {
   presidentUuid String [not null]
   deletedAt DateTime
   notionPageId String
+  profileImageKey String
   President user [not null]
   UserGroup user_group [not null]
   Role role [not null]

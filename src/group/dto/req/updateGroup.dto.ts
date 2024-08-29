@@ -1,10 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateGroupDto {
-  @IsString()
-  @IsNotEmpty()
-  uuid: string;
-
   @IsString()
   @IsOptional()
   name?: string;

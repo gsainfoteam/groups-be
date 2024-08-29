@@ -6,9 +6,10 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/user.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule } from '@nestjs/config';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
-  imports: [ConfigModule, PrismaModule, UserModule, RedisModule],
+  imports: [ConfigModule, PrismaModule, UserModule, RedisModule, FileModule],
   providers: [GroupService, GroupRepository],
   controllers: [GroupController],
   exports: [GroupService],

@@ -15,6 +15,7 @@ import { Authority, Group } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class GroupService {
@@ -23,6 +24,7 @@ export class GroupService {
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
+    private readonly fileService: FileService,
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
@@ -56,18 +58,49 @@ export class GroupService {
 
   async updateGroup(
     updateGroupDto: UpdateGroupDto,
+    groupUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`updateGroup: ${updateGroupDto.uuid}`);
+    this.logger.log(`updateGroup: ${groupUuid}`);
 
     const checkGroupExistence =
-      await this.groupRepository.checkGroupExistenceByUuid(updateGroupDto.uuid);
+      await this.groupRepository.checkGroupExistenceByUuid(groupUuid);
 
     if (!checkGroupExistence) {
       throw new NotFoundException('Group not found');
     }
 
-    await this.groupRepository.updateGroup(updateGroupDto, userUuid);
+    await this.groupRepository.updateGroup(updateGroupDto, groupUuid, userUuid);
+  }
+
+  async uploadGroupImage(
+    file: Express.Multer.File,
+    groupUuid: string,
+    userUuid: string,
+  ): Promise<void> {
+    this.logger.log(`uploadGroupImage: ${groupUuid}`);
+
+    const checkGroupExistence =
+      await this.groupRepository.checkGroupExistenceByUuid(
+        groupUuid,
+        userUuid,
+        Authority.GROUP_UPDATE,
+      );
+
+    if (!checkGroupExistence) {
+      throw new NotFoundException('Group not found');
+    }
+    if (checkGroupExistence.UserRole.length === 0) {
+      throw new ForbiddenException(
+        'You do not have permission to upload image',
+      );
+    }
+
+    const key = `group/${groupUuid}/image/${file.originalname}`;
+
+    await this.fileService.uploadFile(key, file);
+
+    await this.groupRepository.addGroupImage(key, groupUuid);
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {

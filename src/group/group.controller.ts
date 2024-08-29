@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -34,6 +35,7 @@ import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -99,12 +101,30 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @Patch()
+  @Patch(':uuid')
   async updateGroup(
+    @Param('uuid') uuid: string,
     @Body() body: UpdateGroupDto,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.updateGroup(body, user.uuid);
+    return this.groupService.updateGroup(body, uuid, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Upload a group image',
+    description: '그룹의 이미지를 업로드하는 API 입니다.',
+  })
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @UseInterceptors(FileInterceptor('file'))
+  @Post(':uuid/image')
+  async uploadGroupImage(
+    @Param('uuid') uuid: string,
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.uploadGroupImage(file, uuid, user.uuid);
   }
 
   @ApiOperation({
