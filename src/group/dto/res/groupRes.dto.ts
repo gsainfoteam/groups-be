@@ -25,6 +25,9 @@ export class GroupResDto implements Group {
   notionPageId: string | null;
 
   @ApiProperty()
+  profileImageKey: string | null;
+
+  @ApiProperty()
   @Expose()
   get verified(): boolean {
     return this.verifiedAt !== null;

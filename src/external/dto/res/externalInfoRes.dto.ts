@@ -61,6 +61,9 @@ class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty()
   notionPageId: string | null;
 
+  @ApiProperty()
+  profileImageKey: string | null;
+
   @Exclude()
   deletedAt: Date | null;
 }
