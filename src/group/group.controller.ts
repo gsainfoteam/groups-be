@@ -17,7 +17,9 @@ import {
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {
+  ApiBody,
   ApiConflictResponse,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -113,6 +115,19 @@ export class GroupController {
   @ApiOperation({
     summary: 'Upload a group image',
     description: '그룹의 이미지를 업로드하는 API 입니다.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
   })
   @ApiCreatedResponse()
   @ApiForbiddenResponse()
