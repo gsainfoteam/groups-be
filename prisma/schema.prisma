@@ -81,14 +81,15 @@ model User {
 }
 
 model Group {
-  uuid          String    @id @default(uuid()) @db.Uuid
-  name          String    
-  description   String?
-  createdAt     DateTime  @default(now()) @map("created_at")
-  verifiedAt    DateTime? @map("verified_at")
-  presidentUuid String    @map("president_uuid") @db.Uuid
-  deletedAt     DateTime? @map("deleted_at")
-  notionPageId  String?
+  uuid            String    @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  verifiedAt      DateTime? @map("verified_at")
+  presidentUuid   String    @map("president_uuid") @db.Uuid
+  deletedAt       DateTime? @map("deleted_at")
+  notionPageId    String?
+  profileImageKey String?   @map("profile_image_key")
 
   President User @relation(fields: [presidentUuid], references: [uuid])
 
