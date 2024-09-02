@@ -9,6 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ApiBasicAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
@@ -82,6 +83,7 @@ export class ClientController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @ApiBasicAuth()
   @Post('authority')
   @UseGuards(ClientGuard)
   async addAuthority(
@@ -99,6 +101,7 @@ export class ClientController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @ApiBasicAuth()
   @Delete('authority')
   @UseGuards(ClientGuard)
   async removeAuthority(
