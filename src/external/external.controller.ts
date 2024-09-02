@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
+  ApiBasicAuth,
+  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
@@ -29,6 +31,7 @@ export class ExternalController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @ApiBasicAuth('client')
   @Post()
   async createCertToken(
     @GetClient() client: Client,
@@ -44,6 +47,7 @@ export class ExternalController {
   @UseGuards(ExternalGuard)
   @ApiUnauthorizedResponse()
   @ApiInternalServerErrorResponse()
+  @ApiBearerAuth('external')
   @Get('info')
   async getCertInfo(@Req() req: any): Promise<ExternalInfoResDto> {
     return this.externalService.getExternalInfo(req.user);

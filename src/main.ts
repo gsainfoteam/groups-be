@@ -12,6 +12,12 @@ async function bootstrap() {
     .setTitle('Groups API')
     .setDescription('The Groups API')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+      },
+      'external',
+    )
     .addBasicAuth(
       {
         type: 'http',

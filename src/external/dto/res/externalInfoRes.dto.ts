@@ -69,5 +69,6 @@ class GroupWithRoleResDto implements GroupWithRole {
 }
 
 export class ExternalInfoResDto {
+  @ApiProperty({ type: GroupWithRoleResDto, isArray: true })
   list: GroupWithRoleResDto[];
 }
