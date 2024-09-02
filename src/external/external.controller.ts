@@ -2,8 +2,10 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBasicAuth,
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -28,6 +30,7 @@ export class ExternalController {
       '해당 유저가 가입된 그룹 들을 확인할 수 있는 토큰을 생성합니다.',
   })
   @UseGuards(ClientGuard)
+  @ApiCreatedResponse({ type: ExternalTokenResDto })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
@@ -45,6 +48,7 @@ export class ExternalController {
     description: '해당 유저가 가입된 그룹 들에 관한 정보를 가져옵니다.',
   })
   @UseGuards(ExternalGuard)
+  @ApiOkResponse({ type: ExternalInfoResDto })
   @ApiUnauthorizedResponse()
   @ApiInternalServerErrorResponse()
   @ApiBearerAuth('external')

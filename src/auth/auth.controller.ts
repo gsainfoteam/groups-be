@@ -3,7 +3,14 @@ import { IdPGuard } from './guard/idp.guard';
 import { GroupsGuard } from './guard/groups.guard';
 import { GetUser } from './decorator/getUser.decorator';
 import { User } from '@prisma/client';
-import { ApiOAuth2, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOAuth2,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AccessTokenDto } from './dto/res/accessTokenRes.Dto';
+import { UserResDto } from './dto/res/userRes.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,9 +29,13 @@ export class AuthController {
     description:
       'idp login에서 callback을 받아서, idp groups token을 발급받습니다.',
   })
+  @ApiOkResponse({
+    type: AccessTokenDto,
+    description: 'idp groups token',
+  })
   @Get('callback')
   @UseGuards(IdPGuard)
-  login(@Req() req: any): any {
+  login(@Req() req: any): AccessTokenDto {
     return req.user;
   }
 
@@ -34,9 +45,13 @@ export class AuthController {
       '사용자 정보를 조회합니다. 이떄, 사용자 정보는 groups에 저장된 정보만을 가져옵니다.',
   })
   @ApiOAuth2(['openid', 'email', 'profile'])
+  @ApiOkResponse({
+    type: UserResDto,
+    description: 'User information',
+  })
   @Get('info')
   @UseGuards(GroupsGuard)
-  getUserInfo(@GetUser() user: User): any {
+  getUserInfo(@GetUser() user: User): UserResDto {
     return user;
   }
 }

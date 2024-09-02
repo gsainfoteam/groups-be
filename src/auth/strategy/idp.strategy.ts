@@ -3,6 +3,7 @@ import { Strategy } from 'passport-oauth2';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+import { AccessTokenDto } from '../dto/res/accessTokenRes.Dto';
 
 @Injectable()
 export class IdpStrategy extends PassportStrategy(Strategy, 'idp') {
@@ -20,7 +21,7 @@ export class IdpStrategy extends PassportStrategy(Strategy, 'idp') {
     });
   }
 
-  async validate(accessToken: string): Promise<any> {
+  async validate(accessToken: string): Promise<AccessTokenDto> {
     return this.authService.login(accessToken);
   }
 }

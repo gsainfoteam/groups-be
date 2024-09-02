@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { IdpService } from 'src/idp/idp.service';
 import { UserService } from 'src/user/user.service';
+import { AccessTokenDto } from './dto/res/accessTokenRes.Dto';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +12,7 @@ export class AuthService {
     private readonly idpService: IdpService,
   ) {}
 
-  async login(accessToken: string): Promise<{ accessToken: string }> {
+  async login(accessToken: string): Promise<AccessTokenDto> {
     this.logger.log('Login with IDP');
     const { uuid, name, email } =
       await this.idpService.getUserInfo(accessToken);
