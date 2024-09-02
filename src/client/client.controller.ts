@@ -83,7 +83,7 @@ export class ClientController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @ApiBasicAuth()
+  @ApiBasicAuth('client')
   @Post('authority')
   @UseGuards(ClientGuard)
   async addAuthority(
@@ -101,7 +101,7 @@ export class ClientController {
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @ApiBasicAuth()
+  @ApiBasicAuth('client')
   @Delete('authority')
   @UseGuards(ClientGuard)
   async removeAuthority(
