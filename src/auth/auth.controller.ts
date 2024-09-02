@@ -9,7 +9,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AccessTokenDto } from './dto/res/accessTokenRes.Dto';
+import { AccessTokenDto } from './dto/res/accessTokenRes.dto';
 import { UserResDto } from './dto/res/userRes.dto';
 
 @ApiTags('auth')
