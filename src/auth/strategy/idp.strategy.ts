@@ -3,7 +3,7 @@ import { Strategy } from 'passport-oauth2';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
-import { AccessTokenDto } from '../dto/res/accessTokenRes.Dto';
+import { AccessTokenDto } from '../dto/res/accessTokenRes.dto';
 
 @Injectable()
 export class IdpStrategy extends PassportStrategy(Strategy, 'idp') {

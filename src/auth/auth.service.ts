@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { IdpService } from 'src/idp/idp.service';
 import { UserService } from 'src/user/user.service';
-import { AccessTokenDto } from './dto/res/accessTokenRes.Dto';
+import { AccessTokenDto } from './dto/res/accessTokenRes.dto';
 
 @Injectable()
 export class AuthService {
