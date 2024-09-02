@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Authority, Role, RoleExternalAuthority } from '@prisma/client';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { GroupWithRole } from 'src/group/types/groupWithRole';
 
 class RoleExternalAuthorityResDto implements RoleExternalAuthority {
@@ -32,11 +32,23 @@ class RoleResDto implements Role {
   })
   authorities: Authority[];
 
-  @ApiProperty({ type: RoleExternalAuthorityResDto, isArray: true })
+  @ApiProperty()
+  @Expose()
+  get externalAuthority(): string[] {
+    return this.RoleExternalAuthority.map(
+      (roleExternalAuthority) => roleExternalAuthority.authority,
+    );
+  }
+
+  @Exclude()
   RoleExternalAuthority: RoleExternalAuthorityResDto[];
+
+  constructor(partial: Partial<Role>) {
+    Object.assign(this, partial);
+  }
 }
 
-class GroupWithRoleResDto implements GroupWithRole {
+export class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty()
   uuid: string;
 
@@ -66,6 +78,10 @@ class GroupWithRoleResDto implements GroupWithRole {
 
   @Exclude()
   deletedAt: Date | null;
+
+  constructor(partial: Partial<GroupWithRole>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class ExternalInfoResDto {

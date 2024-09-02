@@ -6,7 +6,10 @@ import { UserService } from 'src/user/user.service';
 import { GroupService } from 'src/group/group.service';
 import { ExternalTokenResDto } from './dto/res/externalTokenRes.dto';
 import { ExternalPayload } from './types/certPayload';
-import { ExternalInfoResDto } from './dto/res/externalInfoRes.dto';
+import {
+  ExternalInfoResDto,
+  GroupWithRoleResDto,
+} from './dto/res/externalInfoRes.dto';
 
 @Injectable()
 export class ExternalService {
@@ -35,6 +38,10 @@ export class ExternalService {
   }
 
   async getExternalInfo(payload: ExternalPayload): Promise<ExternalInfoResDto> {
-    return this.groupService.getGroupListWithRole(payload.sub, payload.aud);
+    return {
+      list: (
+        await this.groupService.getGroupListWithRole(payload.sub, payload.aud)
+      ).map((groupWithRole) => new GroupWithRoleResDto(groupWithRole)),
+    };
   }
 }

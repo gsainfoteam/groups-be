@@ -221,15 +221,8 @@ export class GroupService {
   async getGroupListWithRole(
     userUuid: string,
     clientUuid: string,
-  ): Promise<{
-    list: GroupWithRole[];
-  }> {
+  ): Promise<GroupWithRole[]> {
     this.logger.log(`getGroupListWithRole`);
-    return {
-      list: await this.groupRepository.getGroupListWithRole(
-        userUuid,
-        clientUuid,
-      ),
-    };
+    return this.groupRepository.getGroupListWithRole(userUuid, clientUuid);
   }
 }
