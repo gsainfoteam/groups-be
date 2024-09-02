@@ -25,6 +25,7 @@ import { DeleteClientDto } from './dto/req/deleteClient.dto';
 import { ClientGuard } from './guard/client.guard';
 import { GetClient } from './decorator/getClient.decorator';
 import { Client } from '@prisma/client';
+import { AuthorityDto } from './dto/req/authority.dto';
 
 @ApiTags('client')
 @Controller('client')
@@ -85,7 +86,7 @@ export class ClientController {
   @UseGuards(ClientGuard)
   async addAuthority(
     @GetClient() client: Client,
-    @Body('authority') authority: string,
+    @Body() { authority }: AuthorityDto,
   ): Promise<void> {
     await this.clientService.addAuthority(client.uuid, authority);
   }
@@ -102,7 +103,7 @@ export class ClientController {
   @UseGuards(ClientGuard)
   async removeAuthority(
     @GetClient() client: Client,
-    @Body('authority') authority: string,
+    @Body() { authority }: AuthorityDto,
   ): Promise<void> {
     await this.clientService.removeAuthority(client.uuid, authority);
   }
