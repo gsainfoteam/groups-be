@@ -336,6 +336,8 @@ export class GroupRepository {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             throw new NotFoundException('Group not found');
+          } else if (error.code === 'P2002') {
+            throw new ConflictException('User already exists in this group');
           }
           this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
