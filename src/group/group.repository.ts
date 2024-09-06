@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group } from '@prisma/client';
+import { Authority, Group, ViewAs } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
@@ -410,6 +410,39 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException('User not found');
           }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async updateUserGroupViewAs(
+    userUuid: string,
+    groupUuid: string,
+    viewAs: ViewAs,
+  ): Promise<void> {
+    this.logger.log(
+      `update 'view as' of user ${userUuid} in group ${groupUuid}`,
+    );
+
+    await this.prismaService.userGroup
+      .update({
+        where: {
+          userUuid_groupUuid: {
+            userUuid,
+            groupUuid,
+          },
+        },
+        data: {
+          viewAs,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('User is not a group member');
+          }
+          this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
