@@ -11,7 +11,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Authority, Group, ViewAs } from '@prisma/client';
+import { Authority, Group, Visibility } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
@@ -226,17 +226,17 @@ export class GroupService {
     return this.groupRepository.getGroupListWithRole(userUuid, clientUuid);
   }
 
-  async updateUserGroupViewAs(
+  async updateUserVisibilityInGroup(
     userUuid: string,
     groupUuid: string,
-    viewAs: ViewAs,
+    visibility: Visibility,
   ): Promise<void> {
-    this.logger.log('updateUserGroupViewAs');
+    this.logger.log('updateUserVisibilityInGroup');
 
-    await this.groupRepository.updateUserGroupViewAs(
+    await this.groupRepository.updateUserVisibilityInGroup(
       userUuid,
       groupUuid,
-      viewAs,
+      visibility,
     );
   }
 }

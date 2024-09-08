@@ -30,7 +30,7 @@ enum Authority {
   GROUP_DELETE
 }
 
-enum ViewAs {
+enum Visibility {
   Public
   Private
 }
@@ -106,12 +106,12 @@ model Group {
 }
 
 model UserGroup {
-  userUuid  String   @map("user_uuid") @db.Uuid
-  User      User     @relation(fields: [userUuid], references: [uuid])
-  groupUuid String   @map("group_uuid") @db.Uuid
-  Group     Group    @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
-  viewAs    ViewAs   @map("view_as") @default(Private)
+  userUuid    String   @map("user_uuid") @db.Uuid
+  User        User     @relation(fields: [userUuid], references: [uuid])
+  groupUuid   String   @map("group_uuid") @db.Uuid
+  Group       Group    @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+  visibility  Visibility   @map("visibility") @default(Private)
 
   @@id([userUuid, groupUuid])
   @@map("user_group")

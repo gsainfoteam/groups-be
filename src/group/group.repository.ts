@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, ViewAs } from '@prisma/client';
+import { Authority, Group, Visibility } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
@@ -418,13 +418,13 @@ export class GroupRepository {
       });
   }
 
-  async updateUserGroupViewAs(
+  async updateUserVisibilityInGroup(
     userUuid: string,
     groupUuid: string,
-    viewAs: ViewAs,
+    visibility: Visibility,
   ): Promise<void> {
     this.logger.log(
-      `update 'view as' of user ${userUuid} in group ${groupUuid}`,
+      `update 'visibility' of user ${userUuid} in group ${groupUuid}`,
     );
 
     await this.prismaService.userGroup
@@ -436,7 +436,7 @@ export class GroupRepository {
           },
         },
         data: {
-          viewAs,
+          visibility,
         },
       })
       .catch((error) => {

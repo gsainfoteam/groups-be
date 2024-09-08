@@ -73,7 +73,7 @@ Table user_group {
   groupUuid String [not null]
   Group group [not null]
   createdAt DateTime [default: `now()`, not null]
-  viewAs ViewAs [not null, default: 'Private']
+  visibility Visibility [not null, default: 'Private']
 
   indexes {
     (userUuid, groupUuid) [pk]
@@ -125,7 +125,7 @@ Enum Authority {
   GROUP_DELETE
 }
 
-Enum ViewAs {
+Enum Visibility {
   Public
   Private
 }
