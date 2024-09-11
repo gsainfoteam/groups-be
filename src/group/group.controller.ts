@@ -38,6 +38,7 @@ import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityInGroup.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -239,5 +240,25 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<void> {
     return this.groupService.revokeRole(uuid, targetUuid, roleId, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Update "visibility" of user in group',
+    description: '그룹 소속 여부의 공개/비공개 전환을 위한 API입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Patch(':uuid/visibility')
+  async updateUserVisibilityInGroup(
+    @Param('uuid') groupUuid: string,
+    @Body() body: UpdateUserVisibilityInGroupDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.updateUserVisibilityInGroup(
+      user.uuid,
+      groupUuid,
+      body.visibility,
+    );
   }
 }

@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group } from '@prisma/client';
+import { Authority, Group, Visibility } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
@@ -336,6 +336,8 @@ export class GroupRepository {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             throw new NotFoundException('Group not found');
+          } else if (error.code === 'P2002') {
+            throw new ConflictException('User already exists in this group');
           }
           this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
@@ -410,6 +412,39 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException('User not found');
           }
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async updateUserVisibilityInGroup(
+    userUuid: string,
+    groupUuid: string,
+    visibility: Visibility,
+  ): Promise<void> {
+    this.logger.log(
+      `update 'visibility' of user ${userUuid} in group ${groupUuid}`,
+    );
+
+    await this.prismaService.userGroup
+      .update({
+        where: {
+          userUuid_groupUuid: {
+            userUuid,
+            groupUuid,
+          },
+        },
+        data: {
+          visibility,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new ForbiddenException('User is not a group member');
+          }
+          this.logger.log(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');

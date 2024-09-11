@@ -73,6 +73,7 @@ Table user_group {
   groupUuid String [not null]
   Group group [not null]
   createdAt DateTime [default: `now()`, not null]
+  visibility Visibility [not null, default: 'Private']
 
   indexes {
     (userUuid, groupUuid) [pk]
@@ -122,6 +123,11 @@ Enum Authority {
   ROLE_REVOKE
   GROUP_UPDATE
   GROUP_DELETE
+}
+
+Enum Visibility {
+  Public
+  Private
 }
 
 Ref: client_authority.clientUuid > client.uuid
