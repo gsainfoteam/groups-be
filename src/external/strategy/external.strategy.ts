@@ -17,7 +17,7 @@ export class ExternalStrategy extends PassportStrategy(Strategy, 'external') {
     });
   }
 
-  async validate({ uuid }: { uuid: string }): Promise<User> {
-    return this.userService.getUserInfo(uuid);
+  async validate({ sub }: { sub: string }): Promise<User> {
+    return this.userService.getUserInfo(sub);
   }
 }
