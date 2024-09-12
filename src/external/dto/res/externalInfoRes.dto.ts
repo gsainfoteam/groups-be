@@ -17,7 +17,7 @@ class RoleExternalAuthorityResDto implements RoleExternalAuthority {
   authority: string;
 }
 
-class RoleResDto implements Role {
+class RoleWithExternalResDto implements Role {
   @ApiProperty()
   id: number;
 
@@ -32,7 +32,10 @@ class RoleResDto implements Role {
   })
   authorities: Authority[];
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    isArray: true,
+  })
   @Expose()
   get externalAuthority(): string[] {
     return this.RoleExternalAuthority.map(
@@ -43,7 +46,7 @@ class RoleResDto implements Role {
   @Exclude()
   RoleExternalAuthority: RoleExternalAuthorityResDto[];
 
-  constructor(partial: Partial<Role>) {
+  constructor(partial: Partial<RoleWithExternalResDto>) {
     Object.assign(this, partial);
   }
 }
@@ -55,7 +58,9 @@ export class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+  })
   description: string | null;
 
   @ApiProperty()
@@ -64,20 +69,35 @@ export class GroupWithRoleResDto implements GroupWithRole {
   @ApiProperty()
   presidentUuid: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+  })
   verifiedAt: Date | null;
 
-  @ApiProperty({ type: RoleResDto, isArray: true })
-  Role: RoleResDto[];
-
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+  })
   notionPageId: string | null;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+  })
   profileImageKey: string | null;
+
+  @ApiProperty({
+    type: RoleWithExternalResDto,
+    isArray: true,
+  })
+  @Expose()
+  get role(): RoleWithExternalResDto[] {
+    return this.Role.map((role) => new RoleWithExternalResDto(role));
+  }
 
   @Exclude()
   deletedAt: Date | null;
+
+  @Exclude()
+  Role: RoleWithExternalResDto[];
 
   constructor(partial: Partial<GroupWithRole>) {
     Object.assign(this, partial);
