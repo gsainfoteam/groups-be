@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiBasicAuth,
   ApiBearerAuth,
@@ -21,6 +30,7 @@ import { ExternalService } from './external.service';
 
 @Controller('external')
 @ApiTags('external')
+@UseInterceptors(ClassSerializerInterceptor)
 export class ExternalController {
   constructor(private readonly externalService: ExternalService) {}
 
