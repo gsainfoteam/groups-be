@@ -450,4 +450,50 @@ export class GroupRepository {
         throw new InternalServerErrorException('unknown error');
       });
   }
+
+  async changeSuperAdmin(
+    previousSuperAdminUserUuid: string,
+    newSuperAdminUserUuid: string,
+    groupUuid: string,
+  ): Promise<void> {
+    this.logger.log(
+      `change superAdmin from ${previousSuperAdminUserUuid} to ${newSuperAdminUserUuid}`,
+    );
+
+    await this.prismaService.userRole
+      .update({
+        where: {
+          userUuid_groupUuid_roleId: {
+            groupUuid,
+            userUuid: previousSuperAdminUserUuid,
+            roleId: 1,
+          },
+          AND: {
+            User: {
+              UserGroup: {
+                some: {
+                  groupUuid,
+                  userUuid: newSuperAdminUserUuid,
+                },
+              },
+            },
+          },
+        },
+        data: {
+          userUuid: newSuperAdminUserUuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new NotFoundException(
+              'New user is not a group member or previous user is not a super admin',
+            );
+          }
+          this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
 }

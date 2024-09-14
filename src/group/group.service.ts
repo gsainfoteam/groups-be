@@ -239,4 +239,18 @@ export class GroupService {
       visibility,
     );
   }
+
+  async changeSuperAdmin(
+    previousSuperAdminUserUuid: string,
+    newSuperAdminUserUuid: string,
+    groupUuid: string,
+  ): Promise<void> {
+    this.logger.log('changeSuperAdmin');
+
+    await this.groupRepository.changeSuperAdmin(
+      previousSuperAdminUserUuid,
+      newSuperAdminUserUuid,
+      groupUuid,
+    );
+  }
 }
