@@ -1,3 +1,7 @@
+<p align="center">
+  <a href="https://introduce.gistory.me/" target="blank"><img src="assets/Infoteam.png" alt="Infoteam Logo" /></a>
+</p>
+
 # Groups
 
 ## Purpose
