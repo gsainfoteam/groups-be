@@ -239,4 +239,18 @@ export class GroupService {
       visibility,
     );
   }
+
+  async changePresident(
+    previousPresidentUuid: string,
+    newPresidentUuid: string,
+    groupUuid: string,
+  ): Promise<void> {
+    this.logger.log('changePresident');
+
+    await this.groupRepository.changePresident(
+      previousPresidentUuid,
+      newPresidentUuid,
+      groupUuid,
+    );
+  }
 }

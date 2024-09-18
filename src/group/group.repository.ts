@@ -450,4 +450,64 @@ export class GroupRepository {
         throw new InternalServerErrorException('unknown error');
       });
   }
+
+  async changePresident(
+    previousPresidentUuid: string,
+    newPresidentUuid: string,
+    groupUuid: string,
+  ): Promise<void> {
+    this.logger.log(
+      `change president from ${previousPresidentUuid} to ${newPresidentUuid}`,
+    );
+
+    await this.prismaService
+      .$transaction([
+        this.prismaService.group.update({
+          where: {
+            presidentUuid: previousPresidentUuid,
+            uuid: groupUuid,
+            AND: {
+              UserGroup: {
+                some: {
+                  groupUuid,
+                  userUuid: newPresidentUuid,
+                },
+              },
+            },
+          },
+          data: {
+            presidentUuid: newPresidentUuid,
+          },
+        }),
+
+        this.prismaService.userRole.upsert({
+          where: {
+            userUuid_groupUuid_roleId: {
+              groupUuid,
+              userUuid: newPresidentUuid,
+              roleId: 1,
+            },
+          },
+          update: {},
+          create: {
+            groupUuid,
+            userUuid: newPresidentUuid,
+            roleId: 1,
+          },
+        }),
+      ])
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            this.logger.log(error, error.code);
+            throw new NotFoundException(
+              'New president is not a group member or previous user is not a president of the group',
+            );
+          }
+          this.logger.log(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
 }
