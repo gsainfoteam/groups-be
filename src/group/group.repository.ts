@@ -451,43 +451,57 @@ export class GroupRepository {
       });
   }
 
-  async changeSuperAdmin(
-    previousSuperAdminUserUuid: string,
-    newSuperAdminUserUuid: string,
+  async changePresident(
+    previousPresidentUuid: string,
+    newPresidentUuid: string,
     groupUuid: string,
   ): Promise<void> {
     this.logger.log(
-      `change superAdmin from ${previousSuperAdminUserUuid} to ${newSuperAdminUserUuid}`,
+      `change president from ${previousPresidentUuid} to ${newPresidentUuid}`,
     );
 
-    await this.prismaService.userRole
-      .update({
-        where: {
-          userUuid_groupUuid_roleId: {
-            groupUuid,
-            userUuid: previousSuperAdminUserUuid,
-            roleId: 1,
-          },
-          AND: {
-            User: {
+    await this.prismaService
+      .$transaction([
+        this.prismaService.group.update({
+          where: {
+            presidentUuid: previousPresidentUuid,
+            uuid: groupUuid,
+            AND: {
               UserGroup: {
                 some: {
                   groupUuid,
-                  userUuid: newSuperAdminUserUuid,
+                  userUuid: newPresidentUuid,
                 },
               },
             },
           },
-        },
-        data: {
-          userUuid: newSuperAdminUserUuid,
-        },
-      })
+          data: {
+            presidentUuid: newPresidentUuid,
+          },
+        }),
+
+        this.prismaService.userRole.upsert({
+          where: {
+            userUuid_groupUuid_roleId: {
+              groupUuid,
+              userUuid: newPresidentUuid,
+              roleId: 1,
+            },
+          },
+          update: {},
+          create: {
+            groupUuid,
+            userUuid: newPresidentUuid,
+            roleId: 1,
+          },
+        }),
+      ])
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
+            this.logger.log(error, error.code);
             throw new NotFoundException(
-              'New user is not a group member or previous user is not a super admin',
+              'New president is not a group member or previous user is not a president of the group',
             );
           }
           this.logger.log(error);

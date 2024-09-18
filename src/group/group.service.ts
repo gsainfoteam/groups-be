@@ -240,16 +240,16 @@ export class GroupService {
     );
   }
 
-  async changeSuperAdmin(
-    previousSuperAdminUserUuid: string,
-    newSuperAdminUserUuid: string,
+  async changePresident(
+    previousPresidentUuid: string,
+    newPresidentUuid: string,
     groupUuid: string,
   ): Promise<void> {
-    this.logger.log('changeSuperAdmin');
+    this.logger.log('changePresident');
 
-    await this.groupRepository.changeSuperAdmin(
-      previousSuperAdminUserUuid,
-      newSuperAdminUserUuid,
+    await this.groupRepository.changePresident(
+      previousPresidentUuid,
+      newPresidentUuid,
       groupUuid,
     );
   }

@@ -39,7 +39,7 @@ import { JoinDto } from './dto/req/join.dto';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityInGroup.dto';
-import { ChangeSuperAdminDto } from './dto/req/changeSuperAdmin.dto';
+import { ChangePresidentDto } from './dto/req/changePresident.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -264,21 +264,21 @@ export class GroupController {
   }
 
   @ApiOperation({
-    summary: 'Change SuperAdmin of the group',
-    description: '그룹의 최고 관리자를 변경하는 API입니다.',
+    summary: 'Change president of the group',
+    description: '그룹의 President를 변경하는 API입니다.',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @Patch(':uuid/admin')
-  async changeSuperAdmin(
+  @Patch(':uuid/president')
+  async changePresident(
     @Param('uuid') groupUuid: string,
-    @Body() body: ChangeSuperAdminDto,
+    @Body() body: ChangePresidentDto,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.changeSuperAdmin(
+    return this.groupService.changePresident(
       user.uuid,
-      body.newSuperAdminUuid,
+      body.newPresidentUuid,
       groupUuid,
     );
   }
