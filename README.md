@@ -37,7 +37,7 @@ Groups는 말그대로, user가 들어가 있는 group과 그 group에서의 rol
 ### 프로젝트에서 사용되는 Token에 관한 정리
 
 본 프로젝트에서는 IdP에서 발급하는 access token를 IdP token, groups에서 사용자가 포함되어 있는 그룹을 인증하기 위한 token을 external token이라고 명명한다.  
-이때, IdP를 발급하는 주체에 따라서 groups에서 발급한 token을 groups IdP token, client 에서 발급한 token을 client IdP token이라고 한다.
+이때, IdP token를 발급하는 주체에 따라서 groups에서 발급한 token을 groups IdP token, client 에서 발급한 token을 client IdP token이라고 한다.
 또한, groups 로그인을 위해서 발급하는 토큰을 groups token 이라고 하자.
 
 따라서 본 프로젝트에서는 groups IdP token, client IdP token, external token, groups token 총 4개의 토큰이 다루어진다.  
