@@ -10,5 +10,9 @@
     "nestjs",
     "noreply"
   ],
-  "git.branchProtection": ["main"]
+  "git.branchProtection": ["main"],
+  "markdownlint.config": {
+    "MD033": false,
+    "MD041": false
+  }
 }
