@@ -38,9 +38,8 @@ Groups는 말그대로, user가 들어가 있는 group과 그 group에서의 rol
 
 본 프로젝트에서는 IdP에서 발급하는 access token를 IdP token, groups에서 사용자가 포함되어 있는 그룹을 인증하기 위한 token을 external token이라고 명명한다.  
 이때, IdP token를 발급하는 주체에 따라서 groups에서 발급한 token을 groups IdP token, client 에서 발급한 token을 client IdP token이라고 한다.
-또한, groups 로그인을 위해서 발급하는 토큰을 groups token 이라고 하자.
 
-따라서 본 프로젝트에서는 groups IdP token, client IdP token, external token, groups token 총 4개의 토큰이 다루어진다.  
+따라서 본 프로젝트에서는 groups IdP token, client IdP token, external token 총 3개의 토큰이 다루어진다.  
 하지만, client를 구분하지 않는 IdP token의 특성 상, client IdP token과 group IdP token은 동일한 역할을 한다는 것에 유의하자.  
 
 ### External token을 발급받는 과정
@@ -52,7 +51,7 @@ sequenceDiagram
   Participant IdP
   Client->>+IdP: request access token
   IdP->>-Client: client IdP token
-  Client->>+Groups: request groups token with client IdP token, groups id, secret
+  Client->>+Groups: request external token with client IdP token, groups id, secret
   Groups->>-Client: external token
   loop when the client needs information about user's group
     Client->>+Groups: external token
