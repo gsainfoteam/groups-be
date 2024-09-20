@@ -271,7 +271,7 @@ export class GroupRepository {
       });
   }
 
-  async addGroupImage(imageKey: string, groupUuid: string): Promise<void> {
+  async updateGroupImage(imageKey: string, groupUuid: string): Promise<void> {
     await this.prismaService.group
       .update({
         where: {

@@ -116,7 +116,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Upload a group image',
-    description: '그룹의 이미지를 업로드하는 API 입니다.',
+    description:
+      '그룹의 이미지를 업로드하는 API 입니다. 이미 존재하는 이미지는 덮어씌워집니다.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
