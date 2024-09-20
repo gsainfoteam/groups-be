@@ -7,6 +7,7 @@ import {
   ApiOAuth2,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { AccessTokenDto } from './dto/res/accessTokenRes.dto';
@@ -28,6 +29,11 @@ export class AuthController {
     summary: 'Login callback',
     description:
       'idp login에서 callback을 받아서, idp groups token을 발급받습니다.',
+  })
+  @ApiQuery({
+    name: 'code',
+    required: true,
+    description: 'idp에서 발급받은 code입니다.',
   })
   @ApiOkResponse({
     type: AccessTokenDto,
