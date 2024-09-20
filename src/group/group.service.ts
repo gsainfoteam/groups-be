@@ -96,11 +96,15 @@ export class GroupService {
       );
     }
 
-    const key = `group/${groupUuid}/image/${file.originalname}`;
+    const key = `group/${groupUuid}/image/${Date.now().toString()}-${file.originalname}`;
 
     await this.fileService.uploadFile(key, file);
 
-    await this.groupRepository.addGroupImage(key, groupUuid);
+    await this.groupRepository.updateGroupImage(key, groupUuid);
+
+    if (checkGroupExistence.profileImageKey) {
+      await this.fileService.deleteFile(checkGroupExistence.profileImageKey);
+    }
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
