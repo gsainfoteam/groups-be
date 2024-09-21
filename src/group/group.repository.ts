@@ -132,8 +132,8 @@ export class GroupRepository {
       });
   }
 
-  async getGroupByName(name: string): Promise<Group | null> {
-    this.logger.log(`getGroupByName ${name}`);
+  async checkGroupExistenceByName(name: string): Promise<Group | null> {
+    this.logger.log(`checkGroupExistenceByName groupName: ${name}`);
     return this.prismaService.group
       .findFirst({
         where: {
