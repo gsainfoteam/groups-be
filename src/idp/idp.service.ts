@@ -5,10 +5,11 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserInfoResponse } from './types/userInfo.type';
+import { UserInfo } from './types/userInfo.type';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { IdpJwtResponse, IdpUserInfoRes } from './types/idp.type';
 
 @Injectable()
 export class IdpService {
@@ -22,35 +23,86 @@ export class IdpService {
   }
 
   /**
-   * Get user info from IDP and the handing Axios exceptions
-   * @param accessToken it is the idp access token
-   * @returns object of the UserInfo type
+   * this method is used to get the access token from the idp
+   * @param code this is the code that is returned from the idp
+   * @param redirectUri this is the redirect uri that is used to get the code
+   * @returns accessToken, refreshToken
    */
-  async getUserInfo(accessToken: string): Promise<UserInfoResponse> {
-    this.logger.log('Fetching user info from IDP');
+  async getAccessTokenFromIdP(
+    code: string,
+    redirectUri: string,
+  ): Promise<IdpJwtResponse> {
+    this.logger.log('getAccessTokenFromIdP called');
+    const url = this.idpUrl + '/token';
+    const accessTokenResponse = await firstValueFrom(
+      this.httpService
+        .post<IdpJwtResponse>(
+          url,
+          {
+            code,
+            grant_type: 'authorization_code',
+            redirect_uri: redirectUri,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            auth: {
+              username: this.configService.getOrThrow<string>('CLIENT_ID'),
+              password: this.configService.getOrThrow<string>('CLIENT_SECRET'),
+            },
+          },
+        )
+        .pipe(
+          catchError((err: AxiosError) => {
+            if (err instanceof AxiosError && err.response?.status === 401) {
+              this.logger.debug('user invalid code');
+              throw new UnauthorizedException();
+            }
+            this.logger.error(err);
+            this.logger.error(err.response?.data);
+            throw new InternalServerErrorException();
+          }),
+        ),
+    );
+    this.logger.log('getAccessTokenFromIdP success');
+    return accessTokenResponse.data;
+  }
+
+  /**
+   * this method is used to get the user info from the idp
+   * @param accessToken this is the access token that is returned from the idp
+   * @returns user info
+   */
+  async getUserInfo(accessToken: string): Promise<UserInfo> {
+    this.logger.log('getUserInfo called');
     const url = this.idpUrl + '/userinfo';
     const userInfoResponse = await firstValueFrom(
       this.httpService
-        .get<UserInfoResponse>(url, {
+        .get<IdpUserInfoRes>(url, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         })
         .pipe(
-          catchError((error) => {
-            if (error instanceof AxiosError) {
-              if (error.response?.status === 401) {
-                this.logger.debug('Invalid access token');
-                throw new UnauthorizedException('Invalid access token');
-              }
-              this.logger.error('IDP error', error);
-              throw new InternalServerErrorException('IDP error');
+          catchError((err) => {
+            if (err instanceof AxiosError && err.response?.status === 401) {
+              this.logger.debug('user invalid access token');
+              throw new UnauthorizedException();
             }
-            this.logger.error('Unknown error', error);
-            throw new InternalServerErrorException('Unknown error');
+            this.logger.error(err);
+            throw new InternalServerErrorException();
           }),
         ),
     );
-    return userInfoResponse.data;
+    this.logger.log('getUserInfo success');
+    const {
+      name,
+      email,
+      phone_number: phoneNumber,
+      student_id: studentNumber,
+      uuid,
+    } = userInfoResponse.data;
+    return { name, email, phoneNumber, studentNumber, uuid };
   }
 }

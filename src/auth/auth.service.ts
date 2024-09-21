@@ -12,8 +12,10 @@ export class AuthService {
     private readonly idpService: IdpService,
   ) {}
 
-  async login(accessToken: string): Promise<AccessTokenDto> {
-    this.logger.log('Login with IDP');
+  async login(code: string, redirectUri: string): Promise<AccessTokenDto> {
+    this.logger.log('Login');
+    const { access_token: accessToken } =
+      await this.idpService.getAccessTokenFromIdP(code, redirectUri);
     const { uuid, name, email } =
       await this.idpService.getUserInfo(accessToken);
     await this.userService.upsertUser({ uuid, name, email });
