@@ -48,8 +48,9 @@ export class IdpService {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             auth: {
-              username: this.configService.getOrThrow<string>('CLIENT_ID'),
-              password: this.configService.getOrThrow<string>('CLIENT_SECRET'),
+              username: this.configService.getOrThrow<string>('IDP_CLIENT_ID'),
+              password:
+                this.configService.getOrThrow<string>('IDP_CLIENT_SECRET'),
             },
           },
         )
