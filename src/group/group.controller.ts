@@ -40,6 +40,7 @@ import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityInGroup.dto';
 import { ChangePresidentDto } from './dto/req/changePresident.dto';
+import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -80,6 +81,20 @@ export class GroupController {
     return new ExpandedGroupResDto(
       await this.groupService.getGroupByUuid(uuid, user.uuid),
     );
+  }
+
+  @ApiOperation({
+    summary: 'Check group existence by name',
+    description: '이름을 바탕으로 특정 그룹이 존재하는지 확인하는 API입니다.',
+  })
+  @ApiOkResponse({ type: CheckGroupExistenceByNameDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get(':name/exist')
+  async checkGroupExistenceByName(
+    @Param('name') name: string,
+  ): Promise<CheckGroupExistenceByNameDto> {
+    return this.groupService.checkGroupExistenceByName(name);
   }
 
   @ApiOperation({

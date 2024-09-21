@@ -16,6 +16,7 @@ import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileService } from 'src/file/file.service';
+import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 
 @Injectable()
 export class GroupService {
@@ -37,17 +38,32 @@ export class GroupService {
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
 
+  async checkGroupExistenceByName(
+    name: string,
+  ): Promise<CheckGroupExistenceByNameDto> {
+    this.logger.log(`checkGroupExistenceByName ${name}`);
+
+    const checkGroupExistence =
+      await this.groupRepository.checkGroupExistenceByName(name);
+
+    if (checkGroupExistence) {
+      return { exist: true };
+    } else {
+      return { exist: false };
+    }
+  }
+
   async createGroup(
     createGroupDto: CreateGroupDto,
     userUuid: string,
   ): Promise<void> {
     this.logger.log(`createGroup: ${createGroupDto.name}`);
 
-    const checkGroupExistence = await this.groupRepository.getGroupByName(
+    const checkGroupExistence = await this.checkGroupExistenceByName(
       createGroupDto.name,
     );
 
-    if (checkGroupExistence) {
+    if (checkGroupExistence.exist) {
       throw new ConflictException(
         `Group with name ${createGroupDto.name} already exists`,
       );
