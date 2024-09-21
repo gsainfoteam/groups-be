@@ -10,6 +10,7 @@ import { GroupModule } from './group/group.module';
 import { RoleModule } from './role/role.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ExternalModule } from './external/external.module';
+import { NotionModule } from './notion/notion.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ExternalModule } from './external/external.module';
     GroupModule,
     RoleModule,
     ExternalModule,
+    NotionModule,
   ],
   controllers: [AppController],
 })
