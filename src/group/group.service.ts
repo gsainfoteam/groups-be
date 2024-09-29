@@ -56,7 +56,7 @@ export class GroupService {
   async createGroup(
     createGroupDto: CreateGroupDto,
     userUuid: string,
-  ): Promise<void> {
+  ): Promise<Group> {
     this.logger.log(`createGroup: ${createGroupDto.name}`);
 
     const checkGroupExistence = await this.checkGroupExistenceByName(
@@ -69,7 +69,7 @@ export class GroupService {
       );
     }
 
-    await this.groupRepository.createGroup(createGroupDto, userUuid);
+    return this.groupRepository.createGroup(createGroupDto, userUuid);
   }
 
   async updateGroup(

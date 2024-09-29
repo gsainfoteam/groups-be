@@ -30,7 +30,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { User } from '@prisma/client';
+import { Group, User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
@@ -109,7 +109,7 @@ export class GroupController {
   async createGroup(
     @Body() body: CreateGroupDto,
     @GetUser() user: User,
-  ): Promise<void> {
+  ): Promise<Group> {
     return this.groupService.createGroup(body, user.uuid);
   }
 
