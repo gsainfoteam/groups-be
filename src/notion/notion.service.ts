@@ -1,9 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
@@ -29,6 +31,13 @@ export class NotionService {
         },
       ),
     ).catch((error) => {
+      if (error instanceof AxiosError) {
+        this.logger.debug(error.response?.data);
+        if (error.response?.status === 400) {
+          throw new BadRequestException(error.response?.data);
+        }
+        throw new InternalServerErrorException();
+      }
       this.logger.debug(error);
       throw new InternalServerErrorException();
     });
