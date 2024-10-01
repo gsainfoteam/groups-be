@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -30,7 +31,7 @@ export class NotionController {
   @ApiOkResponse()
   @ApiInternalServerErrorResponse()
   @Get(':pageId')
-  async getRecordMap(pageId: string): Promise<JSON> {
+  async getRecordMap(@Param('pageId') pageId: string): Promise<JSON> {
     return this.notionService.getRecordMap(pageId);
   }
 }
