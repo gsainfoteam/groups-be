@@ -30,7 +30,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { Group, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
@@ -41,6 +41,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityInGroup.dto';
 import { ChangePresidentDto } from './dto/req/changePresident.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
+import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -109,7 +110,7 @@ export class GroupController {
   async createGroup(
     @Body() body: CreateGroupDto,
     @GetUser() user: User,
-  ): Promise<Group> {
+  ): Promise<GroupCreateResDto> {
     return this.groupService.createGroup(body, user.uuid);
   }
 
