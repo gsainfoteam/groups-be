@@ -17,6 +17,7 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileService } from 'src/file/file.service';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
+import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 
 @Injectable()
 export class GroupService {
@@ -56,7 +57,7 @@ export class GroupService {
   async createGroup(
     createGroupDto: CreateGroupDto,
     userUuid: string,
-  ): Promise<void> {
+  ): Promise<GroupCreateResDto> {
     this.logger.log(`createGroup: ${createGroupDto.name}`);
 
     const checkGroupExistence = await this.checkGroupExistenceByName(
@@ -69,7 +70,7 @@ export class GroupService {
       );
     }
 
-    await this.groupRepository.createGroup(createGroupDto, userUuid);
+    return this.groupRepository.createGroup(createGroupDto, userUuid);
   }
 
   async updateGroup(

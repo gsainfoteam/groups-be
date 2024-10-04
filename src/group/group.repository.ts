@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { GroupWithUserRole } from './types/groupwithUserRole.type';
+import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -180,7 +181,7 @@ export class GroupRepository {
     }: Pick<Group, 'name'> &
       Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
-  ): Promise<Group> {
+  ): Promise<GroupCreateResDto> {
     this.logger.log(`createGroup: ${name}`);
     return this.prismaService.group
       .create({

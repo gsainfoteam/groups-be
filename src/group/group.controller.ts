@@ -41,6 +41,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityInGroup.dto';
 import { ChangePresidentDto } from './dto/req/changePresident.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
+import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -109,7 +110,7 @@ export class GroupController {
   async createGroup(
     @Body() body: CreateGroupDto,
     @GetUser() user: User,
-  ): Promise<void> {
+  ): Promise<GroupCreateResDto> {
     return this.groupService.createGroup(body, user.uuid);
   }
 
