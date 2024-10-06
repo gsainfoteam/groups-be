@@ -15,21 +15,7 @@ export class NotionService {
 
   async getRecordMap(pageId: string): Promise<JSON> {
     const response = await firstValueFrom(
-      this.httpService.post(
-        `https://www.notion.so/api/v3/loadPageChunk`,
-        {
-          pageId,
-          limit: 100,
-          cursor: { stack: [] },
-          chunkNumber: 0,
-          verticalColumns: false,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      ),
+      this.httpService.get(`https://notion-api.splitbee.io/v1/page/${pageId}`),
     ).catch((error) => {
       if (error instanceof AxiosError) {
         this.logger.debug(error.response?.data);
