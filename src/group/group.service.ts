@@ -172,6 +172,23 @@ export class GroupService {
     return { code };
   }
 
+  async getInvitationInfo(
+    code: string,
+    userUuid: string,
+  ): Promise<ExpandedGroup> {
+    this.logger.log(`getInvitationInfo ${code}`);
+
+    const groupUuid = await this.redis.get(
+      `${this.invitationCodePrefix}:${code}`,
+    );
+
+    if (!groupUuid) {
+      throw new ForbiddenException('Invalid invite code');
+    }
+
+    return this.groupRepository.getGroupByUuid(groupUuid, userUuid);
+  }
+
   async joinMember(code: string, userUuid: string): Promise<void> {
     this.logger.log(`updateMember: ${code}`);
     const uuid = await this.redis.get(`${this.invitationCodePrefix}:${code}`);

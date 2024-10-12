@@ -42,6 +42,7 @@ import { UpdateUserVisibilityInGroupDto } from './dto/req/updateUserVisibilityIn
 import { ChangePresidentDto } from './dto/req/changePresident.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
+import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -191,6 +192,23 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
     return this.groupService.createInviteCode(uuid, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Get the invited group name and email of invited group president',
+    description: '초대 그룹 이름과 그룹 관리자의 email을 조회합니다.',
+  })
+  @ApiOkResponse({ type: InvitationInfoResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get('join/:code')
+  async getInvitationInfo(
+    @Param('code') code: string,
+    @GetUser() user: User,
+  ): Promise<InvitationInfoResDto> {
+    return new InvitationInfoResDto(
+      await this.groupService.getInvitationInfo(code, user.uuid),
+    );
   }
 
   @ApiOperation({
