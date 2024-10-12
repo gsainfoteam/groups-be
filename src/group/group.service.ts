@@ -146,6 +146,7 @@ export class GroupService {
   async createInviteCode(
     uuid: string,
     userUuid: string,
+    duration: number,
   ): Promise<InviteCodeResDto> {
     this.logger.log(`createInviteCode: ${uuid}`);
     if (
@@ -167,7 +168,7 @@ export class GroupService {
       `${this.invitationCodePrefix}:${code}`,
       uuid,
       'EX',
-      14 * 24 * 60 * 60,
+      duration,
     );
     return { code };
   }

@@ -43,6 +43,7 @@ import { ChangePresidentDto } from './dto/req/changePresident.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
+import { InvitationExpDto } from './dto/req/invitationExp.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -189,9 +190,10 @@ export class GroupController {
   @Post(':uuid/invite')
   async createInviteCode(
     @Param('uuid') uuid: string,
+    @Query() query: InvitationExpDto,
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
-    return this.groupService.createInviteCode(uuid, user.uuid);
+    return this.groupService.createInviteCode(uuid, user.uuid, query.duration);
   }
 
   @ApiOperation({
