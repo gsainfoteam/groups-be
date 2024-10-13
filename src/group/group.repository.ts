@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, Visibility } from '@prisma/client';
+import { Authority, Group, Visibility, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
@@ -345,6 +345,71 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+  }
+
+  async isMemberInGroup(groupUuid: string, user: User): Promise<boolean> {
+    this.logger.log(`isMemberInGroup: ${user.uuid}`);
+    const isMember = await this.prismaService.userGroup
+      .findFirst({
+        where: {
+          userUuid: user.uuid,
+          groupUuid: groupUuid,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+    return !(isMember === null);
+  }
+
+  async getMembersByGroupUuid(groupUuid: string, user: User): Promise<User[]> {
+    this.logger.log(`getMembersByGroupUuid: ${groupUuid}`);
+    const isMember = await this.isMemberInGroup(groupUuid, user);
+    const userGroups = await this.prismaService.userGroup
+      .findMany({
+        where: {
+          groupUuid,
+        },
+        include: {
+          User: true,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+    const members = isMember
+      ? userGroups
+      : userGroups.filter((usergroup) => usergroup.visibility === 'Public');
+
+    return members.map((member) => member.User);
+    // if (isMember) {
+    //   userGroups = await this.prismaService.userGroup.findMany({
+    //     where: {
+    //       groupUuid,
+    //     },
+    //     include: {
+    //       User: true,
+    //     },
+    //   });
+    // }
+
+    // userGroups = await this.prismaService.userGroup.findMany({
+    //   where: {
+    //     groupUuid,
+    //     visibility: 'Public',
+    //   },
+    //   include: {
+    //     User: true,
+    //   },
+    // });
+
+    //return userGroups.map((userGroup) => userGroup.User);
   }
 
   async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
