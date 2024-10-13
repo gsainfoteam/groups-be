@@ -70,6 +70,23 @@ export class GroupController {
   }
 
   @ApiOperation({
+    summary: 'Get the invited group name and email of invited group president',
+    description: '초대 그룹 이름과 그룹 관리자의 email을 조회합니다.',
+  })
+  @ApiOkResponse({ type: InvitationInfoResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get('join')
+  async getInvitationInfo(
+    @Query('code') code: string,
+    @GetUser() user: User,
+  ): Promise<InvitationInfoResDto> {
+    return new InvitationInfoResDto(
+      await this.groupService.getInvitationInfo(code, user.uuid),
+    );
+  }
+
+  @ApiOperation({
     summary: 'Get a group by uuid',
     description: 'uuid를 바탕으로 특정 그룹을 가져오는 API 입니다.',
   })
@@ -182,7 +199,7 @@ export class GroupController {
   @ApiOperation({
     summary: 'Create an invite code',
     description:
-      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다.',
+      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다. 코드가 유효한 duration의 최소값은 1, 최대값은 60 * 60 * 24 * 30 = 2592000입니다.',
   })
   @ApiCreatedResponse({ type: InviteCodeResDto })
   @ApiForbiddenResponse()
@@ -194,23 +211,6 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
     return this.groupService.createInviteCode(uuid, user.uuid, query.duration);
-  }
-
-  @ApiOperation({
-    summary: 'Get the invited group name and email of invited group president',
-    description: '초대 그룹 이름과 그룹 관리자의 email을 조회합니다.',
-  })
-  @ApiOkResponse({ type: InvitationInfoResDto })
-  @ApiForbiddenResponse()
-  @ApiInternalServerErrorResponse()
-  @Get('join/:code')
-  async getInvitationInfo(
-    @Param('code') code: string,
-    @GetUser() user: User,
-  ): Promise<InvitationInfoResDto> {
-    return new InvitationInfoResDto(
-      await this.groupService.getInvitationInfo(code, user.uuid),
-    );
   }
 
   @ApiOperation({

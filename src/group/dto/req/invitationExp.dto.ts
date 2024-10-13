@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, Max } from 'class-validator';
+import { IsInt, IsNotEmpty, Max, Min } from 'class-validator';
 
 export class InvitationExpDto {
   @ApiProperty()
   @Type(() => Number)
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
+  @Min(1)
   @Max(60 * 60 * 24 * 30)
   duration: number;
 }

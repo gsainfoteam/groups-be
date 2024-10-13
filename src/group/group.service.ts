@@ -146,7 +146,7 @@ export class GroupService {
   async createInviteCode(
     uuid: string,
     userUuid: string,
-    duration: number,
+    duration: number = 60 * 60,
   ): Promise<InviteCodeResDto> {
     this.logger.log(`createInviteCode: ${uuid}`);
     if (
@@ -177,7 +177,7 @@ export class GroupService {
     code: string,
     userUuid: string,
   ): Promise<ExpandedGroup> {
-    this.logger.log(`getInvitationInfo ${code}`);
+    this.logger.log(`getInvitationInfo called`);
 
     const groupUuid = await this.redis.get(
       `${this.invitationCodePrefix}:${code}`,
