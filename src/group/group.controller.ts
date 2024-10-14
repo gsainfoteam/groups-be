@@ -222,7 +222,7 @@ export class GroupController {
   })
   @ApiOkResponse({ type: MemberListResDto })
   @ApiInternalServerErrorResponse()
-  @Get(':uuid/memeber')
+  @Get(':uuid/member')
   async getMemberInGroup(
     @Param('uuid') uuid: string,
     @GetUser() user: User,
