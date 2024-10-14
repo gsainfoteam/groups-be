@@ -3,7 +3,7 @@ import { User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 import { ExpandedGroup } from 'src/group/types/ExpandedGroup.type';
 
-class PresidentResDto implements User {
+export class PresidentResDto implements User {
   @ApiProperty()
   uuid: string;
 

@@ -146,6 +146,7 @@ export class GroupService {
   async createInviteCode(
     uuid: string,
     userUuid: string,
+    duration: number = 60 * 60,
   ): Promise<InviteCodeResDto> {
     this.logger.log(`createInviteCode: ${uuid}`);
     if (
@@ -167,9 +168,26 @@ export class GroupService {
       `${this.invitationCodePrefix}:${code}`,
       uuid,
       'EX',
-      14 * 24 * 60 * 60,
+      duration,
     );
     return { code };
+  }
+
+  async getInvitationInfo(
+    code: string,
+    userUuid: string,
+  ): Promise<ExpandedGroup> {
+    this.logger.log(`getInvitationInfo called`);
+
+    const groupUuid = await this.redis.get(
+      `${this.invitationCodePrefix}:${code}`,
+    );
+
+    if (!groupUuid) {
+      throw new ForbiddenException('Invalid invite code');
+    }
+
+    return this.groupRepository.getGroupByUuid(groupUuid, userUuid);
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
