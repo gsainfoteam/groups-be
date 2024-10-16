@@ -353,18 +353,22 @@ export class GroupRepository {
       .findMany({
         where: {
           groupUuid,
-          OR: [
-            {
-              Group: {
-                UserGroup: {
-                  some: {
-                    userUuid: user.uuid,
+          And:[
+            OR: [
+              {
+                Group: {
+                  UserGroup: {
+                    some: {
+                      userUuid: user.uuid,
+                    },
                   },
                 },
               },
-            },
-            { visibility: Visibility.Public },
-          ],
+              { visibility: Visibility.Public },
+            ],
+
+          ]
+          
         },
         include: {
           User: true,
