@@ -11,7 +11,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Authority, Group, Visibility } from '@prisma/client';
+import { Authority, Group, Visibility, User } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
@@ -197,6 +197,11 @@ export class GroupService {
       throw new ForbiddenException('Invalid invite code');
     }
     await this.groupRepository.addUserToGroup(uuid, userUuid);
+  }
+
+  async getMembersByGroupUuid(groupUuid: string, user: User): Promise<User[]> {
+    this.logger.log(`getMemberInGroup: ${groupUuid}`);
+    return await this.groupRepository.getMembersByGroupUuid(groupUuid, user);
   }
 
   async removeMember(

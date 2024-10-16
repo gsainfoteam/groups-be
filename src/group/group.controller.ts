@@ -32,7 +32,12 @@ import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
-import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
+import {
+  GroupListResDto,
+  GroupResDto,
+  MemberListResDto,
+  MemberResDto,
+} from './dto/res/groupRes.dto';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
 import { JoinDto } from './dto/req/join.dto';
@@ -228,6 +233,25 @@ export class GroupController {
   @Post('join')
   async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
     return this.groupService.joinMember(body.code, user.uuid);
+  }
+
+  @ApiOperation({
+    summary: 'Get Group members information',
+    description:
+      '멤버 읽기 권한이 있는 그룹장 및 그룹원들이 그룹인원들의 정보를 가져옵니다.만약 그룹 멤버가 아니라면, public 그룹원들만 볼 수 있습니다. ',
+  })
+  @ApiOkResponse({ type: MemberListResDto })
+  @ApiInternalServerErrorResponse()
+  @Get(':uuid/member')
+  async getMemberInGroup(
+    @Param('uuid') uuid: string,
+    @GetUser() user: User,
+  ): Promise<MemberListResDto> {
+    return {
+      list: (await this.groupService.getMembersByGroupUuid(uuid, user)).map(
+        (member: User) => new MemberResDto(member),
+      ),
+    };
   }
 
   @ApiOperation({

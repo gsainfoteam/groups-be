@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, Visibility } from '@prisma/client';
+import { Authority, Group, Visibility, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
@@ -345,6 +345,43 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+  }
+
+  async getMembersByGroupUuid(groupUuid: string, user: User): Promise<User[]> {
+    this.logger.log(`getMembersByGroupUuid: ${groupUuid}`);
+    const userGroups = await this.prismaService.userGroup
+      .findMany({
+        where: {
+          groupUuid,
+          And:[
+            OR: [
+              {
+                Group: {
+                  UserGroup: {
+                    some: {
+                      userUuid: user.uuid,
+                    },
+                  },
+                },
+              },
+              { visibility: Visibility.Public },
+            ],
+
+          ]
+          
+        },
+        include: {
+          User: true,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+
+    return userGroups.map((userGroup) => userGroup.User);
   }
 
   async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
