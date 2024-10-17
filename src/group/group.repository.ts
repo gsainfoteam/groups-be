@@ -19,57 +19,103 @@ export class GroupRepository {
   private readonly logger = new Logger(GroupRepository.name);
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getGroupList(userUuid: string): Promise<Group[]> {
+  async getGroupList(userUuid: string, s3Url?: string): Promise<Group[]> {
     this.logger.log(`getGroupList`);
-    return this.prismaService.group.findMany({
-      where: {
-        deletedAt: null,
-        UserGroup: {
-          some: {
-            userUuid,
+    return this.prismaService
+      .$extends({
+        result: {
+          group: {
+            profileImageUrl: {
+              needs: { profileImageKey: true },
+              compute(user) {
+                if (!user.profileImageKey) return null;
+                return `${s3Url}/${user.profileImageKey}`;
+              },
+            },
           },
         },
-      },
-    });
+      })
+      .group.findMany({
+        where: {
+          deletedAt: null,
+          UserGroup: {
+            some: {
+              userUuid,
+            },
+          },
+        },
+      });
   }
 
   async getGroupListWithRole(
     userUuid: string,
     clientUuid: string,
+    s3Url?: string,
   ): Promise<GroupWithRole[]> {
     this.logger.log(`getGroupListWithRole`);
-    return this.prismaService.group.findMany({
-      where: {
-        deletedAt: null,
-        UserGroup: {
-          some: {
-            userUuid,
-          },
-        },
-      },
-      include: {
-        Role: {
-          where: {
-            userRole: {
-              some: {
-                userUuid,
+    return this.prismaService
+      .$extends({
+        result: {
+          group: {
+            profileImageUrl: {
+              needs: { profileImageKey: true },
+              compute(user) {
+                if (!user.profileImageKey) return null;
+                return `${s3Url}/${user.profileImageKey}`;
               },
             },
           },
-          include: {
-            RoleExternalAuthority: {
-              where: clientUuid ? { clientUuid } : undefined,
+        },
+      })
+      .group.findMany({
+        where: {
+          deletedAt: null,
+          UserGroup: {
+            some: {
+              userUuid,
             },
           },
         },
-      },
-    });
+        include: {
+          Role: {
+            where: {
+              userRole: {
+                some: {
+                  userUuid,
+                },
+              },
+            },
+            include: {
+              RoleExternalAuthority: {
+                where: clientUuid ? { clientUuid } : undefined,
+              },
+            },
+          },
+        },
+      });
   }
 
-  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+  async getGroupByUuid(
+    uuid: string,
+    userUuid: string,
+    s3Url?: string,
+  ): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
-    return this.prismaService.group
-      .findUniqueOrThrow({
+    return this.prismaService
+      .$extends({
+        result: {
+          group: {
+            profileImageUrl: {
+              needs: { profileImageKey: true },
+              compute(user) {
+                if (!user.profileImageKey || !s3Url) return null;
+                return `${s3Url}/${user.profileImageKey}`;
+              },
+            },
+          },
+        },
+      })
+      .group.findUniqueOrThrow({
         where: {
           deletedAt: null,
           uuid,
@@ -181,10 +227,24 @@ export class GroupRepository {
     }: Pick<Group, 'name'> &
       Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
+    s3Url: string,
   ): Promise<GroupCreateResDto> {
     this.logger.log(`createGroup: ${name}`);
-    return this.prismaService.group
-      .create({
+    return this.prismaService
+      .$extends({
+        result: {
+          group: {
+            profileImageUrl: {
+              needs: { profileImageKey: true },
+              compute(user) {
+                if (!user.profileImageKey) return null;
+                return `${s3Url}/${user.profileImageKey}`;
+              },
+            },
+          },
+        },
+      })
+      .group.create({
         data: {
           name,
           description,
