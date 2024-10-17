@@ -33,10 +33,23 @@ export class GroupResDto implements Group {
     return this.verifiedAt !== null;
   }
 
+  @ApiProperty({
+    type: String,
+  })
+  @Expose()
+  get profileImageUrl(): string | null {
+    return this.profileImageKey
+      ? `${this.s3Url}/${this.profileImageKey}`
+      : null;
+  }
+
+  @Exclude()
+  s3Url: string;
+
   @Exclude()
   deletedAt: Date | null;
 
-  constructor(partial: Partial<GroupResDto>) {
+  constructor(partial: Partial<GroupResDto> & { s3Url: string }) {
     Object.assign(this, partial);
   }
 }

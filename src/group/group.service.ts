@@ -11,32 +11,54 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Authority, Group, Visibility, User } from '@prisma/client';
+import { Authority, Visibility, User } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
-import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileService } from 'src/file/file.service';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
+import { ExpandedGroupResDto } from './dto/res/ExpandedGroupRes.dto';
+import { ConfigService } from '@nestjs/config';
+import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
+import { GroupListResDto, GroupResDto } from './dto/res/groupRes.dto';
 
 @Injectable()
 export class GroupService {
   private readonly logger = new Logger(GroupService.name);
   private readonly invitationCodePrefix = 'invitationCode';
+  private readonly s3Url: string;
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
     private readonly fileService: FileService,
-  ) {}
-
-  async getGroupList(userUuid: string): Promise<Group[]> {
-    this.logger.log(`getGroupList`);
-    return this.groupRepository.getGroupList(userUuid);
+    private readonly configService: ConfigService,
+  ) {
+    this.s3Url = `https://s3.${configService.get<string>(
+      'AWS_S3_REGION',
+    )}.amazonaws.com/${configService.get<string>('AWS_S3_BUCKET_NAME')}`;
   }
 
-  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+  async getGroupList(userUuid: string): Promise<GroupListResDto> {
+    this.logger.log(`getGroupList`);
+    return {
+      list: (await this.groupRepository.getGroupList(userUuid)).map((group) => {
+        return new GroupResDto({
+          s3Url: this.s3Url,
+          ...group,
+        });
+      }),
+    };
+  }
+
+  async getGroupByUuid(
+    uuid: string,
+    userUuid: string,
+  ): Promise<ExpandedGroupResDto> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
-    return this.groupRepository.getGroupByUuid(uuid, userUuid);
+    return new ExpandedGroupResDto({
+      s3Url: this.s3Url,
+      ...this.groupRepository.getGroupByUuid(uuid, userUuid),
+    });
   }
 
   async checkGroupExistenceByName(
@@ -70,7 +92,10 @@ export class GroupService {
       );
     }
 
-    return this.groupRepository.createGroup(createGroupDto, userUuid);
+    return new GroupCreateResDto({
+      s3Url: this.s3Url,
+      ...this.groupRepository.createGroup(createGroupDto, userUuid),
+    });
   }
 
   async updateGroup(
@@ -176,7 +201,7 @@ export class GroupService {
   async getInvitationInfo(
     code: string,
     userUuid: string,
-  ): Promise<ExpandedGroup> {
+  ): Promise<InvitationInfoResDto> {
     this.logger.log(`getInvitationInfo called`);
 
     const groupUuid = await this.redis.get(
@@ -187,7 +212,10 @@ export class GroupService {
       throw new ForbiddenException('Invalid invite code');
     }
 
-    return this.groupRepository.getGroupByUuid(groupUuid, userUuid);
+    return new InvitationInfoResDto({
+      s3Url: this.s3Url,
+      ...this.groupRepository.getGroupByUuid(groupUuid, userUuid),
+    });
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {

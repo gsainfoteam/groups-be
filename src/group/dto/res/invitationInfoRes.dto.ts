@@ -40,10 +40,23 @@ export class InvitationInfoResDto implements ExpandedGroup {
     return this.President.email;
   }
 
+  @ApiProperty({
+    type: String,
+  })
+  @Expose()
+  get profileImageUrl(): string | null {
+    return this.profileImageKey
+      ? `${this.s3Url}/${this.profileImageKey}`
+      : null;
+  }
+
+  @Exclude()
+  s3Url: string;
+
   @ApiProperty()
   name: string;
 
-  constructor(partial: Partial<InvitationInfoResDto>) {
+  constructor(partial: Partial<InvitationInfoResDto> & { s3Url: string }) {
     Object.assign(this, partial);
   }
 }

@@ -93,13 +93,26 @@ export class GroupWithRoleResDto implements GroupWithRole {
     return this.Role.map((role) => new RoleWithExternalResDto(role));
   }
 
+  @ApiProperty({
+    type: String,
+  })
+  @Expose()
+  get profileImageUrl(): string | null {
+    return this.profileImageKey
+      ? `${this.s3Url}/${this.profileImageKey}`
+      : null;
+  }
+
+  @Exclude()
+  s3Url: string;
+
   @Exclude()
   deletedAt: Date | null;
 
   @Exclude()
   Role: RoleWithExternalResDto[];
 
-  constructor(partial: Partial<GroupWithRole>) {
+  constructor(partial: Partial<GroupWithRole> & { s3Url: string }) {
     Object.assign(this, partial);
   }
 }

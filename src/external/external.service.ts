@@ -10,15 +10,22 @@ import {
   ExternalInfoResDto,
   GroupWithRoleResDto,
 } from './dto/res/externalInfoRes.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ExternalService {
+  private readonly s3Url: string;
   constructor(
     private readonly jwtService: JwtService,
     private readonly idpService: IdpService,
     private readonly userService: UserService,
     private readonly groupService: GroupService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.s3Url = `https://s3.${configService.get<string>(
+      'AWS_S3_REGION',
+    )}.amazonaws.com/${configService.get<string>('AWS_S3_BUCKET_NAME')}`;
+  }
 
   async createExternalToken(
     idpToken: string,
@@ -41,7 +48,10 @@ export class ExternalService {
     return {
       list: (
         await this.groupService.getGroupListWithRole(payload.sub, payload.aud)
-      ).map((groupWithRole) => new GroupWithRoleResDto(groupWithRole)),
+      ).map(
+        (groupWithRole) =>
+          new GroupWithRoleResDto({ s3Url: this.s3Url, ...groupWithRole }),
+      ),
     };
   }
 }

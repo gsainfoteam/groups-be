@@ -69,7 +69,20 @@ export class ExpandedGroupResDto implements ExpandedGroup {
   @ApiProperty()
   profileImageKey: string | null;
 
-  constructor(partial: Partial<ExpandedGroup>) {
+  @ApiProperty({
+    type: String,
+  })
+  @Expose()
+  get profileImageUrl(): string | null {
+    return this.profileImageKey
+      ? `${this.s3Url}/${this.profileImageKey}`
+      : null;
+  }
+
+  @Exclude()
+  s3Url: string;
+
+  constructor(partial: Partial<ExpandedGroup> & { s3Url: string }) {
     Object.assign(this, partial);
   }
 }

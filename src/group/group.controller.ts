@@ -34,7 +34,6 @@ import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
   GroupListResDto,
-  GroupResDto,
   MemberListResDto,
   MemberResDto,
 } from './dto/res/groupRes.dto';
@@ -67,11 +66,7 @@ export class GroupController {
   @ApiInternalServerErrorResponse()
   @Get()
   async getGroupList(@GetUser() user: User): Promise<GroupListResDto> {
-    return {
-      list: (await this.groupService.getGroupList(user.uuid)).map((group) => {
-        return new GroupResDto(group);
-      }),
-    };
+    return this.groupService.getGroupList(user.uuid);
   }
 
   @ApiOperation({
