@@ -69,6 +69,9 @@ export class ExpandedGroupResDto implements ExpandedGroup {
   @ApiProperty()
   profileImageKey: string | null;
 
+  @ApiProperty()
+  profileImageUrl: string | null;
+
   constructor(partial: Partial<ExpandedGroup>) {
     Object.assign(this, partial);
   }

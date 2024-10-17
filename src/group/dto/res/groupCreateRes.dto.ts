@@ -31,4 +31,7 @@ export class GroupCreateResDto implements Group {
 
   @ApiProperty()
   profileImageKey: string | null;
+
+  @ApiProperty()
+  profileImageUrl: string | null;
 }

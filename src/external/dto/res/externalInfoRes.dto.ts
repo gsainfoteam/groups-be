@@ -84,6 +84,9 @@ export class GroupWithRoleResDto implements GroupWithRole {
   })
   profileImageKey: string | null;
 
+  @ApiProperty()
+  profileImageUrl: string | null;
+
   @ApiProperty({
     type: RoleWithExternalResDto,
     isArray: true,

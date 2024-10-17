@@ -28,6 +28,9 @@ export class GroupResDto implements Group {
   profileImageKey: string | null;
 
   @ApiProperty()
+  profileImageUrl: string | null;
+
+  @ApiProperty()
   @Expose()
   get verified(): boolean {
     return this.verifiedAt !== null;
