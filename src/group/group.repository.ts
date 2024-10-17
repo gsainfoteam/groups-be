@@ -87,7 +87,7 @@ export class GroupRepository {
             },
             include: {
               RoleExternalAuthority: {
-                where: clientUuid ? { clientUuid } : undefined,
+                ...(clientUuid && { where: { clientUuid } }),
               },
             },
           },
@@ -227,7 +227,7 @@ export class GroupRepository {
     }: Pick<Group, 'name'> &
       Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
-    s3Url: string,
+    s3Url?: string,
   ): Promise<GroupCreateResDto> {
     this.logger.log(`createGroup: ${name}`);
     return this.prismaService
@@ -237,7 +237,7 @@ export class GroupRepository {
             profileImageUrl: {
               needs: { profileImageKey: true },
               compute(user) {
-                if (!user.profileImageKey) return null;
+                if (!user.profileImageKey || !s3Url) return null;
                 return `${s3Url}/${user.profileImageKey}`;
               },
             },
