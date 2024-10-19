@@ -113,16 +113,19 @@ export class GroupRepository {
           uuid,
         },
         include: {
-          UserRole: {
-            where: {
-              userUuid,
-              Role: {
-                authorities: {
-                  has: authority,
+          ...(userUuid &&
+            authority && {
+              UserRole: {
+                where: {
+                  userUuid,
+                  Role: {
+                    authorities: {
+                      has: authority,
+                    },
+                  },
                 },
               },
-            },
-          },
+            }),
         },
       })
       .catch((error) => {
