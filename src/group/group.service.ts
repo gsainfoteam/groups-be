@@ -24,26 +24,21 @@ import { ConfigService } from '@nestjs/config';
 export class GroupService {
   private readonly logger = new Logger(GroupService.name);
   private readonly invitationCodePrefix = 'invitationCode';
-  private readonly s3Url: string;
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
     private readonly fileService: FileService,
     private readonly configService: ConfigService,
-  ) {
-    this.s3Url = `https://s3.${configService.getOrThrow<string>(
-      'AWS_S3_REGION',
-    )}.amazonaws.com/${configService.getOrThrow<string>('AWS_S3_BUCKET')}`;
-  }
+  ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
     this.logger.log(`getGroupList`);
-    return this.groupRepository.getGroupList(userUuid, this.s3Url);
+    return this.groupRepository.getGroupList(userUuid);
   }
 
   async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
-    return this.groupRepository.getGroupByUuid(uuid, userUuid, this.s3Url);
+    return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
 
   async checkGroupExistenceByName(
@@ -77,11 +72,7 @@ export class GroupService {
       );
     }
 
-    return this.groupRepository.createGroup(
-      createGroupDto,
-      userUuid,
-      this.s3Url,
-    );
+    return this.groupRepository.createGroup(createGroupDto, userUuid);
   }
 
   async updateGroup(
@@ -198,7 +189,7 @@ export class GroupService {
       throw new ForbiddenException('Invalid invite code');
     }
 
-    return this.groupRepository.getGroupByUuid(groupUuid, userUuid, this.s3Url);
+    return this.groupRepository.getGroupByUuid(groupUuid, userUuid);
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
@@ -278,11 +269,7 @@ export class GroupService {
     clientUuid: string,
   ): Promise<GroupWithRole[]> {
     this.logger.log(`getGroupListWithRole`);
-    return this.groupRepository.getGroupListWithRole(
-      userUuid,
-      clientUuid,
-      this.s3Url,
-    );
+    return this.groupRepository.getGroupListWithRole(userUuid, clientUuid);
   }
 
   async updateUserVisibilityInGroup(
