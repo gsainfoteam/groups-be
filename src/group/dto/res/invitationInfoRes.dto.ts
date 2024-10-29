@@ -34,6 +34,9 @@ export class InvitationInfoResDto implements ExpandedGroup {
   @Exclude()
   profileImageKey: string | null;
 
+  @Exclude()
+  profileImageUrl: string | null;
+
   @ApiProperty()
   @Expose()
   get presidentEmail(): string {

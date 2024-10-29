@@ -13,15 +13,24 @@ import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { GroupWithUserRole } from './types/groupwithUserRole.type';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GroupRepository {
   private readonly logger = new Logger(GroupRepository.name);
-  constructor(private readonly prismaService: PrismaService) {}
+  private readonly s3Url: string;
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
+  ) {
+    this.s3Url = `https://s3.${configService.getOrThrow<string>(
+      'AWS_S3_REGION',
+    )}.amazonaws.com/${configService.getOrThrow<string>('AWS_S3_BUCKET')}`;
+  }
 
   async getGroupList(userUuid: string): Promise<Group[]> {
     this.logger.log(`getGroupList`);
-    return this.prismaService.group.findMany({
+    return this.extendPrismaWithProfileImageUrl(this.s3Url).group.findMany({
       where: {
         deletedAt: null,
         UserGroup: {
@@ -38,7 +47,7 @@ export class GroupRepository {
     clientUuid: string,
   ): Promise<GroupWithRole[]> {
     this.logger.log(`getGroupListWithRole`);
-    return this.prismaService.group.findMany({
+    return this.extendPrismaWithProfileImageUrl(this.s3Url).group.findMany({
       where: {
         deletedAt: null,
         UserGroup: {
@@ -58,7 +67,7 @@ export class GroupRepository {
           },
           include: {
             RoleExternalAuthority: {
-              where: clientUuid ? { clientUuid } : undefined,
+              ...(clientUuid && { where: { clientUuid } }),
             },
           },
         },
@@ -68,8 +77,8 @@ export class GroupRepository {
 
   async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
-    return this.prismaService.group
-      .findUniqueOrThrow({
+    return this.extendPrismaWithProfileImageUrl(this.s3Url)
+      .group.findUniqueOrThrow({
         where: {
           deletedAt: null,
           uuid,
@@ -184,10 +193,24 @@ export class GroupRepository {
     }: Pick<Group, 'name'> &
       Partial<Pick<Group, 'description' | 'notionPageId'>>,
     userUuid: string,
+    s3Url?: string,
   ): Promise<GroupCreateResDto> {
     this.logger.log(`createGroup: ${name}`);
-    return this.prismaService.group
-      .create({
+    return this.prismaService
+      .$extends({
+        result: {
+          group: {
+            profileImageUrl: {
+              needs: { profileImageKey: true },
+              compute(user) {
+                if (!user.profileImageKey || !s3Url) return null;
+                return `${s3Url}/${user.profileImageKey}`;
+              },
+            },
+          },
+        },
+      })
+      .group.create({
         data: {
           name,
           description,
@@ -546,5 +569,21 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+  }
+
+  private extendPrismaWithProfileImageUrl(s3Url: string) {
+    return this.prismaService.$extends({
+      result: {
+        group: {
+          profileImageUrl: {
+            needs: { profileImageKey: true },
+            compute(group) {
+              if (!group.profileImageKey) return null;
+              return `${s3Url}/${group.profileImageKey}`;
+            },
+          },
+        },
+      },
+    });
   }
 }

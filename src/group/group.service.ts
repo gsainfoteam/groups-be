@@ -18,6 +18,7 @@ import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { FileService } from 'src/file/file.service';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GroupService {
@@ -27,6 +28,7 @@ export class GroupService {
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
     private readonly fileService: FileService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
