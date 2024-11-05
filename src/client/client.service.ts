@@ -111,7 +111,6 @@ export class ClientService {
       hashed: bcrypt.hashSync(secretKey, bcrypt.genSaltSync(10)),
     };
   }
-}
   /**
    * Retrieve the list of authorities assigned to the client
    * @param uuid uuid of the client
@@ -121,3 +120,5 @@ export class ClientService {
     this.logger.log(`Retrieving authorities for client: ${uuid}`);
     return this.clientRepository.getAuthoritiesByClientUuid(uuid);
   }
+}
+  
