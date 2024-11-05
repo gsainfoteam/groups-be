@@ -110,4 +110,28 @@ export class ClientController {
   ): Promise<void> {
     await this.clientService.removeAuthority(client.uuid, authority);
   }
+
+  @ApiOperation({
+    summary: 'Get client authorities',
+    description: 'Retrieve the list of authorities assigned to the client',
+  })
+  @ApiOkResponse({
+    description: 'List of authorities successfully retrieved',
+    type: [String],  // authorities를 문자열 배열로 반환한다고 명시
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized client',
+  })
+  @ApiForbiddenResponse({
+    description: 'Client does not have permission to access this endpoint',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Unknown errors',
+  })
+  @ApiBasicAuth('client')
+  @Get('authorities')
+  @UseGuards(ClientGuard)
+  async getAuthorities(@GetClient() client: Client): Promise<string[]> {
+    return this.clientService.getAuthorities(client.uuid);
+  }
 }

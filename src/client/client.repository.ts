@@ -132,4 +132,24 @@ export class ClientRepository {
         throw new InternalServerErrorException('unknown error');
       });
   }
+  /**
+   * Get the list of authorities assigned to a client by UUID
+   * @param clientUuid UUID of the client
+   * @returns Array of authorities
+   */
+  async getAuthoritiesByClientUuid(clientUuid: string): Promise<string[]> {
+    this.logger.log(`Retrieving authorities for client: ${clientUuid}`);
+    const client = await this.prismaService.client.findUnique({
+      where: { uuid: clientUuid },
+      select: { ExternalAuthority: { select: { authority: true } } }, // ExternalAuthority 필드 선택
+    });
+
+    if (!client) {
+      this.logger.debug(`client not found`);
+      throw new ForbiddenException('client not found');
+    }
+
+    // 권한 목록만 배열로 반환
+    return client.ExternalAuthority.map((auth) => auth.authority);
+  }
 }

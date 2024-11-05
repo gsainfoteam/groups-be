@@ -112,3 +112,12 @@ export class ClientService {
     };
   }
 }
+  /**
+   * Retrieve the list of authorities assigned to the client
+   * @param uuid uuid of the client
+   * @returns List of authorities assigned to the client
+   */
+  async getAuthorities(uuid: string): Promise<string[]> {
+    this.logger.log(`Retrieving authorities for client: ${uuid}`);
+    return this.clientRepository.getAuthoritiesByClientUuid(uuid);
+  }
