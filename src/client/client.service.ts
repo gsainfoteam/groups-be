@@ -114,16 +114,21 @@ export class ClientService {
   /**
    * Retrieve the client information along with the list of authorities assigned to the client
    * @param uuid uuid of the client
-   * @returns Object containing client information and list of authorities
+   * @returns ClientWithAuthoritiesDto containing client info and authorities
    */
-  async getClientWithAuthorities(uuid: string): Promise<{ client: Client; authorities: string[] }> {
+  async getClientWithAuthorities(uuid: string): Promise<ClientWithAuthoritiesDto> {
     this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
-    const client = await this.clientRepository.findByUuid(uuid);
-    if (!client) {
-      this.logger.debug(`Client not found with uuid: ${uuid}`);
-      throw new ForbiddenException('invalid client');
-    }
-    const authorities = await this.clientRepository.getAuthoritiesByClientUuid(uuid);
-    return { client, authorities };
+    const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
+
+    // Convert data to match ClientWithAuthoritiesDto structure
+    return {
+      uuid: clientData.uuid,
+      name: clientData.name,
+      password: clientData.password,
+      createdAt: clientData.createdAt,
+      updatedAt: clientData.updatedAt,
+      grant: clientData.grant,
+      authorities: clientData.ExternalAuthority.map((auth) => auth.authority),
+    };
   }
 }

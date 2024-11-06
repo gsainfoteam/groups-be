@@ -141,7 +141,7 @@ export class ClientRepository {
     this.logger.log(`Retrieving authorities for client: ${clientUuid}`);
     const client = await this.prismaService.client.findUnique({
       where: { uuid: clientUuid },
-      select: { ExternalAuthority: { select: { authority: true } } }, // ExternalAuthority 필드 선택
+      select: { ExternalAuthority: { select: { authority: true } } },
     });
 
     if (!client) {
@@ -151,5 +151,28 @@ export class ClientRepository {
 
     // 권한 목록만 배열로 반환
     return client.ExternalAuthority.map((auth) => auth.authority);
+  }
+  /**
+   * Retrieve client information along with authorities in a single query
+   * @param uuid UUID of the client
+   * @returns Client object with authorities
+   */
+  async getClientWithAuthorities(uuid: string): Promise<Client & { ExternalAuthority: { authority: string }[] }> {
+    this.logger.log(`Retrieving client with authorities for uuid: ${uuid}`);
+    const client = await this.prismaService.client.findUnique({
+      where: { uuid },
+      include: {
+        ExternalAuthority: {
+          select: { authority: true },
+        },
+      },
+    });
+
+    if (!client) {
+      this.logger.debug(`client not found`);
+      throw new ForbiddenException('client not found');
+    }
+
+    return client;
   }
 }
