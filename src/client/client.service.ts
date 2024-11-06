@@ -119,6 +119,10 @@ export class ClientService {
   async getClientWithAuthorities(uuid: string): Promise<{ client: Client; authorities: string[] }> {
     this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
     const client = await this.clientRepository.findByUuid(uuid);
+    if (!client) {
+      this.logger.debug(`Client not found with uuid: ${uuid}`);
+      throw new ForbiddenException('invalid client');
+    }
     const authorities = await this.clientRepository.getAuthoritiesByClientUuid(uuid);
     return { client, authorities };
   }
