@@ -7,6 +7,7 @@ import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { ClientWithAuthoritiesDto } from './dto/res/clientWithAuthorities.dto';
 
 @Injectable()
 export class ClientService {
@@ -111,28 +112,32 @@ export class ClientService {
       hashed: bcrypt.hashSync(secretKey, bcrypt.genSaltSync(10)),
     };
   }
-  /**
-   * Retrieve the client information along with the list of authorities assigned to the client
-   * @param uuid uuid of the client
-   * @returns ClientWithAuthoritiesDto containing client info and authorities
-   */
-  async getClientWithAuthorities(uuid: string): Promise<ClientWithAuthoritiesDto> {
-    this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
-    const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
+/**
+ * Retrieve the client information along with the list of authorities assigned to the client
+ * @param uuid uuid of the client
+ * @returns ClientWithAuthoritiesDto containing client info and authorities
+ */
+async getClientWithAuthorities(
+  uuid: string,
+): Promise<ClientWithAuthoritiesDto> {
+  this.logger.log(
+    `Retrieving client info and authorities for client: ${uuid}`,
+  );
 
-    if (!clientData) {
-      this.logger.debug(`Client not found with uuid: ${uuid}`);
-      throw new ForbiddenException('invalid client');
-    }
+  const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
 
-    // Convert data to match ClientWithAuthoritiesDto structure
-    return {
-      uuid: clientData.uuid,
-      name: clientData.name,
-      createdAt: clientData.createdAt,
-      updatedAt: clientData.updatedAt,
-      grant: clientData.grant,
-      authorities: clientData.ExternalAuthority.map((auth) => auth.authority),
-    };
+  if (!clientData) {
+    this.logger.debug(`Client not found with uuid: ${uuid}`);
+    throw new ForbiddenException('invalid client');
   }
+
+  return {
+    uuid: clientData.uuid,
+    name: clientData.name,
+    createdAt: clientData.createdAt,
+    updatedAt: clientData.updatedAt,
+    grant: clientData.grant,
+    authorities: clientData.ExternalAuthority.map((auth) => auth.authority),
+  };
+}
 }
