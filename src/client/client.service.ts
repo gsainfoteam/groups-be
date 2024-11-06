@@ -127,4 +127,3 @@ export class ClientService {
     return { client, authorities };
   }
 }
-  
