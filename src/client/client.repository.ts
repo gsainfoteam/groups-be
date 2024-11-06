@@ -133,25 +133,6 @@ export class ClientRepository {
       });
   }
   /**
-   * Get the list of authorities assigned to a client by UUID
-   * @param clientUuid UUID of the client
-   * @returns Array of authorities
-   */
-  async getAuthoritiesByClientUuid(clientUuid: string): Promise<string[]> {
-    this.logger.log(`Retrieving authorities for client: ${clientUuid}`);
-    const client = await this.prismaService.client.findUnique({
-      where: { uuid: clientUuid },
-      select: { ExternalAuthority: { select: { authority: true } } },
-    });
-
-    if (!client) {
-      this.logger.debug(`client not found`);
-      throw new ForbiddenException('client not found');
-    }
-
-    return client.ExternalAuthority.map((auth) => auth.authority);
-  }
-  /**
    * Retrieve client information along with authorities in a single query
    * @param uuid UUID of the client
    * @returns Client object with authorities
