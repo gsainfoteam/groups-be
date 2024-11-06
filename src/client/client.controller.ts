@@ -22,6 +22,7 @@ import {
 import { ClientService } from './client.service';
 import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ClientResDto } from './dto/res/clientRes.dto';
+import { ClientWithAuthoritiesDto } from './dto/res/clientWithAuthorities.dto';
 import { DeleteClientDto } from './dto/req/deleteClient.dto';
 import { ClientGuard } from './guard/client.guard';
 import { GetClient } from './decorator/getClient.decorator';
@@ -112,12 +113,12 @@ export class ClientController {
   }
 
   @ApiOperation({
-    summary: 'Get client authorities',
-    description: 'Retrieve the list of authorities assigned to the client',
+    summary: 'Get client information with authorities',
+    description: 'Retrieve the client information along with its assigned authorities',
   })
   @ApiOkResponse({
-    description: 'List of authorities successfully retrieved',
-    type: [String],  // authorities를 문자열 배열로 반환한다고 명시
+    description: 'Client information and authorities successfully retrieved',
+    type: ClientWithAuthoritiesDto, 
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized client',
@@ -129,9 +130,10 @@ export class ClientController {
     description: 'Unknown errors',
   })
   @ApiBasicAuth('client')
-  @Get('authorities')
+  @Get() 
   @UseGuards(ClientGuard)
-  async getAuthorities(@GetClient() client: Client): Promise<string[]> {
-    return this.clientService.getAuthorities(client.uuid);
+  async getClientWithAuthorities(@GetClient() client: Client): Promise<ClientWithAuthoritiesDto> {
+    const result = await this.clientService.getClientWithAuthorities(client.uuid);
+    return result;
   }
 }

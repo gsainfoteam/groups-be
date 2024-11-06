@@ -112,13 +112,15 @@ export class ClientService {
     };
   }
   /**
-   * Retrieve the list of authorities assigned to the client
+   * Retrieve the client information along with the list of authorities assigned to the client
    * @param uuid uuid of the client
-   * @returns List of authorities assigned to the client
+   * @returns Object containing client information and list of authorities
    */
-  async getAuthorities(uuid: string): Promise<string[]> {
-    this.logger.log(`Retrieving authorities for client: ${uuid}`);
-    return this.clientRepository.getAuthoritiesByClientUuid(uuid);
+  async getClientWithAuthorities(uuid: string): Promise<{ client: Client; authorities: string[] }> {
+    this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
+    const client = await this.clientRepository.findByUuid(uuid);
+    const authorities = await this.clientRepository.getAuthoritiesByClientUuid(uuid);
+    return { client, authorities };
   }
 }
   
