@@ -120,11 +120,15 @@ export class ClientService {
     this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
     const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
 
+    if (!clientData) {
+      this.logger.debug(`Client not found with uuid: ${uuid}`);
+      throw new ForbiddenException('invalid client');
+    }
+
     // Convert data to match ClientWithAuthoritiesDto structure
     return {
       uuid: clientData.uuid,
       name: clientData.name,
-      password: clientData.password,
       createdAt: clientData.createdAt,
       updatedAt: clientData.updatedAt,
       grant: clientData.grant,
