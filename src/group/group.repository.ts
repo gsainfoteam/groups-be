@@ -14,6 +14,7 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { GroupWithUserRole } from './types/groupwithUserRole.type';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
+import { ExpandedUser } from './types/ExpandedUser';
 
 @Injectable()
 export class GroupRepository {
@@ -372,8 +373,20 @@ export class GroupRepository {
         throw new InternalServerErrorException('unknown error');
       });
   }
+  async isUserAdmin(user: User): Promise<boolean> {
+    const userRole = await this.prismaService.userRole.findFirst({
+      where: {
+        userUuid: user.uuid,
+        roleId: 1,
+      },
+    });
+    return userRole ? true : false;
+  }
 
-  async getMembersByGroupUuid(groupUuid: string, user: User): Promise<User[]> {
+  async getMembersByGroupUuid(
+    groupUuid: string,
+    user: User,
+  ): Promise<ExpandedUser[]> {
     this.logger.log(`getMembersByGroupUuid: ${groupUuid}`);
     const userGroups = await this.prismaService.userGroup
       .findMany({
@@ -392,8 +405,20 @@ export class GroupRepository {
             { visibility: Visibility.Public },
           ],
         },
-        include: {
-          User: true,
+        select: {
+          User: {
+            select: {
+              uuid: true,
+              name: true,
+              email: true,
+              createdAt: true,
+              UserRole: {
+                select: {
+                  Role: { select: { name: true } },
+                },
+              },
+            },
+          },
         },
       })
       .catch((error) => {
@@ -402,8 +427,14 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
-
-    return userGroups.map((userGroup) => userGroup.User);
+    const expandedUsers: ExpandedUser[] = userGroups.map((group) => ({
+      uuid: group.User.uuid,
+      name: group.User.name,
+      email: group.User.email,
+      createdAt: group.User.createdAt,
+      role: group.User.UserRole[0]?.Role.name || '', // 첫 번째 역할의 이름을 가져오고, 없으면 빈 문자열
+    }));
+    return expandedUsers;
   }
 
   async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
