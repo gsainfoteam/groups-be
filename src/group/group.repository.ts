@@ -427,6 +427,7 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+    //expandedUser type에 맞게 변환 과정 추가
     const expandedUsers: ExpandedUser[] = userGroups.map((group) => ({
       uuid: group.User.uuid,
       name: group.User.name,
