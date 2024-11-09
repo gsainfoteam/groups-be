@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Group, User } from '@prisma/client';
+import { Group } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 
 export class GroupResDto implements Group {
@@ -49,7 +49,7 @@ export class GroupListResDto {
   list: GroupResDto[];
 }
 
-export class MemberResDto implements User {
+export class MemberResDto {
   @ApiProperty()
   @Expose()
   uuid: string;
@@ -60,14 +60,14 @@ export class MemberResDto implements User {
 
   @ApiPropertyOptional()
   @Expose()
-  email: string;
+  email: string | null;
 
   @Exclude()
   createdAt: Date;
 
   @ApiPropertyOptional()
   @Expose()
-  role?: string;
+  role: string | null;
 
   constructor(partial: Partial<MemberResDto>) {
     Object.assign(this, partial);

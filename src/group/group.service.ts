@@ -213,7 +213,11 @@ export class GroupService {
     );
     const admin = await this.groupRepository.isUserAdmin(user);
     if (!admin) {
-      const filteredMembers = members.map(({ uuid, name }) => ({ uuid, name }));
+      const filteredMembers = members.map((member) => ({
+        ...member,
+        email: null,
+        role: null,
+      }));
       return filteredMembers;
     }
     return members;
