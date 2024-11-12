@@ -131,13 +131,13 @@ async getClientWithAuthorities(
     throw new ForbiddenException('invalid client');
   }
 
-  return {
+  return plainToInstance(ClientWithAuthoritiesDto,{
     uuid: clientData.uuid,
     name: clientData.name,
     createdAt: clientData.createdAt,
     updatedAt: clientData.updatedAt,
     grant: clientData.grant,
     authorities: clientData.ExternalAuthority.map((auth) => auth.authority),
-  };
+  });
 }
 }

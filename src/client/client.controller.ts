@@ -6,8 +6,10 @@ import {
   Param,
   Post,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiBasicAuth,
@@ -33,6 +35,7 @@ import { AuthorityDto } from './dto/req/authority.dto';
 @ApiTags('client')
 @Controller('client')
 @UsePipes(new ValidationPipe({ transform: true }))
+@UseInterceptors(ClassSerializerInterceptor)
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
