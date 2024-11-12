@@ -19,6 +19,7 @@ import { FileService } from 'src/file/file.service';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
+import { ExpandedUser } from './types/ExpandedUser';
 
 @Injectable()
 export class GroupService {
@@ -201,9 +202,25 @@ export class GroupService {
     await this.groupRepository.addUserToGroup(uuid, userUuid);
   }
 
-  async getMembersByGroupUuid(groupUuid: string, user: User): Promise<User[]> {
+  async getMembersByGroupUuid(
+    groupUuid: string,
+    user: User,
+  ): Promise<ExpandedUser[]> {
     this.logger.log(`getMemberInGroup: ${groupUuid}`);
-    return await this.groupRepository.getMembersByGroupUuid(groupUuid, user);
+    const members = await this.groupRepository.getMembersByGroupUuid(
+      groupUuid,
+      user,
+    );
+    const admin = await this.groupRepository.isUserAdmin(user);
+    if (!admin) {
+      const filteredMembers = members.map((member) => ({
+        ...member,
+        email: null,
+        role: null,
+      }));
+      return filteredMembers;
+    }
+    return members;
   }
 
   async removeMember(

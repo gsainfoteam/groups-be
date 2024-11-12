@@ -249,7 +249,7 @@ export class GroupController {
   ): Promise<MemberListResDto> {
     return {
       list: (await this.groupService.getMembersByGroupUuid(uuid, user)).map(
-        (member: User) => new MemberResDto(member),
+        (member) => new MemberResDto(member),
       ),
     };
   }
