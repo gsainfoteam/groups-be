@@ -49,7 +49,6 @@ import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByNam
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 import { InvitationExpDto } from './dto/req/invitationExp.dto';
-import { ExpandedUser } from './types/ExpandedUser';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -250,7 +249,7 @@ export class GroupController {
   ): Promise<MemberListResDto> {
     return {
       list: (await this.groupService.getMembersByGroupUuid(uuid, user)).map(
-        (member: ExpandedUser) => new MemberResDto(member),
+        (member) => new MemberResDto(member),
       ),
     };
   }

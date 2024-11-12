@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Group } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
+import { ExpandedUser } from 'src/group/types/ExpandedUser';
 
 export class GroupResDto implements Group {
   @ApiProperty()
@@ -49,7 +50,7 @@ export class GroupListResDto {
   list: GroupResDto[];
 }
 
-export class MemberResDto {
+export class MemberResDto implements ExpandedUser {
   @ApiProperty()
   @Expose()
   uuid: string;
