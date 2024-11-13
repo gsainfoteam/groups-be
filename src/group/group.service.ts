@@ -37,7 +37,10 @@ export class GroupService {
     return this.groupRepository.getGroupList(userUuid);
   }
 
-  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+  async getGroupByUuidWithUserUuid(
+    uuid: string,
+    userUuid: string,
+  ): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }

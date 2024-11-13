@@ -103,7 +103,7 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<ExpandedGroupResDto> {
     return new ExpandedGroupResDto(
-      await this.groupService.getGroupByUuid(uuid, user.uuid),
+      await this.groupService.getGroupByUuidWithUserUuid(uuid, user.uuid),
     );
   }
 
