@@ -119,12 +119,18 @@ export class ClientService {
  * @returns ClientWithAuthoritiesDto containing client info and authorities
  */
 
-async getClientWithAuthorities(uuid: string) {
-  return this.prisma.client.findUnique({
-    where: { uuid },
-    include: {
-      ExternalAuthority: true
-    }
-  });
+async getClientWithAuthorities(
+  uuid: string,
+): Promise<ClientWithAuthoritiesDto> {
+  this.logger.log(`Retrieving client info and authorities for client: ${uuid}`);
+  
+  const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
+
+  if (!clientData) {
+    this.logger.debug(`Client not found with uuid: ${uuid}`);
+    throw new ForbiddenException('invalid client');
+  }
+
+  return plainToInstance(ClientWithAuthoritiesDto, clientData);
 }
 }

@@ -137,28 +137,27 @@ export class ClientRepository {
    * @param uuid UUID of the client
    * @returns Client object with authorities
    */
-  async getAuthoritiesByClientUuid(clientUuid: string): Promise<string[]> {
-    this.logger.log(`Retrieving authorities for client: ${clientUuid}`);
-    return this.prismaService.client
-      .findUnique({
-        where: { uuid: clientUuid },
-        select: { ExternalAuthority: { select: { authority: true } } },
-      })
-      .then((client) => {
-        if (!client) {
-          this.logger.debug(`client not found`);
-          throw new ForbiddenException('client not found');
-        }
-        // Return array of authorities
-        return client.ExternalAuthority.map((auth) => auth.authority);
-      })
-      .catch((error) => {
-        if (error instanceof PrismaClientKnownRequestError) {
-          this.logger.error(`unknown database error`);
-          throw new InternalServerErrorException('unknown database error');
-        }
-        this.logger.error(`unknown error`);
-        throw new InternalServerErrorException('unknown error');
-      });
-    }
+  async getClientWithAuthorities(uuid: string): Promise<Client & { ExternalAuthority: { authority: string }[] }> {
+    this.logger.log(`Retrieving client with authorities for uuid: ${uuid}`);
+    
+    return this.prismaService.client.findUnique({
+      where: { uuid },
+      include: {
+        ExternalAuthority: { select: { authority: true } },
+      },
+    }).then((client) => {
+      if (!client) {
+        this.logger.debug(`Client not found for uuid: ${uuid}`);
+        throw new ForbiddenException('client not found');
+      }
+      return client;
+    }).catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        this.logger.error(`unknown database error`);
+        throw new InternalServerErrorException('unknown database error');
+      }
+      this.logger.error(`unknown error`);
+      throw new InternalServerErrorException('unknown error');
+    });
+  }
   }
