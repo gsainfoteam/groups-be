@@ -7,6 +7,7 @@ import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { plainToInstance } from 'class-transformer';
 import { ClientWithAuthoritiesDto } from './dto/res/clientWithAuthorities.dto';
 
 @Injectable()
@@ -117,27 +118,13 @@ export class ClientService {
  * @param uuid uuid of the client
  * @returns ClientWithAuthoritiesDto containing client info and authorities
  */
-async getClientWithAuthorities(
-  uuid: string,
-): Promise<ClientWithAuthoritiesDto> {
-  this.logger.log(
-    `Retrieving client info and authorities for client: ${uuid}`,
-  );
 
-  const clientData = await this.clientRepository.getClientWithAuthorities(uuid);
-
-  if (!clientData) {
-    this.logger.debug(`Client not found with uuid: ${uuid}`);
-    throw new ForbiddenException('invalid client');
-  }
-
-  return plainToInstance(ClientWithAuthoritiesDto,{
-    uuid: clientData.uuid,
-    name: clientData.name,
-    createdAt: clientData.createdAt,
-    updatedAt: clientData.updatedAt,
-    grant: clientData.grant,
-    authorities: clientData.ExternalAuthority.map((auth) => auth.authority),
+async getClientWithAuthorities(uuid: string) {
+  return this.prisma.client.findUnique({
+    where: { uuid },
+    include: {
+      ExternalAuthority: true
+    }
   });
 }
 }
