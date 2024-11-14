@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -15,6 +15,7 @@ import { RedisIndicator } from './indicator/redis.indicator';
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
+  private readonly logger = new Logger(HealthController.name);
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
@@ -28,6 +29,7 @@ export class HealthController {
   @Get()
   @HealthCheck()
   async check() {
+    this.logger.log('Health check');
     return this.health.check([
       () =>
         this.http.pingCheck(

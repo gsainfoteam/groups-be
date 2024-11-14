@@ -9,7 +9,7 @@ import { RedisIndicator } from './indicator/redis.indicator';
 @Module({
   imports: [
     PrismaModule,
-    TerminusModule.forRoot({ errorLogStyle: 'pretty' }),
+    TerminusModule.forRoot({ errorLogStyle: 'pretty', logger: true }),
     ConfigModule,
     RedisModule,
   ],
