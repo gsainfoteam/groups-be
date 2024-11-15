@@ -76,18 +76,24 @@ export class GroupRepository {
     });
   }
 
-  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+  async getGroupByUuid(
+    uuid: string,
+    userUuid?: string,
+  ): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
+
     return this.extendPrismaWithProfileImageUrl(this.s3Url)
       .group.findUniqueOrThrow({
         where: {
           deletedAt: null,
           uuid,
-          UserGroup: {
-            some: {
-              userUuid,
+          ...(userUuid && {
+            UserGroup: {
+              some: {
+                userUuid,
+              },
             },
-          },
+          }),
         },
         include: {
           President: true,

@@ -84,10 +84,9 @@ export class GroupController {
   @Get('join')
   async getInvitationInfo(
     @Query('code') code: string,
-    @GetUser() user: User,
   ): Promise<InvitationInfoResDto> {
     return new InvitationInfoResDto(
-      await this.groupService.getInvitationInfo(code, user.uuid),
+      await this.groupService.getInvitationInfo(code),
     );
   }
 
@@ -104,7 +103,7 @@ export class GroupController {
     @GetUser() user: User,
   ): Promise<ExpandedGroupResDto> {
     return new ExpandedGroupResDto(
-      await this.groupService.getGroupByUuid(uuid, user.uuid),
+      await this.groupService.getGroupByUuidWithUserUuid(uuid, user.uuid),
     );
   }
 

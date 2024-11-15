@@ -37,7 +37,10 @@ export class GroupService {
     return this.groupRepository.getGroupList(userUuid);
   }
 
-  async getGroupByUuid(uuid: string, userUuid: string): Promise<ExpandedGroup> {
+  async getGroupByUuidWithUserUuid(
+    uuid: string,
+    userUuid: string,
+  ): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
@@ -176,10 +179,7 @@ export class GroupService {
     return { code };
   }
 
-  async getInvitationInfo(
-    code: string,
-    userUuid: string,
-  ): Promise<ExpandedGroup> {
+  async getInvitationInfo(code: string): Promise<ExpandedGroup> {
     this.logger.log(`getInvitationInfo called`);
 
     const groupUuid = await this.redis.get(
@@ -190,7 +190,7 @@ export class GroupService {
       throw new ForbiddenException('Invalid invite code');
     }
 
-    return this.groupRepository.getGroupByUuid(groupUuid, userUuid);
+    return this.groupRepository.getGroupByUuid(groupUuid);
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
