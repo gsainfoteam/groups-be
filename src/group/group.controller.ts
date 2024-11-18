@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -33,6 +34,8 @@ import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
+  GroupInfo,
+  GroupInfoListDto,
   GroupListResDto,
   GroupResDto,
   MemberListResDto,
@@ -120,6 +123,31 @@ export class GroupController {
     @Param('name') name: string,
   ): Promise<CheckGroupExistenceByNameDto> {
     return this.groupService.checkGroupExistenceByName(name);
+  }
+
+  @ApiOperation({
+    summary: 'Get Groups by name(partial)',
+    description:
+      '그룹명의 일부를 입력받고, 입력받은 문자열이 포함된 그룹명을 가지는 그룹을 가져오는 API입니다.',
+  })
+  @ApiOkResponse({ type: GroupInfoListDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get(':name')
+  async getGroupListByGroupNameQuery(
+    @Param('name') groupNameQuery: string,
+  ): Promise<GroupInfoListDto> {
+    if (!groupNameQuery || groupNameQuery.trim() === '') {
+      throw new BadRequestException('Group name query cannot be empty');
+    }
+
+    return {
+      list: (
+        await this.groupService.getGroupListByGroupNameQuery(groupNameQuery)
+      ).map((group) => {
+        return new GroupInfo(group);
+      }),
+    };
   }
 
   @ApiOperation({
