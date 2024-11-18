@@ -5,6 +5,25 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // set CORS config
+  const whitelist = [
+    /https:\/\/.*groups.gistory.me/,
+    /https:\/\/.*groups-fe.pages.dev/,
+    /http:\/\/localhost:3000/,
+  ];
+  app.enableCors({
+    origin: function (origin, callback) {
+      if (!origin || whitelist.some((regex) => regex.test(origin))) {
+        callback(null, origin);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true,
+  });
   // load config service
   const configService = app.get(ConfigService);
   // swagger config
