@@ -15,7 +15,7 @@ import { GroupWithUserRole } from './types/groupwithUserRole.type';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
-import { GroupInfo } from './dto/res/groupRes.dto';
+import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -110,36 +110,32 @@ export class GroupRepository {
       });
   }
 
-  async getGroupListByGroupNameQuery(
-    groupNameQuery: string,
-  ): Promise<GroupInfo[]> {
-    this.logger.log(`getGroupsByGroupName : ${groupNameQuery}`);
-
-    const groups = this.extendPrismaWithProfileImageUrl(this.s3Url)
+  async getGroupListByGroupNameQuery({
+    limit,
+    offset,
+    query,
+  }: GetGroupByNameQueryDto): Promise<Group[]> {
+    this.logger.log(`getGroupsByGroupName : ${query}`);
+    return this.extendPrismaWithProfileImageUrl(this.s3Url)
       .group.findMany({
+        take: limit,
+        skip: offset,
         where: {
           deletedAt: null,
           name: {
-            contains: groupNameQuery,
+            contains: query,
           },
         },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code == 'P2025') {
+          if (error.code === 'P2025') {
             throw new NotFoundException('Group not found');
           }
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
       });
-
-    return (await groups).map((group) => ({
-      uuid: group.uuid,
-      name: group.name,
-      verified: group.verifiedAt !== null,
-      profileImageUrl: group.profileImageUrl,
-    }));
   }
 
   async checkGroupExistenceByUuid(

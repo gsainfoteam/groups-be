@@ -50,33 +50,6 @@ export class GroupListResDto {
   list: GroupResDto[];
 }
 
-export class GroupInfo {
-  @ApiProperty()
-  @Expose()
-  uuid: string;
-
-  @ApiProperty()
-  @Expose()
-  name: string;
-
-  @ApiProperty()
-  @Expose()
-  verified: boolean;
-
-  @ApiProperty()
-  @Expose()
-  profileImageUrl: string | null;
-
-  constructor(partial: Partial<GroupInfo>) {
-    Object.assign(this, partial);
-  }
-}
-
-export class GroupInfoListDto {
-  @ApiProperty({ type: [GroupInfo] })
-  list: GroupInfo[];
-}
-
 export class MemberResDto implements ExpandedUser {
   @ApiProperty()
   @Expose()

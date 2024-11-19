@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -34,8 +33,6 @@ import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
-  GroupInfo,
-  GroupInfoListDto,
   GroupListResDto,
   GroupResDto,
   MemberListResDto,
@@ -52,6 +49,7 @@ import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByNam
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 import { InvitationExpDto } from './dto/req/invitationExp.dto';
+import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -95,6 +93,27 @@ export class GroupController {
   }
 
   @ApiOperation({
+    summary: 'Get Groups by name(partial)',
+    description:
+      '그룹명의 일부를 입력받고, 입력받은 문자열이 포함된 그룹명을 가지는 그룹을 가져오는 API입니다.',
+  })
+  @ApiOkResponse({ type: GroupListResDto })
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get('search')
+  async getGroupListByGroupNameQuery(
+    @Query() groupNameQuery: GetGroupByNameQueryDto,
+  ): Promise<GroupListResDto> {
+    return {
+      list: (
+        await this.groupService.getGroupListByGroupNameQuery(groupNameQuery)
+      ).map((group) => {
+        return new GroupResDto(group);
+      }),
+    };
+  }
+
+  @ApiOperation({
     summary: 'Get a group by uuid',
     description: 'uuid를 바탕으로 특정 그룹을 가져오는 API 입니다.',
   })
@@ -123,31 +142,6 @@ export class GroupController {
     @Param('name') name: string,
   ): Promise<CheckGroupExistenceByNameDto> {
     return this.groupService.checkGroupExistenceByName(name);
-  }
-
-  @ApiOperation({
-    summary: 'Get Groups by name(partial)',
-    description:
-      '그룹명의 일부를 입력받고, 입력받은 문자열이 포함된 그룹명을 가지는 그룹을 가져오는 API입니다.',
-  })
-  @ApiOkResponse({ type: GroupInfoListDto })
-  @ApiForbiddenResponse()
-  @ApiInternalServerErrorResponse()
-  @Get(':name')
-  async getGroupListByGroupNameQuery(
-    @Param('name') groupNameQuery: string,
-  ): Promise<GroupInfoListDto> {
-    if (!groupNameQuery || groupNameQuery.trim() === '') {
-      throw new BadRequestException('Group name query cannot be empty');
-    }
-
-    return {
-      list: (
-        await this.groupService.getGroupListByGroupNameQuery(groupNameQuery)
-      ).map((group) => {
-        return new GroupInfo(group);
-      }),
-    };
   }
 
   @ApiOperation({
