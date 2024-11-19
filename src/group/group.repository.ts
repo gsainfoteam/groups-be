@@ -101,9 +101,6 @@ export class GroupRepository {
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') {
-            throw new NotFoundException('Group not found');
-          }
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
