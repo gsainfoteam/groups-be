@@ -137,7 +137,6 @@ export class ClientController {
   @Get() 
   @UseGuards(ClientGuard)
   async getClientWithAuthorities(@GetClient() client: Client): Promise<ClientWithAuthoritiesDto> {
-    const result = await this.clientService.getClientWithAuthorities(client.uuid);
-    return result;
+    return this.clientService.getClientWithAuthorities(client.uuid);
   }
 }
