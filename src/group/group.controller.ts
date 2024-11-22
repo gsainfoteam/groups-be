@@ -266,6 +266,7 @@ export class GroupController {
       '옳지 않은 초대 코드입니다. 초대 코드가 만료되었거나, 존재하지 않습니다.',
   })
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Post('join')
   async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
     return this.groupService.joinMember(body.code, user.uuid);
