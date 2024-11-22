@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {
+  ApiBasicAuth,
   ApiBody,
   ApiConflictResponse,
   ApiConsumes,
@@ -27,6 +28,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
@@ -100,10 +102,12 @@ export class GroupController {
       '그룹명의 일부를 입력받고, 입력받은 문자열이 포함된 그룹명을 가지는 그룹을 가져오는 API입니다.',
   })
   @ApiOkResponse({ type: GroupListResDto })
+  @ApiUnauthorizedResponse()
+  @ApiBasicAuth('client')
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(ClientGuard)
   @Get('search')
+  @UseGuards(ClientGuard)
   async getGroupListByGroupNameQuery(
     @Query() groupNameQuery: GetGroupByNameQueryDto,
   ): Promise<GroupListResDto> {

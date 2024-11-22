@@ -123,6 +123,7 @@ export class GroupRepository {
             contains: query,
           },
         },
+        orderBy: [{ name: 'asc' }, { createdAt: 'desc' }],
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {

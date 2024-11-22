@@ -1,10 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, Max, Min } from 'class-validator';
+import { IsOptional, MaxLength, MinLength } from 'class-validator';
 import { IsNumber, IsString } from 'class-validator';
 
 export class GetGroupByNameQueryDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '0',
     description: '넘길 그룹 개수',
     required: false,
@@ -14,7 +14,7 @@ export class GetGroupByNameQueryDto {
   @IsOptional()
   offset?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '10',
     description: '페이지당 그룹 개수',
     required: false,
@@ -29,8 +29,8 @@ export class GetGroupByNameQueryDto {
     description: '검색할 그룹 이름(일부)',
     required: true,
   })
-  @Max(40)
-  @Min(1)
+  @MaxLength(20)
+  @MinLength(1)
   @IsString()
   query: string;
 }
