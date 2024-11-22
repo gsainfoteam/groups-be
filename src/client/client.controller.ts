@@ -2,11 +2,14 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiBasicAuth,
@@ -22,6 +25,7 @@ import {
 import { ClientService } from './client.service';
 import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ClientResDto } from './dto/res/clientRes.dto';
+import { ClientWithAuthoritiesDto } from './dto/res/clientWithAuthorities.dto';
 import { DeleteClientDto } from './dto/req/deleteClient.dto';
 import { ClientGuard } from './guard/client.guard';
 import { GetClient } from './decorator/getClient.decorator';
@@ -31,6 +35,7 @@ import { AuthorityDto } from './dto/req/authority.dto';
 @ApiTags('client')
 @Controller('client')
 @UsePipes(new ValidationPipe({ transform: true }))
+@UseInterceptors(ClassSerializerInterceptor)
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
@@ -109,5 +114,29 @@ export class ClientController {
     @Body() { authority }: AuthorityDto,
   ): Promise<void> {
     await this.clientService.removeAuthority(client.uuid, authority);
+  }
+
+  @ApiOperation({
+    summary: 'Get client information with authorities',
+    description: 'Retrieve the client information along with its assigned authorities',
+  })
+  @ApiOkResponse({
+    description: 'Client information and authorities successfully retrieved',
+    type: ClientWithAuthoritiesDto, 
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized client',
+  })
+  @ApiForbiddenResponse({
+    description: 'Client does not have permission to access this endpoint',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Unknown errors',
+  })
+  @ApiBasicAuth('client')
+  @Get() 
+  @UseGuards(ClientGuard)
+  async getClientWithAuthorities(@GetClient() client: Client): Promise<ClientWithAuthoritiesDto> {
+    return this.clientService.getClientWithAuthorities(client.uuid);
   }
 }
