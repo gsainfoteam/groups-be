@@ -15,6 +15,7 @@ import { GroupWithUserRole } from './types/groupwithUserRole.type';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
+import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 
 @Injectable()
 export class GroupRepository {
@@ -103,6 +104,32 @@ export class GroupRepository {
             },
           },
         },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
+  }
+
+  async getGroupListByGroupNameQuery({
+    limit,
+    offset,
+    query,
+  }: GetGroupByNameQueryDto): Promise<Group[]> {
+    this.logger.log(`getGroupsByGroupName : ${query}`);
+    return this.extendPrismaWithProfileImageUrl(this.s3Url)
+      .group.findMany({
+        take: limit,
+        skip: offset,
+        where: {
+          deletedAt: null,
+          name: {
+            contains: query,
+          },
+        },
+        orderBy: [{ name: 'asc' }, { createdAt: 'desc' }],
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {

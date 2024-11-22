@@ -20,6 +20,7 @@ import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByNam
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
+import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 
 @Injectable()
 export class GroupService {
@@ -43,6 +44,13 @@ export class GroupService {
   ): Promise<ExpandedGroup> {
     this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
+  }
+
+  async getGroupListByGroupNameQuery(
+    groupNameQuery: GetGroupByNameQueryDto,
+  ): Promise<Group[]> {
+    this.logger.log(`getGroupsByGroupName: ${groupNameQuery}`);
+    return this.groupRepository.getGroupListByGroupNameQuery(groupNameQuery);
   }
 
   async checkGroupExistenceByName(

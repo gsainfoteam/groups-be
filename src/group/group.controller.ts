@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {
+  ApiBasicAuth,
   ApiBody,
   ApiConflictResponse,
   ApiConsumes,
@@ -27,6 +28,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
@@ -49,11 +51,12 @@ import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByNam
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 import { InvitationExpDto } from './dto/req/invitationExp.dto';
+import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
+import { ClientGuard } from 'src/client/guard/client.guard';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
 @Controller('group')
-@UseGuards(GroupsGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseInterceptors(ClassSerializerInterceptor)
 export class GroupController {
@@ -65,6 +68,7 @@ export class GroupController {
   })
   @ApiOkResponse({ type: GroupListResDto })
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Get()
   async getGroupList(@GetUser() user: User): Promise<GroupListResDto> {
     return {
@@ -81,6 +85,7 @@ export class GroupController {
   @ApiOkResponse({ type: InvitationInfoResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Get('join')
   async getInvitationInfo(
     @Query('code') code: string,
@@ -91,12 +96,37 @@ export class GroupController {
   }
 
   @ApiOperation({
+    summary: 'Get Groups by name(partial)',
+    description:
+      '그룹명의 일부를 입력받고, 입력받은 문자열이 포함된 그룹명을 가지는 그룹을 가져오는 API입니다.',
+  })
+  @ApiOkResponse({ type: GroupListResDto })
+  @ApiUnauthorizedResponse()
+  @ApiBasicAuth('client')
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @Get('search')
+  @UseGuards(ClientGuard)
+  async getGroupListByGroupNameQuery(
+    @Query() groupNameQuery: GetGroupByNameQueryDto,
+  ): Promise<GroupListResDto> {
+    return {
+      list: (
+        await this.groupService.getGroupListByGroupNameQuery(groupNameQuery)
+      ).map((group) => {
+        return new GroupResDto(group);
+      }),
+    };
+  }
+
+  @ApiOperation({
     summary: 'Get a group by uuid',
     description: 'uuid를 바탕으로 특정 그룹을 가져오는 API 입니다.',
   })
   @ApiOkResponse({ type: ExpandedGroupResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Get(':uuid')
   async getGroupByUuid(
     @Param('uuid') uuid: string,
@@ -114,6 +144,7 @@ export class GroupController {
   @ApiOkResponse({ type: CheckGroupExistenceByNameDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Get(':name/exist')
   async checkGroupExistenceByName(
     @Param('name') name: string,
@@ -129,6 +160,7 @@ export class GroupController {
   @ApiCreatedResponse()
   @ApiConflictResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Post()
   async createGroup(
     @Body() body: CreateGroupDto,
@@ -144,6 +176,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Patch(':uuid')
   async updateGroup(
     @Param('uuid') uuid: string,
@@ -175,6 +208,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(GroupsGuard)
   @Post(':uuid/image')
   async uploadGroupImage(
     @Param('uuid') uuid: string,
@@ -192,6 +226,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Delete(':uuid')
   async deleteGroup(
     @Param('uuid') uuid: string,
@@ -208,6 +243,7 @@ export class GroupController {
   @ApiCreatedResponse({ type: InviteCodeResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Post(':uuid/invite')
   async createInviteCode(
     @Param('uuid') uuid: string,
@@ -229,6 +265,7 @@ export class GroupController {
       '옳지 않은 초대 코드입니다. 초대 코드가 만료되었거나, 존재하지 않습니다.',
   })
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Post('join')
   async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
     return this.groupService.joinMember(body.code, user.uuid);
@@ -241,6 +278,7 @@ export class GroupController {
   })
   @ApiOkResponse({ type: MemberListResDto })
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Get(':uuid/member')
   async getMemberInGroup(
     @Param('uuid') uuid: string,
@@ -260,6 +298,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Delete(':uuid/member/:targetUuid')
   async removeMember(
     @Param('uuid') uuid: string,
@@ -276,6 +315,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Patch(':uuid/member/:targetUuid/role')
   async grantRoleToUser(
     @Param('uuid') uuid: string,
@@ -293,6 +333,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Delete(':uuid/member/:targetUuid/role')
   async revokeRoleFromUser(
     @Param('uuid') uuid: string,
@@ -310,6 +351,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Patch(':uuid/visibility')
   async updateUserVisibilityInGroup(
     @Param('uuid') groupUuid: string,
@@ -330,6 +372,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
   @Patch(':uuid/president')
   async changePresident(
     @Param('uuid') groupUuid: string,
