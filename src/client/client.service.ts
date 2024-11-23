@@ -7,8 +7,10 @@ import { RegisterClientDto } from './dto/req/registerClient.dto';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class ClientService {
   private readonly logger = new Logger(ClientService.name);
   private readonly SlACK_WEBHOOK_URL: string;
@@ -27,7 +29,6 @@ export class ClientService {
    * @returns created client object
    */
   async register({ name }: RegisterClientDto): Promise<Client> {
-    this.logger.log(`registering client: ${name}`);
     const { secretKey, hashed } = this.generateClientSecret();
     const result = await this.clientRepository.create({
       name,
@@ -46,7 +47,6 @@ export class ClientService {
    * @param password password of the client to delete
    */
   async delete(uuid: string, password: string): Promise<void> {
-    this.logger.log(`deleting client: ${uuid}`);
     if (!(await this.validate(uuid, password))) {
       this.logger.debug(`invalid password`);
       throw new ForbiddenException('invalid password');
@@ -55,12 +55,10 @@ export class ClientService {
   }
 
   async addAuthority(uuid: string, authority: string): Promise<void> {
-    this.logger.log(`adding authority: ${authority} to client: ${uuid}`);
     await this.clientRepository.addAuthority(uuid, authority);
   }
 
   async removeAuthority(uuid: string, authority: string): Promise<void> {
-    this.logger.log(`removing authority: ${authority} from client: ${uuid}`);
     await this.clientRepository.removeAuthority(uuid, authority);
   }
 
@@ -71,7 +69,6 @@ export class ClientService {
    * @returns Client object if the client is valid, otherwise null
    */
   async validate(uuid: string, password: string): Promise<Client | null> {
-    this.logger.log(`validating client: ${uuid}`);
     const client = await this.clientRepository.findByUuid(uuid);
     if (client && (await bcrypt.compare(password, client.password))) {
       return client;
@@ -83,7 +80,6 @@ export class ClientService {
     uuid,
     name,
   }: Client): Promise<void> {
-    this.logger.log(`granting request through slack for client uuid: ${uuid}`);
     await firstValueFrom(
       this.httpService.post(this.SlACK_WEBHOOK_URL, {
         text: `Service server sends permission request for client ${name}(${uuid})`,

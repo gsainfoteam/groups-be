@@ -8,6 +8,7 @@
     "gsainfoteam",
     "infoteam",
     "libvips",
+    "Loggable",
     "nestjs",
     "noreply"
   ],

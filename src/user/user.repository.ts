@@ -1,8 +1,10 @@
+import { Loggable } from '@lib/logger/decorator/loggable';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
+@Loggable()
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
