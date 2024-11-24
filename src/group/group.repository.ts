@@ -315,7 +315,7 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException();
           }
-          this.logger.error(error);
+          this.logger.error(error, error.code);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
