@@ -9,6 +9,7 @@ import { ExternalService } from './external.service';
 import { ExternalController } from './external.controller';
 import { ExternalGuard } from './guard/external.guard';
 import { ExternalStrategy } from './strategy/external.strategy';
+import { LoggerModule } from '@lib/logger';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ExternalStrategy } from './strategy/external.strategy';
         },
       }),
     }),
+    LoggerModule,
   ],
   providers: [ExternalService, ExternalGuard, ExternalStrategy],
   controllers: [ExternalController],
