@@ -2,7 +2,6 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { GroupRepository } from './group.repository';
@@ -21,10 +20,11 @@ import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class GroupService {
-  private readonly logger = new Logger(GroupService.name);
   private readonly invitationCodePrefix = 'invitationCode';
   constructor(
     private readonly groupRepository: GroupRepository,
@@ -34,7 +34,6 @@ export class GroupService {
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
-    this.logger.log(`getGroupList`);
     return this.groupRepository.getGroupList(userUuid);
   }
 
@@ -42,22 +41,18 @@ export class GroupService {
     uuid: string,
     userUuid: string,
   ): Promise<ExpandedGroup> {
-    this.logger.log(`getGroupByUuid: ${uuid}`);
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
 
   async getGroupListByGroupNameQuery(
     groupNameQuery: GetGroupByNameQueryDto,
   ): Promise<Group[]> {
-    this.logger.log(`getGroupsByGroupName: ${groupNameQuery}`);
     return this.groupRepository.getGroupListByGroupNameQuery(groupNameQuery);
   }
 
   async checkGroupExistenceByName(
     name: string,
   ): Promise<CheckGroupExistenceByNameDto> {
-    this.logger.log(`checkGroupExistenceByName ${name}`);
-
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByName(name);
 
@@ -72,8 +67,6 @@ export class GroupService {
     createGroupDto: CreateGroupDto,
     userUuid: string,
   ): Promise<GroupCreateResDto> {
-    this.logger.log(`createGroup: ${createGroupDto.name}`);
-
     const checkGroupExistence = await this.checkGroupExistenceByName(
       createGroupDto.name,
     );
@@ -92,8 +85,6 @@ export class GroupService {
     groupUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`updateGroup: ${groupUuid}`);
-
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(groupUuid);
 
@@ -109,8 +100,6 @@ export class GroupService {
     groupUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`uploadGroupImage: ${groupUuid}`);
-
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(
         groupUuid,
@@ -139,8 +128,6 @@ export class GroupService {
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
-    this.logger.log(`deleteGroup: ${uuid}`);
-
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(uuid);
 
@@ -162,7 +149,6 @@ export class GroupService {
     userUuid: string,
     duration: number = 60 * 60,
   ): Promise<InviteCodeResDto> {
-    this.logger.log(`createInviteCode: ${uuid}`);
     if (
       !(await this.groupRepository.validateAuthority(
         uuid,
@@ -188,8 +174,6 @@ export class GroupService {
   }
 
   async getInvitationInfo(code: string): Promise<ExpandedGroup> {
-    this.logger.log(`getInvitationInfo called`);
-
     const groupUuid = await this.redis.get(
       `${this.invitationCodePrefix}:${code}`,
     );
@@ -202,7 +186,6 @@ export class GroupService {
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
-    this.logger.log(`updateMember: ${code}`);
     const uuid = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
     if (!uuid) {
       throw new ForbiddenException('Invalid invite code');
@@ -214,7 +197,6 @@ export class GroupService {
     groupUuid: string,
     user: User,
   ): Promise<ExpandedUser[]> {
-    this.logger.log(`getMemberInGroup: ${groupUuid}`);
     const members = await this.groupRepository.getMembersByGroupUuid(
       groupUuid,
       user,
@@ -236,7 +218,6 @@ export class GroupService {
     targetUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`removeMember: ${uuid}`);
     if (
       !(await this.groupRepository.validateAuthority(
         uuid,
@@ -257,7 +238,6 @@ export class GroupService {
     roleId: number,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`grantRole: ${uuid}`);
     if (
       !(await this.groupRepository.validateAuthority(
         uuid,
@@ -276,7 +256,6 @@ export class GroupService {
     roleId: number,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`revokeRole: ${uuid}`);
     if (
       !(await this.groupRepository.validateAuthority(
         uuid,
@@ -293,7 +272,6 @@ export class GroupService {
     userUuid: string,
     clientUuid: string,
   ): Promise<GroupWithRole[]> {
-    this.logger.log(`getGroupListWithRole`);
     return this.groupRepository.getGroupListWithRole(userUuid, clientUuid);
   }
 
@@ -302,8 +280,6 @@ export class GroupService {
     groupUuid: string,
     visibility: Visibility,
   ): Promise<void> {
-    this.logger.log('updateUserVisibilityInGroup');
-
     await this.groupRepository.updateUserVisibilityInGroup(
       userUuid,
       groupUuid,
@@ -316,8 +292,6 @@ export class GroupService {
     newPresidentUuid: string,
     groupUuid: string,
   ): Promise<void> {
-    this.logger.log('changePresident');
-
     await this.groupRepository.changePresident(
       previousPresidentUuid,
       newPresidentUuid,

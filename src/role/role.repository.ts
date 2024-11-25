@@ -1,3 +1,4 @@
+import { Loggable } from '@lib/logger/decorator/loggable';
 import {
   ConflictException,
   ForbiddenException,
@@ -11,6 +12,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
+@Loggable()
 export class RoleRepository {
   private readonly logger = new Logger(RoleRepository.name);
   constructor(private readonly prismaService: PrismaService) {}
@@ -24,7 +26,6 @@ export class RoleRepository {
     { name }: Pick<Group, 'name'>,
     userUuid: string,
   ): Promise<Role[]> {
-    this.logger.log(`Retrieving roles for group ${name}`);
     return this.prismaService.role.findMany({
       where: {
         Group: {
@@ -52,7 +53,6 @@ export class RoleRepository {
     }: Pick<Role, 'name' | 'groupUuid'> & Partial<Pick<Role, 'authorities'>>,
     userUuid: string,
   ): Promise<Role> {
-    this.logger.log(`Creating role ${name} for group ${groupUuid}`);
     return this.prismaService.role
       .create({
         data: {

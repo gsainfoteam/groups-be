@@ -10,8 +10,10 @@ import {
   ExternalInfoResDto,
   GroupWithRoleResDto,
 } from './dto/res/externalInfoRes.dto';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class ExternalService {
   constructor(
     private readonly jwtService: JwtService,

@@ -1,12 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RoleRepository } from './role.repository';
 import { CreateRoleDto } from './dto/req/createRole.dto';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { RoleListResDto } from './dto/res/roleRes.dto';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class RoleService {
-  private readonly logger = new Logger(RoleService.name);
   constructor(private readonly roleRepository: RoleRepository) {}
 
   /**
@@ -16,7 +17,6 @@ export class RoleService {
    * @returns the list of roles for the group
    */
   async getRoles(groupUuid: string, userUuid: string): Promise<RoleListResDto> {
-    this.logger.log(`Retrieving roles for group ${groupUuid}`);
     return {
       list: await this.roleRepository.getRoles({ name: groupUuid }, userUuid),
     };
@@ -34,7 +34,6 @@ export class RoleService {
     createRoleDto: CreateRoleDto,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`Creating role`);
     await this.roleRepository.createRole(
       { groupUuid, ...createRoleDto },
       userUuid,
@@ -54,7 +53,6 @@ export class RoleService {
     updateRoleDto: UpdateRoleDto,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`Updating role`);
     await this.roleRepository.updateRole(
       { id, groupUuid, ...updateRoleDto },
       userUuid,
@@ -72,7 +70,6 @@ export class RoleService {
     id: number,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`Deleting role ${id} for group ${groupUuid}`);
     await this.roleRepository.deleteRole({ groupUuid, id }, userUuid);
   }
 }

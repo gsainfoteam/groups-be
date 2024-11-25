@@ -1,19 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { IdpService } from 'src/idp/idp.service';
 import { UserService } from 'src/user/user.service';
 import { AccessTokenDto } from './dto/res/accessTokenRes.dto';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly userService: UserService,
     private readonly idpService: IdpService,
   ) {}
 
   async login(code: string, redirectUri: string): Promise<AccessTokenDto> {
-    this.logger.log('Login');
     const { access_token: accessToken } =
       await this.idpService.getAccessTokenFromIdP(code, redirectUri);
     const { uuid, name, email } =
@@ -23,7 +23,6 @@ export class AuthService {
   }
 
   async validateUser(accessToken: string): Promise<User> {
-    this.logger.log('Validate user');
     const { uuid } = await this.idpService.getUserInfo(accessToken);
     return this.userService.getUserInfo(uuid);
   }

@@ -16,8 +16,10 @@ import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
+import { Loggable } from '@lib/logger/decorator/loggable';
 
 @Injectable()
+@Loggable()
 export class GroupRepository {
   private readonly logger = new Logger(GroupRepository.name);
   private readonly s3Url: string;
@@ -31,7 +33,6 @@ export class GroupRepository {
   }
 
   async getGroupList(userUuid: string): Promise<Group[]> {
-    this.logger.log(`getGroupList`);
     return this.extendPrismaWithProfileImageUrl(this.s3Url).group.findMany({
       where: {
         deletedAt: null,
@@ -48,7 +49,6 @@ export class GroupRepository {
     userUuid: string,
     clientUuid: string,
   ): Promise<GroupWithRole[]> {
-    this.logger.log(`getGroupListWithRole`);
     return this.extendPrismaWithProfileImageUrl(this.s3Url).group.findMany({
       where: {
         deletedAt: null,
@@ -81,8 +81,6 @@ export class GroupRepository {
     uuid: string,
     userUuid?: string,
   ): Promise<ExpandedGroup> {
-    this.logger.log(`getGroupByUuid: ${uuid}`);
-
     return this.extendPrismaWithProfileImageUrl(this.s3Url)
       .group.findUniqueOrThrow({
         where: {
@@ -118,7 +116,6 @@ export class GroupRepository {
     offset,
     query,
   }: GetGroupByNameQueryDto): Promise<Group[]> {
-    this.logger.log(`getGroupsByGroupName : ${query}`);
     return this.extendPrismaWithProfileImageUrl(this.s3Url)
       .group.findMany({
         take: limit,
@@ -147,8 +144,6 @@ export class GroupRepository {
     userUuid?: string,
     authority?: Authority,
   ): Promise<GroupWithUserRole | null> {
-    this.logger.log(`checkGroupExistenceByUuid ${uuid}`);
-
     return this.prismaService.group
       .findUnique({
         where: {
@@ -180,7 +175,6 @@ export class GroupRepository {
   }
 
   async checkGroupExistenceByName(name: string): Promise<Group | null> {
-    this.logger.log(`checkGroupExistenceByName groupName: ${name}`);
     return this.prismaService.group
       .findFirst({
         where: {
@@ -201,7 +195,6 @@ export class GroupRepository {
     authorities: Authority[],
     userUuid: string,
   ): Promise<Group | null> {
-    this.logger.log(`validateAuthority: ${uuid}, ${authorities}`);
     return this.prismaService.group.findUnique({
       where: {
         uuid,
@@ -229,7 +222,6 @@ export class GroupRepository {
     userUuid: string,
     s3Url?: string,
   ): Promise<GroupCreateResDto> {
-    this.logger.log(`createGroup: ${name}`);
     return this.prismaService
       .$extends({
         result: {
@@ -297,8 +289,6 @@ export class GroupRepository {
     groupUuid: string,
     userUuid: string,
   ): Promise<void> {
-    this.logger.log(`updateGroup ${groupUuid}`);
-
     await this.prismaService.group
       .update({
         where: {
@@ -325,7 +315,7 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException();
           }
-          this.logger.log(error);
+          this.logger.error(error, error.code);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -351,8 +341,6 @@ export class GroupRepository {
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
-    this.logger.log(`deleteGroup: ${uuid}`);
-
     await this.prismaService.group
       .update({
         where: {
@@ -377,7 +365,7 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException();
           }
-          this.logger.log(error);
+          this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -385,7 +373,6 @@ export class GroupRepository {
   }
 
   async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
-    this.logger.log(`addUserToGroup: ${uuid}`);
     await this.prismaService.userGroup
       .create({
         data: {
@@ -400,7 +387,7 @@ export class GroupRepository {
           } else if (error.code === 'P2002') {
             throw new ConflictException('User already exists in this group');
           }
-          this.logger.log(error);
+          this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -420,7 +407,6 @@ export class GroupRepository {
     groupUuid: string,
     user: User,
   ): Promise<ExpandedUser[]> {
-    this.logger.log(`getMembersByGroupUuid: ${groupUuid}`);
     const userGroups = await this.prismaService.userGroup
       .findMany({
         where: {
@@ -472,7 +458,6 @@ export class GroupRepository {
   }
 
   async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
-    this.logger.log(`removeUserFromGroup: ${uuid}`);
     await this.prismaService.userGroup
       .deleteMany({
         where: {
@@ -496,7 +481,6 @@ export class GroupRepository {
     roleId: number,
     targetUuid: string,
   ): Promise<void> {
-    this.logger.log(`addRoleToUser: ${uuid}`);
     await this.prismaService.userRole
       .create({
         data: {
@@ -521,7 +505,6 @@ export class GroupRepository {
     roleId: number,
     targetUuid: string,
   ): Promise<void> {
-    this.logger.log(`removeRoleFromUser: ${uuid}`);
     await this.prismaService.userRole
       .delete({
         where: {
@@ -548,10 +531,6 @@ export class GroupRepository {
     groupUuid: string,
     visibility: Visibility,
   ): Promise<void> {
-    this.logger.log(
-      `update 'visibility' of user ${userUuid} in group ${groupUuid}`,
-    );
-
     await this.prismaService.userGroup
       .update({
         where: {
@@ -569,7 +548,7 @@ export class GroupRepository {
           if (error.code === 'P2025') {
             throw new ForbiddenException('User is not a group member');
           }
-          this.logger.log(error);
+          this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -581,10 +560,6 @@ export class GroupRepository {
     newPresidentUuid: string,
     groupUuid: string,
   ): Promise<void> {
-    this.logger.log(
-      `change president from ${previousPresidentUuid} to ${newPresidentUuid}`,
-    );
-
     await this.prismaService
       .$transaction([
         this.prismaService.group.update({
@@ -624,12 +599,12 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.log(error, error.code);
+            this.logger.error(error, error.code);
             throw new NotFoundException(
               'New president is not a group member or previous user is not a president of the group',
             );
           }
-          this.logger.log(error);
+          this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');

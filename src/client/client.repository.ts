@@ -1,3 +1,4 @@
+import { Loggable } from '@lib/logger/decorator/loggable';
 import {
   ConflictException,
   ForbiddenException,
@@ -10,6 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
+@Loggable()
 export class ClientRepository {
   private readonly logger = new Logger(ClientRepository.name);
   constructor(private readonly prismaService: PrismaService) {}
@@ -23,7 +25,6 @@ export class ClientRepository {
     name,
     password,
   }: Pick<Client, 'name' | 'password'>): Promise<Client> {
-    this.logger.log(`creating client: ${name}`);
     return this.prismaService.client
       .create({
         data: { name, password },
@@ -48,7 +49,6 @@ export class ClientRepository {
    * @returns Founded client or null
    */
   async findByUuid(uuid: string): Promise<Client | null> {
-    this.logger.log(`finding client: ${uuid}`);
     return this.prismaService.client.findUnique({
       where: { uuid },
     });
@@ -60,7 +60,6 @@ export class ClientRepository {
    * @returns Deleted client
    */
   async deleteByUuid(uuid: string): Promise<Client> {
-    this.logger.log(`deleting client: ${uuid}`);
     return this.prismaService.client
       .delete({
         where: {
@@ -82,7 +81,6 @@ export class ClientRepository {
   }
 
   async addAuthority(uuid: string, authority: string): Promise<void> {
-    this.logger.log(`adding authority: ${authority} to client: ${uuid}`);
     await this.prismaService.client
       .update({
         where: { uuid },
@@ -109,7 +107,6 @@ export class ClientRepository {
   }
 
   async removeAuthority(uuid: string, authority: string): Promise<void> {
-    this.logger.log(`removing authority: ${authority} from client: ${uuid}`);
     await this.prismaService.externalAuthority
       .delete({
         where: {
