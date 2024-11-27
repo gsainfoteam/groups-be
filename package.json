@@ -50,6 +50,7 @@
     "ts-case-convert": "^2.0.7"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.26",
     "@nestjs/cli": "^10.4.4",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
