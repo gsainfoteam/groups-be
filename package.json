@@ -18,7 +18,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "doc": "node ./patch-compodoc.js && npx compodoc -p tsconfig.json -a assets -d ./doc"
   },
   "config": {
     "libvips": "8.14.3"
@@ -50,6 +51,7 @@
     "ts-case-convert": "^2.0.7"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.26",
     "@nestjs/cli": "^10.4.4",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
