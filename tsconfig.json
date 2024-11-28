@@ -35,6 +35,12 @@
       ],
       "@lib/infoteam-idp/*": [
         "libs/infoteam-idp/src/*"
+      ],
+      "@lib/file": [
+        "libs/file/src"
+      ],
+      "@lib/file/*": [
+        "libs/file/src/*"
       ]
     }
   }

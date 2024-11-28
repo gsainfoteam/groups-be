@@ -14,13 +14,13 @@ import { Authority, Group, Visibility, User } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
-import { FileService } from 'src/file/file.service';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
 import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
+import { FileService } from '@lib/file';
 
 @Injectable()
 @Loggable()

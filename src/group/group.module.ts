@@ -5,9 +5,9 @@ import { GroupRepository } from './group.repository';
 import { UserModule } from 'src/user/user.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule } from '@nestjs/config';
-import { FileModule } from 'src/file/file.module';
 import { LoggerModule } from '@lib/logger';
 import { PrismaModule } from '@lib/prisma';
+import { FileModule } from '@lib/file';
 
 @Module({
   imports: [
