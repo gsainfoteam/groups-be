@@ -1,4 +1,5 @@
 import { Loggable } from '@lib/logger/decorator/loggable';
+import { PrismaService } from '@lib/prisma';
 import {
   ConflictException,
   ForbiddenException,
@@ -9,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { Authority, Group, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 @Loggable()

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
 import { TerminusModule } from '@nestjs/terminus';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { RedisIndicator } from './indicator/redis.indicator';
+import { PrismaModule } from '@lib/prisma';
 
 @Module({
   imports: [
