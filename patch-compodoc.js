@@ -1,11 +1,18 @@
 #!/usr/bin/env node
-const fs = require('fs');
+import fs from 'fs';
+
+const findCliFile = (dir) => {
+  const files = fs.readdirSync(dir);
+  return files.find(
+    (file) => file.startsWith('index-cli-') && file.endsWith('.js'),
+  );
+};
 
 const compoMod = `${process.cwd()}/node_modules/@compodoc/compodoc`;
 const updates = [
   {
     // filename 'index-cli-Cr-tk_1e.js' is unique to compodoc v1.1.24, this will need to be updated to reflect the correct path for whichever version you're on
-    target: `${compoMod}/dist/index-cli-D7g1_4MM.js`,
+    target: `${compoMod}/dist/${findCliFile(`${compoMod}/dist`)}`,
     search: `if (!language) {`,
     replace: `if (language === 'mermaid') {
       //  setting the mermaid css class will enable the diagram to be rendered
@@ -23,8 +30,14 @@ const updates = [
 ];
 
 for (const update of updates) {
-  const data = fs.readFileSync(update.target);
-  const patched = data.toString().replace(update.search, update.replace);
-  fs.writeFileSync(update.target, patched);
+  try {
+    const data = fs.readFileSync(update.target);
+    const patched = data.toString().replace(update.search, update.replace);
+    fs.writeFileSync(update.target, patched);
+  } catch (error) {
+    console.error(`failed to patch ${update.target}`);
+    console.error(error);
+    process.exit(1);
+  }
 }
 console.log('successfully patched compodoc');
