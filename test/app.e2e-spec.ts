@@ -3,8 +3,7 @@ import { AppModule } from '../src/app.module';
 import * as request from 'supertest';
 import { INestApplication, ExecutionContext } from '@nestjs/common';
 import { UserGuard } from 'src/user/guard/user.guard';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaService } from '@lib/prisma';
 
 describe('GroupController (e2e)', () => {
   let app: INestApplication;
@@ -15,17 +14,21 @@ describe('GroupController (e2e)', () => {
   User : d75f9a3b-b110-437e-9287-eaaf5965849d (인증 역할)
        : 9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd (테스트 역할)
   */
-  async function initializeApp(overrideGuardFunction?: (context: ExecutionContext) => boolean) {
+  async function initializeApp(
+    overrideGuardFunction?: (context: ExecutionContext) => boolean,
+  ) {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideGuard(UserGuard)
       .useValue({
-        canActivate: overrideGuardFunction ? overrideGuardFunction : (context: ExecutionContext) => {
-          const req = context.switchToHttp().getRequest();
-          req.user = { uuid: 'd75f9a3b-b110-437e-9287-eaaf5965849d' }; // TestUser
-          return true;
-        }
+        canActivate: overrideGuardFunction
+          ? overrideGuardFunction
+          : (context: ExecutionContext) => {
+              const req = context.switchToHttp().getRequest();
+              req.user = { uuid: 'd75f9a3b-b110-437e-9287-eaaf5965849d' }; // TestUser
+              return true;
+            },
       })
       .compile();
 
@@ -44,14 +47,14 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const newGroup = {
         name: 'NewTestTeam',
-        description: 'A new team for testing'
+        description: 'A new team for testing',
       };
 
       await request(app.getHttpServer())
         .post('/group')
         .send(newGroup)
         .expect(201)
-        .then(response => {
+        .then((response) => {
           expect(response.body.name).toEqual(newGroup.name);
           expect(response.body.description).toEqual(newGroup.description);
         });
@@ -61,14 +64,14 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const newGroup = {
         name: 'NewTestTeam',
-        description: 'A new team for testing'
+        description: 'A new team for testing',
       };
 
       await request(app.getHttpServer())
         .post('/group')
         .send(newGroup)
         .expect(409)
-        .then(response => {
+        .then((response) => {
           expect(response.body.message).toContain('already exists');
         });
     });
@@ -93,7 +96,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/group/${groupName}`)
         .expect(200)
-        .then(response => {
+        .then((response) => {
           expect(response.body).toHaveProperty('name', groupName);
           expect(response.body).toHaveProperty('description');
         });
@@ -105,7 +108,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/group/${groupName}`)
         .expect(404)
-        .then(response => {
+        .then((response) => {
           expect(response.body.message).toContain('does not exist');
         });
     });
@@ -116,14 +119,14 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const groupName = 'NewTestTeam';
       const updateData = {
-        description: 'Updated description for testing'
+        description: 'Updated description for testing',
       };
 
       await request(app.getHttpServer())
         .patch(`/group/${groupName}`)
         .send(updateData)
         .expect(200)
-        .then(response => {
+        .then((response) => {
           expect(response.body.description).toEqual(updateData.description);
         });
     });
@@ -132,14 +135,14 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const groupName = 'NonExistentGroup';
       const updateData = {
-        description: 'This update should fail'
+        description: 'This update should fail',
       };
 
       await request(app.getHttpServer())
         .patch(`/group/${groupName}`)
         .send(updateData)
         .expect(404)
-        .then(response => {
+        .then((response) => {
           expect(response.body.message).toContain('does not exist');
         });
     });
@@ -153,7 +156,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/group/${groupName}`)
         .expect(200)
-        .then(response => {
+        .then((response) => {
           expect(response.body).toBeTruthy();
         });
     });
@@ -165,7 +168,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/group/${groupName}`)
         .expect(404)
-        .then(response => {
+        .then((response) => {
           expect(response.body.message).toContain('does not exist');
         });
     });
@@ -176,14 +179,14 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const groupName = 'TestTeam';
       const newMember = {
-        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd' // 새로운 user
+        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd', // 새로운 user
       };
 
       await request(app.getHttpServer())
         .post(`/group/${groupName}/member`)
         .send(newMember)
         .expect(201)
-        .then(response => {
+        .then((response) => {
           expect(response.body).toHaveProperty('groupName', groupName);
           expect(response.body).toHaveProperty('userUuid', newMember.uuid);
           expect(response.body).toHaveProperty('createdAt');
@@ -194,15 +197,17 @@ describe('GroupController (e2e)', () => {
       app = await initializeApp();
       const groupName = 'TestTeam';
       const existingMember = {
-        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd'
+        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd',
       };
 
       await request(app.getHttpServer())
         .post(`/group/${groupName}/member`)
         .send(existingMember)
         .expect(409)
-        .then(response => {
-          expect(response.body.message).toContain('User already exists in group');
+        .then((response) => {
+          expect(response.body.message).toContain(
+            'User already exists in group',
+          );
         });
     });
   });
@@ -215,7 +220,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/group/${groupName}/member`)
         .expect(200)
-        .then(response => {
+        .then((response) => {
           expect(Array.isArray(response.body)).toBeTruthy();
           expect(response.body.length).toBeGreaterThan(0);
           expect(response.body[0]).toHaveProperty('uuid');
@@ -232,7 +237,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/group/${groupName}/member/${memberUuid}`)
         .expect(200)
-        .then(response => {
+        .then((response) => {
           expect(response.body).toHaveProperty('groupName', groupName);
           expect(response.body).toHaveProperty('userUuid', memberUuid);
         });
@@ -246,7 +251,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/group/${groupName}/member/${nonExistentMemberUuid}`)
         .expect(403)
-        .then(response => {
+        .then((response) => {
           expect(response.body.message).toContain("doesn't have permission");
         });
     });
@@ -259,7 +264,7 @@ describe('GroupController (e2e)', () => {
         await request(app.getHttpServer())
           .get(`/group/${groupName}/role`)
           .expect(200)
-          .then(response => {
+          .then((response) => {
             expect(Array.isArray(response.body.list)).toBeTruthy();
             expect(response.body.list.length).toBeGreaterThan(0);
             expect(response.body.list[0]).toHaveProperty('id');
@@ -276,13 +281,13 @@ describe('GroupController (e2e)', () => {
         const newRole = {
           name: 'NewRole',
           authorities: ['ROLE_CREATE'],
-          externalAuthorities: ['ZIGGLE_WRITE_NOTICE']
+          externalAuthorities: ['ZIGGLE_WRITE_NOTICE'],
         };
 
         await request(app.getHttpServer())
           .post(`/group/${groupName}/role`)
           .send(newRole)
-          .expect(201)
+          .expect(201);
         // role 부분의 출력이 없기에 그냥 오류 없는 것만 감지
       });
 
@@ -292,15 +297,15 @@ describe('GroupController (e2e)', () => {
         const newRole = {
           name: 'NewRole',
           authorities: ['ROLE_CREATE'],
-          externalAuthorities: ['ZIGGLE_WRITE_NOTICE']
+          externalAuthorities: ['ZIGGLE_WRITE_NOTICE'],
         };
 
         await request(app.getHttpServer())
           .post(`/group/${groupName}/role`)
           .send(newRole)
           .expect(409)
-          .then(response => {
-            expect(response.body.message).toContain("Role already exists");
+          .then((response) => {
+            expect(response.body.message).toContain('Role already exists');
           });
       });
 
@@ -310,15 +315,15 @@ describe('GroupController (e2e)', () => {
         const newRole = {
           name: 'NewRole',
           authorities: ['ROLE_CREATE'],
-          externalAuthorities: ['ZIGGLE_WRITE_NOTICE']
+          externalAuthorities: ['ZIGGLE_WRITE_NOTICE'],
         };
 
         await request(app.getHttpServer())
           .post(`/group/${groupName}/role`)
           .send(newRole)
           .expect(403)
-          .then(response => {
-            expect(response.body.message).toContain("Group not found");
+          .then((response) => {
+            expect(response.body.message).toContain('Group not found');
           });
       });
     });
@@ -336,7 +341,7 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .put(`/group/${groupName}/role/${roleId}`)
         .send(updateRoleDto)
-        .expect(200)
+        .expect(200);
     });
 
     it('없는 group을 update할 때 처리할 수 있는가.', async () => {
@@ -351,8 +356,8 @@ describe('GroupController (e2e)', () => {
         .put(`/group/${groupName}/role/${roleId}`)
         .send(updateRoleDto)
         .expect(403)
-        .then(response => {
-          expect(response.body.message).toContain("Group not found");
+        .then((response) => {
+          expect(response.body.message).toContain('Group not found');
         });
     });
   });
@@ -362,12 +367,12 @@ describe('GroupController (e2e)', () => {
       const groupName = 'TestTeam';
       const roleId = 2; // 존재하는 역할 ID
       const newMember = {
-        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd' // 새로운 user
+        uuid: '9cb6a0d8-3c07-4311-a5eb-3e1dd6628bbd', // 새로운 user
       };
 
       await request(app.getHttpServer())
         .post(`/group/${groupName}/member/${newMember.uuid}/role/${roleId}`)
-        .expect(201)
+        .expect(201);
     });
   });
 
@@ -379,7 +384,7 @@ describe('GroupController (e2e)', () => {
 
       await request(app.getHttpServer())
         .delete(`/group/${groupName}/member/${memberUuid}/role/${roleId}`)
-        .expect(200)
+        .expect(200);
     });
   });
 
@@ -391,7 +396,7 @@ describe('GroupController (e2e)', () => {
 
       await request(app.getHttpServer())
         .delete(`/group/${groupName}/role/${roleId}`)
-        .expect(200)
+        .expect(200);
       // role 부분의 출력이 없기에 그냥 오류 없는 것만 감지
     });
 
@@ -403,8 +408,8 @@ describe('GroupController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/group/${groupName}/role/${roleId}`)
         .expect(403)
-        .then(response => {
-          expect(response.body.message).toContain("Role not found");
+        .then((response) => {
+          expect(response.body.message).toContain('Role not found');
         });
     });
   });
