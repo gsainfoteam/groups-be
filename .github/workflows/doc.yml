@@ -2,8 +2,11 @@ name: Deploy Compodoc to Pages
 
 on:
   push:
-    branches: ['main']
-
+    branches:
+      - main
+    paths:
+      - src/**
+      
   workflow_dispatch:
 
 permissions:
