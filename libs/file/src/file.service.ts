@@ -3,7 +3,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { Loggable } from '@lib/logger/decorator/loggable';
 import {
   Injectable,
   InternalServerErrorException,
@@ -12,7 +11,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-@Loggable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
   private readonly s3Client: S3Client;

@@ -23,6 +23,24 @@
       ],
       "@lib/logger/*": [
         "libs/logger/src/*"
+      ],
+      "@lib/prisma": [
+        "libs/prisma/src"
+      ],
+      "@lib/prisma/*": [
+        "libs/prisma/src/*"
+      ],
+      "@lib/infoteam-idp": [
+        "libs/infoteam-idp/src"
+      ],
+      "@lib/infoteam-idp/*": [
+        "libs/infoteam-idp/src/*"
+      ],
+      "@lib/file": [
+        "libs/file/src"
+      ],
+      "@lib/file/*": [
+        "libs/file/src/*"
       ]
     }
   }

@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { Authority, Group, Visibility, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { GroupWithUserRole } from './types/groupwithUserRole.type';
@@ -17,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
+import { PrismaService } from '@lib/prisma';
 
 @Injectable()
 @Loggable()

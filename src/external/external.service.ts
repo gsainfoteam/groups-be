@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Client } from '@prisma/client';
-import { IdpService } from 'src/idp/idp.service';
 import { UserService } from 'src/user/user.service';
 import { GroupService } from 'src/group/group.service';
 import { ExternalTokenResDto } from './dto/res/externalTokenRes.dto';
@@ -11,13 +10,14 @@ import {
   GroupWithRoleResDto,
 } from './dto/res/externalInfoRes.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
+import { InfoteamIdpService } from '@lib/infoteam-idp';
 
 @Injectable()
 @Loggable()
 export class ExternalService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly idpService: IdpService,
+    private readonly idpService: InfoteamIdpService,
     private readonly userService: UserService,
     private readonly groupService: GroupService,
   ) {}

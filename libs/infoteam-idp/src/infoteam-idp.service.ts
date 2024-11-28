@@ -5,15 +5,15 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserInfo } from './types/userInfo.type';
 import { ConfigService } from '@nestjs/config';
+import { IdpJwtResponse, IdpUserInfoRes } from './types/idp.type';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { IdpJwtResponse, IdpUserInfoRes } from './types/idp.type';
+import { UserInfo } from './types/userInfo.type';
 
 @Injectable()
-export class IdpService {
-  private readonly logger = new Logger(IdpService.name);
+export class InfoteamIdpService {
+  private readonly logger = new Logger(InfoteamIdpService.name);
   private idpUrl: string;
   constructor(
     private readonly httpService: HttpService,

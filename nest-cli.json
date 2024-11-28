@@ -15,6 +15,33 @@
       "compilerOptions": {
         "tsConfigPath": "libs/logger/tsconfig.lib.json"
       }
+    },
+    "prisma": {
+      "type": "library",
+      "root": "libs/prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+      }
+    },
+    "infoteam-idp": {
+      "type": "library",
+      "root": "libs/infoteam-idp",
+      "entryFile": "index",
+      "sourceRoot": "libs/infoteam-idp/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/infoteam-idp/tsconfig.lib.json"
+      }
+    },
+    "file": {
+      "type": "library",
+      "root": "libs/file",
+      "entryFile": "index",
+      "sourceRoot": "libs/file/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/file/tsconfig.lib.json"
+      }
     }
   }
 }
