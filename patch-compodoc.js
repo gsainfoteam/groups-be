@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import fs from 'fs';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs');
 
 const findCliFile = (dir) => {
   const files = fs.readdirSync(dir);
