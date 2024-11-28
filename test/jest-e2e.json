@@ -15,6 +15,8 @@
     "@lib/logger/(.*)": "<rootDir>/../libs/logger/src/$1",
     "@lib/logger": "<rootDir>/../libs/logger/src",
     "@lib/prisma/(.*)": "<rootDir>/../libs/prisma/src/$1",
-    "@lib/prisma": "<rootDir>/../libs/prisma/src"
+    "@lib/prisma": "<rootDir>/../libs/prisma/src",
+    "@lib/infoteam-idp/(.*)": "<rootDir>/../libs/infoteam-idp/src/$1",
+    "@lib/infoteam-idp": "<rootDir>/../libs/infoteam-idp/src"
   }
 }

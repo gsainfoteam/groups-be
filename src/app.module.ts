@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { IdpModule } from './idp/idp.module';
 import { HealthModule } from './health/health.module';
 import { ClientModule } from './client/client.module';
 import { AuthModule } from './auth/auth.module';
@@ -25,7 +24,6 @@ import { NotionModule } from './notion/notion.module';
         url: configService.getOrThrow<string>('REDIS_URL'),
       }),
     }),
-    IdpModule,
     HealthModule,
     ClientModule,
     AuthModule,
