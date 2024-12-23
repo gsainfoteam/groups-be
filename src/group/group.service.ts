@@ -20,7 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
-import { FileService } from '@lib/file';
+import { ObjectService } from '@lib/object';
 
 @Injectable()
 @Loggable()
@@ -29,7 +29,7 @@ export class GroupService {
   constructor(
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
-    private readonly fileService: FileService,
+    private readonly objectService: ObjectService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -118,13 +118,9 @@ export class GroupService {
 
     const key = `group/${groupUuid}/image/${Date.now().toString()}-${file.originalname}`;
 
-    await this.fileService.uploadFile(key, file);
+    await this.objectService.uploadObject(key, file);
 
     await this.groupRepository.updateGroupImage(key, groupUuid);
-
-    if (checkGroupExistence.profileImageKey) {
-      await this.fileService.deleteFile(checkGroupExistence.profileImageKey);
-    }
   }
 
   async deleteGroup(uuid: string, userUuid: string): Promise<void> {
@@ -136,6 +132,12 @@ export class GroupService {
     }
 
     await this.groupRepository.deleteGroup(uuid, userUuid);
+
+    if (checkGroupExistence.profileImageKey) {
+      await this.objectService.deleteObject(
+        checkGroupExistence.profileImageKey,
+      );
+    }
   }
 
   /**
