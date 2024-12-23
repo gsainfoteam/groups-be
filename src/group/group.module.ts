@@ -7,7 +7,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from '@lib/logger';
 import { PrismaModule } from '@lib/prisma';
-import { FileModule } from '@lib/file';
+import { ObjectModule } from '@lib/object';
 
 @Module({
   imports: [
@@ -15,8 +15,8 @@ import { FileModule } from '@lib/file';
     PrismaModule,
     UserModule,
     RedisModule,
-    FileModule,
     LoggerModule,
+    ObjectModule,
   ],
   providers: [GroupService, GroupRepository],
   controllers: [GroupController],

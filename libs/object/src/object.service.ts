@@ -10,9 +10,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+/**
+ * Service for using AWS S3.
+ */
 @Injectable()
-export class FileService {
-  private readonly logger = new Logger(FileService.name);
+export class ObjectService {
+  private readonly logger = new Logger(ObjectService.name);
   private readonly s3Client: S3Client;
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -24,7 +27,15 @@ export class FileService {
     });
   }
 
-  async uploadFile(key: string, file: Express.Multer.File): Promise<string> {
+  /**
+   * Uploads an object to S3. The object will be stored in the bucket defined in the configuration.
+   * Note that the type of the file is provided by multer.
+   * @param key the key of the object
+   * @param file the file to upload
+   * @returns the uploaded object key
+   * @throws InternalServerErrorException if the upload fails
+   */
+  async uploadObject(key: string, file: Express.Multer.File): Promise<string> {
     await this.s3Client
       .send(
         new PutObjectCommand({
@@ -43,7 +54,12 @@ export class FileService {
     return key;
   }
 
-  async deleteFile(key: string): Promise<void> {
+  /**
+   * Deletes an object from S3.
+   * @param key the key of the object to delete
+   * @throws InternalServerErrorException if the deletion fails
+   */
+  async deleteObject(key: string): Promise<void> {
     await this.s3Client
       .send(
         new DeleteObjectCommand({
