@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - src/**
+      - libs/**
       - prisma/schema.prisma
 
 env:

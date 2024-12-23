@@ -6,7 +6,8 @@ on:
       - main
     paths:
       - src/**
-      
+      - libs/**
+
   workflow_dispatch:
 
 permissions:
