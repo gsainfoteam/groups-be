@@ -9,6 +9,9 @@ export class LoggerDecoratorRegister implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner,
   ) {}
 
+  /**
+   * if the decorator, loggable, is founded, it will log before and after the method
+   */
   onModuleInit() {
     return this.discoveryService
       .getProviders()
