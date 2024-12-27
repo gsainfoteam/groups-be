@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
@@ -27,12 +28,29 @@ import { ClientGuard } from './guard/client.guard';
 import { GetClient } from './decorator/getClient.decorator';
 import { Client } from '@prisma/client';
 import { AuthorityDto } from './dto/req/authority.dto';
+import { ExpandedClientResDto } from './dto/res/expandedClientRes.dto';
 
 @ApiTags('client')
 @Controller('client')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
+
+  @ApiOperation({
+    summary: 'Get clients',
+    description: 'Get clients with name and uuid',
+  })
+  @ApiOkResponse({
+    description: 'The clients have been successfully fetched.',
+    type: [ExpandedClientResDto],
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Unknown errors',
+  })
+  @Get(':uuid')
+  async getClient(@Param('uuid') uuid: string): Promise<ExpandedClientResDto> {
+    return this.clientService.getClient(uuid);
+  }
 
   @ApiOperation({
     summary: 'Register a new client',
