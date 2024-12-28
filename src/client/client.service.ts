@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { Loggable } from '@lib/logger/decorator/loggable';
+import { ExpandedClient } from './types/ExpandedClient.type';
 
 @Injectable()
 @Loggable()
@@ -21,6 +22,21 @@ export class ClientService {
   ) {
     this.SlACK_WEBHOOK_URL =
       this.configService.getOrThrow<string>('SLACK_WEBHOOK_URL');
+  }
+
+  /**
+   * get client
+   * @param uuid uuid of the client to get
+   * @returns client
+   */
+  async getClient(uuid: string): Promise<ExpandedClient> {
+    const client = await this.clientRepository.findByUuidWithAuthority(uuid);
+    if (!client) {
+      this.logger.debug(`client not found`);
+      throw new ForbiddenException('client not found');
+    }
+
+    return client;
   }
 
   /**

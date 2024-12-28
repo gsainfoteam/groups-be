@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Client } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ExpandedClient } from './types/ExpandedClient.type';
 
 @Injectable()
 @Loggable()
@@ -51,6 +52,18 @@ export class ClientRepository {
   async findByUuid(uuid: string): Promise<Client | null> {
     return this.prismaService.client.findUnique({
       where: { uuid },
+    });
+  }
+
+  /**
+   * Find a client by uuid with authorities. if the client is not found, return null
+   * @param uuid the uuid of the client to find
+   * @returns Founded client or null
+   */
+  async findByUuidWithAuthority(uuid: string): Promise<ExpandedClient | null> {
+    return this.prismaService.client.findUnique({
+      where: { uuid },
+      include: { ExternalAuthority: true },
     });
   }
 
