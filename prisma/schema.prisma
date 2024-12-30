@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 generator dbml {
@@ -106,12 +107,12 @@ model Group {
 }
 
 model UserGroup {
-  userUuid    String   @map("user_uuid") @db.Uuid
-  User        User     @relation(fields: [userUuid], references: [uuid])
-  groupUuid   String   @map("group_uuid") @db.Uuid
-  Group       Group    @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  createdAt   DateTime @default(now()) @map("created_at")
-  visibility  Visibility   @map("visibility") @default(Private)
+  userUuid   String     @map("user_uuid") @db.Uuid
+  User       User       @relation(fields: [userUuid], references: [uuid])
+  groupUuid  String     @map("group_uuid") @db.Uuid
+  Group      Group      @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  visibility Visibility @default(Private) @map("visibility")
 
   @@id([userUuid, groupUuid])
   @@map("user_group")
