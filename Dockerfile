@@ -23,8 +23,7 @@ WORKDIR /app
 ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
   apk update && \
-  apk add build-base libheif vips-dev vips -q && \
-  apk add --no-cache openssl
+  apk add build-base libheif vips-dev vips -q
 
 COPY --from=builder /app ./
 
