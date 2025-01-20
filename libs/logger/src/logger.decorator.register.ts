@@ -2,8 +2,12 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner } from '@nestjs/core';
 import { LOGGABLE } from './decorator/loggable';
 
+/**
+ * This class is used for logging before/after the function whose class has "Loggable" decorator
+ */
 @Injectable()
 export class LoggerDecoratorRegister implements OnModuleInit {
+  /** To find the the functions whose class has "Loggable" decorator, discoveryService and MetadataScanner */
   constructor(
     private readonly discoveryService: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,

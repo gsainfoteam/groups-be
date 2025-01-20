@@ -10,6 +10,7 @@
     "infoteam",
     "libvips",
     "Loggable",
+    "metatype",
     "nestjs",
     "noreply"
   ],
