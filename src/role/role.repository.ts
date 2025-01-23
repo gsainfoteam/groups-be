@@ -8,7 +8,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, Role } from '@prisma/client';
+import { Authority, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -23,13 +23,13 @@ export class RoleRepository {
    * @returns the list of roles for the group
    */
   async getRoles(
-    { name }: Pick<Group, 'name'>,
+    { groupUuid }: Pick<Role, 'groupUuid'>,
     userUuid: string,
   ): Promise<Role[]> {
     return this.prismaService.role.findMany({
       where: {
         Group: {
-          name,
+          uuid: groupUuid,
           UserGroup: {
             some: {
               userUuid,

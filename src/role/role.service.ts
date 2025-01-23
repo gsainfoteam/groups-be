@@ -18,7 +18,7 @@ export class RoleService {
    */
   async getRoles(groupUuid: string, userUuid: string): Promise<RoleListResDto> {
     return {
-      list: await this.roleRepository.getRoles({ name: groupUuid }, userUuid),
+      list: await this.roleRepository.getRoles({ groupUuid }, userUuid),
     };
   }
 
