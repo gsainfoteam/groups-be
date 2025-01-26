@@ -11,10 +11,16 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { UserInfo } from './types/userInfo.type';
 
+/**
+ * This is the helper Class for infoteam idp service
+ */
 @Injectable()
 export class InfoteamIdpService {
+  /** The object for logging */
   private readonly logger = new Logger(InfoteamIdpService.name);
+  /** The url of infoteam idp service */
   private idpUrl: string;
+  /** setting the idpUrl and Using httpService and configService */
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,

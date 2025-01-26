@@ -15,8 +15,11 @@ import { ConfigService } from '@nestjs/config';
  */
 @Injectable()
 export class ObjectService {
+  /** The object for logging */
   private readonly logger = new Logger(ObjectService.name);
+  /** The object for connecting to aws s3 */
   private readonly s3Client: S3Client;
+  /** Creating the s3 client object */
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
       region: configService.getOrThrow('AWS_S3_REGION'),
