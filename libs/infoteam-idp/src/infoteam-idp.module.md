@@ -16,8 +16,8 @@
 
 ``` env
     IDP_URL=https://api.idp.gistory.me
-    IDP_CLIENT_ID=yourclientid
-    IDP_CLIENT_SECRET=yourclientsecret
+    IDP_CLIENT_ID=yourClientId
+    IDP_CLIENT_SECRET=yourClientSecret
 ```
 
 위의 설정변수를 보면 알 수 있겠지만, 해당 모듈을 사용하기 위해서는 먼저 infoteam idp에서 client등록을 해야지 사용할 수 있습니다.
