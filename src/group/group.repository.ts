@@ -248,24 +248,36 @@ export class GroupRepository {
             },
           },
           Role: {
-            create: {
-              id: 1,
-              name: 'admin',
-              authorities: [
-                Authority.MEMBER_UPDATE,
-                Authority.MEMBER_DELETE,
-                Authority.ROLE_CREATE,
-                Authority.ROLE_UPDATE,
-                Authority.ROLE_DELETE,
-                Authority.GROUP_UPDATE,
-                Authority.GROUP_DELETE,
-              ],
-              userRole: {
-                create: {
-                  userUuid,
+            create: [
+              {
+                id: 1,
+                name: 'admin',
+                authorities: [
+                  Authority.MEMBER_UPDATE,
+                  Authority.MEMBER_DELETE,
+                  Authority.ROLE_CREATE,
+                  Authority.ROLE_UPDATE,
+                  Authority.ROLE_DELETE,
+                  Authority.GROUP_UPDATE,
+                  Authority.GROUP_DELETE,
+                ],
+                userRole: {
+                  create: {
+                    userUuid,
+                  },
                 },
               },
-            },
+              {
+                id: 2,
+                name: 'manager',
+                authorities: [Authority.MEMBER_UPDATE],
+              },
+              {
+                id: 3,
+                name: 'member',
+                authorities: [],
+              },
+            ],
           },
         },
       })
