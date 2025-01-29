@@ -231,6 +231,17 @@ export class GroupService {
         'You do not have permission to remove a member',
       );
     }
+
+    const groupInfo = await this.groupRepository.getGroupByUuid(uuid);
+
+    if (groupInfo.President.uuid === targetUuid) {
+      throw new ForbiddenException(
+        groupInfo.President.uuid === userUuid
+          ? 'You cannot remove yourself from the group'
+          : 'You cannot remove the president',
+      );
+    }
+
     await this.groupRepository.removeUserFromGroup(uuid, targetUuid);
   }
 
