@@ -18,10 +18,10 @@ export class ExternalStrategy extends PassportStrategy(Strategy, 'external') {
   }
 
   async validate({ sub, aud, iss }: ExternalPayload): Promise<ExternalPayload> {
-    if (!this.userService.getUserInfo(sub)) {
+    const user = await this.userService.getUserInfo(sub);
+    if (!user) {
       throw new ForbiddenException('User not found');
     }
-
     return { sub, aud, iss };
   }
 }
