@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from 'src/user/user.service';
+import { ExternalPayload } from '../types/certPayload';
 
 @Injectable()
 export class ExternalStrategy extends PassportStrategy(Strategy, 'external') {
@@ -17,7 +17,11 @@ export class ExternalStrategy extends PassportStrategy(Strategy, 'external') {
     });
   }
 
-  async validate({ sub }: { sub: string }): Promise<User> {
-    return this.userService.getUserInfo(sub);
+  async validate({ sub, aud, iss }: ExternalPayload): Promise<ExternalPayload> {
+    if (!this.userService.getUserInfo(sub)) {
+      throw new ForbiddenException('User not found');
+    }
+
+    return { sub, aud, iss };
   }
 }
