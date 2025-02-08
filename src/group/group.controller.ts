@@ -126,14 +126,13 @@ export class GroupController {
   @ApiOkResponse({ type: ExpandedGroupResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
   @Get(':uuid')
   async getGroupByUuid(
     @Param('uuid') uuid: string,
-    @GetUser() user: User,
+    @GetUser() user?: User,
   ): Promise<ExpandedGroupResDto> {
     return new ExpandedGroupResDto(
-      await this.groupService.getGroupByUuidWithUserUuid(uuid, user.uuid),
+      await this.groupService.getGroupByUuidWithUserUuid(uuid, user?.uuid),
     );
   }
 
