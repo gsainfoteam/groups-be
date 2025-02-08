@@ -39,7 +39,7 @@ export class GroupService {
 
   async getGroupByUuidWithUserUuid(
     uuid: string,
-    userUuid: string,
+    userUuid?: string,
   ): Promise<ExpandedGroup> {
     return this.groupRepository.getGroupByUuid(uuid, userUuid);
   }
