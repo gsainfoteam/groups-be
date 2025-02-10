@@ -258,6 +258,8 @@ export class GroupRepository {
                   Authority.ROLE_CREATE,
                   Authority.ROLE_UPDATE,
                   Authority.ROLE_DELETE,
+                  Authority.ROLE_GRANT,
+                  Authority.ROLE_REVOKE,
                   Authority.GROUP_UPDATE,
                   Authority.GROUP_DELETE,
                 ],
