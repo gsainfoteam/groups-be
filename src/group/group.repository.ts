@@ -446,6 +446,7 @@ export class GroupRepository {
               email: true,
               createdAt: true,
               UserRole: {
+                where: { groupUuid },
                 select: {
                   Role: { select: { name: true } },
                 },
@@ -460,13 +461,12 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
-    //expandedUser type에 맞게 변환 과정 추가
     const expandedUsers: ExpandedUser[] = userGroups.map((group) => ({
       uuid: group.User.uuid,
       name: group.User.name,
       email: group.User.email,
       createdAt: group.User.createdAt,
-      role: group.User.UserRole[0]?.Role.name || '', // 첫 번째 역할의 이름을 가져오고, 없으면 빈 문자열
+      role: group.User.UserRole[0]?.Role?.name || '',
     }));
     return expandedUsers;
   }
