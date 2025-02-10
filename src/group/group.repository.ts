@@ -466,7 +466,7 @@ export class GroupRepository {
       name: group.User.name,
       email: group.User.email,
       createdAt: group.User.createdAt,
-      role: group.User.UserRole[0]?.Role.name || '',
+      role: group.User.UserRole[0]?.Role?.name || '',
     }));
     return expandedUsers;
   }
