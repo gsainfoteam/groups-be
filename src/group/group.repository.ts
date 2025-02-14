@@ -263,6 +263,20 @@ export class GroupRepository {
                   Authority.GROUP_UPDATE,
                   Authority.GROUP_DELETE,
                 ],
+                RoleExternalAuthority: {
+                  createMany: {
+                    data: [
+                      {
+                        clientUuid: '8df6f258-f096-4f56-9d1b-7701c7376efd',
+                        authority: 'WRITE',
+                      },
+                      {
+                        clientUuid: '8df6f258-f096-4f56-9d1b-7701c7376efd',
+                        authority: 'DELETE',
+                      },
+                    ],
+                  },
+                },
                 userRole: {
                   create: {
                     userUuid,
