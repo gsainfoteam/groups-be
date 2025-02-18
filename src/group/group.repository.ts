@@ -18,6 +18,9 @@ import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
 import { PrismaService } from '@lib/prisma';
 
+const ZIGGLE_CLIENT_UUID = '8df6f258-f096-4f56-9d1b-7701c7376efd';
+const ZIGGLE_AUTHORITIES = ['WRITE', 'DELETE'] as const;
+
 @Injectable()
 @Loggable()
 export class GroupRepository {
@@ -263,6 +266,15 @@ export class GroupRepository {
                   Authority.GROUP_UPDATE,
                   Authority.GROUP_DELETE,
                 ],
+                // TODO: it's hard coded. this should be changed.
+                RoleExternalAuthority: {
+                  createMany: {
+                    data: ZIGGLE_AUTHORITIES.map((authority) => ({
+                      clientUuid: ZIGGLE_CLIENT_UUID,
+                      authority,
+                    })),
+                  },
+                },
                 userRole: {
                   create: {
                     userUuid,
