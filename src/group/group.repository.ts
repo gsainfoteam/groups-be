@@ -266,6 +266,7 @@ export class GroupRepository {
                   Authority.GROUP_UPDATE,
                   Authority.GROUP_DELETE,
                 ],
+                // TODO: it's hard coded. this should be changed.
                 RoleExternalAuthority: {
                   createMany: {
                     data: ZIGGLE_AUTHORITIES.map((authority) => ({
