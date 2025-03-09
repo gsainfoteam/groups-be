@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, Visibility, User } from '@prisma/client';
+import { Authority, Group, Visibility, User, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
@@ -396,6 +396,22 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+  }
+
+  async getUserRoleInGroup(uuid: string, userUuid: string): Promise<Role> {
+    const role = await this.prismaService.userRole.findFirst({
+      where: {
+        userUuid,
+        groupUuid: uuid,
+      },
+      select: {
+        Role: true,
+      },
+    });
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+    return role.Role;
   }
 
   async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
