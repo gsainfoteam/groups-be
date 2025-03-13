@@ -281,16 +281,6 @@ export class GroupRepository {
                   },
                 },
               },
-              {
-                id: 2,
-                name: 'manager',
-                authorities: [Authority.MEMBER_UPDATE],
-              },
-              {
-                id: 3,
-                name: 'member',
-                authorities: [],
-              },
             ],
           },
         },
