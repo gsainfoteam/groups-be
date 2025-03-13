@@ -7,6 +7,12 @@ export class InvitationExpDto {
   @Type(() => Number)
   @IsInt()
   @IsNotEmpty()
+  roleId: number;
+
+  @ApiProperty()
+  @Type(() => Number)
+  @IsInt()
+  @IsNotEmpty()
   @Min(1)
   @Max(60 * 60 * 24 * 30)
   duration: number;

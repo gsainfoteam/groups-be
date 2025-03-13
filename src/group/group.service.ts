@@ -21,6 +21,7 @@ import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
 import { ObjectService } from '@lib/object';
+import { InviteCache } from './types/InviteCache.type';
 
 @Injectable()
 @Loggable()
@@ -152,13 +153,14 @@ export class GroupService {
    */
   async createInviteCode(
     uuid: string,
+    roleId: number,
     userUuid: string,
     duration: number = 60 * 60,
   ): Promise<InviteCodeResDto> {
     if (
       !(await this.groupRepository.validateAuthority(
         uuid,
-        [Authority.MEMBER_UPDATE],
+        [Authority.MEMBER_UPDATE, Authority.ROLE_GRANT],
         userUuid,
       ))
     ) {
@@ -170,9 +172,13 @@ export class GroupService {
       .randomBytes(32)
       .toString('base64')
       .replace(/[+\/=]/g, '');
+    const inviteCache: InviteCache = {
+      groupUuid: uuid,
+      roleId: 1,
+    };
     await this.redis.set(
       `${this.invitationCodePrefix}:${code}`,
-      uuid,
+      JSON.stringify(inviteCache),
       'EX',
       duration,
     );
@@ -180,23 +186,29 @@ export class GroupService {
   }
 
   async getInvitationInfo(code: string): Promise<ExpandedGroup> {
-    const groupUuid = await this.redis.get(
-      `${this.invitationCodePrefix}:${code}`,
-    );
+    const cache = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
 
-    if (!groupUuid) {
+    if (!cache) {
       throw new ForbiddenException('Invalid invite code');
     }
 
-    return this.groupRepository.getGroupByUuid(groupUuid);
+    const inviteCache: InviteCache = JSON.parse(cache);
+
+    return this.groupRepository.getGroupByUuid(inviteCache.groupUuid);
   }
 
   async joinMember(code: string, userUuid: string): Promise<void> {
-    const uuid = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
-    if (!uuid) {
+    const cache = await this.redis.get(`${this.invitationCodePrefix}:${code}`);
+    if (!cache) {
       throw new ForbiddenException('Invalid invite code');
     }
-    await this.groupRepository.addUserToGroup(uuid, userUuid);
+
+    const inviteCache: InviteCache = JSON.parse(cache);
+    await this.groupRepository.addUserToGroup(
+      inviteCache.groupUuid,
+      inviteCache.roleId,
+      userUuid,
+    );
   }
 
   async getMembersByGroupUuid(

@@ -414,7 +414,11 @@ export class GroupRepository {
     return role.Role;
   }
 
-  async addUserToGroup(uuid: string, userUuid: string): Promise<void> {
+  async addUserToGroup(
+    uuid: string,
+    roleId: number,
+    userUuid: string,
+  ): Promise<void> {
     await this.prismaService.userGroup
       .create({
         data: {
@@ -434,7 +438,28 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
+
+    // need to improve this part
+    await this.prismaService.userRole
+      .create({
+        data: {
+          groupUuid: uuid,
+          userUuid,
+          roleId,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new NotFoundException('Role not found');
+          }
+          this.logger.error(error);
+          throw new InternalServerErrorException('unknown database error');
+        }
+        throw new InternalServerErrorException('unknown error');
+      });
   }
+
   async isUserAdmin(user: User): Promise<boolean> {
     const userRole = await this.prismaService.userRole.findFirst({
       where: {

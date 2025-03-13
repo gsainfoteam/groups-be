@@ -265,7 +265,12 @@ export class GroupController {
     @Query() query: InvitationExpDto,
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
-    return this.groupService.createInviteCode(uuid, user.uuid, query.duration);
+    return this.groupService.createInviteCode(
+      uuid,
+      query.roleId,
+      user.uuid,
+      query.duration,
+    );
   }
 
   @ApiOperation({
