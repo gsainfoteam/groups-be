@@ -174,7 +174,7 @@ export class GroupService {
       .replace(/[+\/=]/g, '');
     const inviteCache: InviteCache = {
       groupUuid: uuid,
-      roleId: 1,
+      roleId,
     };
     await this.redis.set(
       `${this.invitationCodePrefix}:${code}`,
