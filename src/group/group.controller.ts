@@ -292,6 +292,22 @@ export class GroupController {
   }
 
   @ApiOperation({
+    summary: 'leave group userself ',
+    description: '스스로 그룹을 나가는 API 입니다.',
+  })
+  @ApiOkResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  @UseGuards(GroupsGuard)
+  @Delete(':uuid/member/leave')
+  async leaveFromGroup(
+    @Param('uuid') uuid: string,
+    @GetUser() user: User,
+  ): Promise<void> {
+    return this.groupService.leaveFromGroup(uuid, user.uuid);
+  }
+
+  @ApiOperation({
     summary: 'Get Group members information',
     description:
       '멤버 읽기 권한이 있는 그룹장 및 그룹원들이 그룹인원들의 정보를 가져옵니다.만약 그룹 멤버가 아니라면, public 그룹원들만 볼 수 있습니다. ',

@@ -261,6 +261,15 @@ export class GroupService {
     await this.groupRepository.removeUserFromGroup(uuid, targetUuid);
   }
 
+  async leaveFromGroup(uuid: string, userUuid: string): Promise<void> {
+    const groupInfo = await this.groupRepository.getGroupByUuid(uuid);
+
+    if (!groupInfo) {
+      throw new NotFoundException("There'are no group");
+    }
+    await this.groupRepository.removeUserFromGroup(uuid, userUuid);
+  }
+
   async grantRole(
     uuid: string,
     targetUuid: string,
