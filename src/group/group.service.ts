@@ -265,9 +265,15 @@ export class GroupService {
     const groupInfo = await this.groupRepository.getGroupByUuid(uuid);
 
     if (!groupInfo) {
-      throw new NotFoundException("There'are no group");
+      throw new NotFoundException('Group does not exist');
     }
-    await this.groupRepository.removeUserFromGroup(uuid, userUuid);
+
+    if (groupInfo.President.uuid === userUuid) {
+      throw new ForbiddenException(
+        'You cannot leave as the president, transfer ownership first',
+      );
+    }
+    await this.groupRepository.removeUserFromGroupSelf(uuid, userUuid);
   }
 
   async grantRole(

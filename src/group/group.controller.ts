@@ -292,7 +292,7 @@ export class GroupController {
   }
 
   @ApiOperation({
-    summary: 'leave group userself ',
+    summary: 'leave group userself',
     description: '스스로 그룹을 나가는 API 입니다.',
   })
   @ApiOkResponse()
