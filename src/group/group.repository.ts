@@ -394,6 +394,9 @@ export class GroupRepository {
         userUuid,
         groupUuid: uuid,
       },
+      orderBy: {
+        roleId: 'asc',
+      },
       select: {
         Role: true,
       },
