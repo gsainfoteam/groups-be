@@ -170,7 +170,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Update group info',
-    description: '그룹의 정보를 업데이트하는 API입니다.',
+    description:
+      '그룹의 정보를 업데이트하는 API입니다. 필요 권한: GROUP_UPDATE',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -188,7 +189,7 @@ export class GroupController {
   @ApiOperation({
     summary: 'Upload a group image',
     description:
-      '그룹의 이미지를 업로드하는 API 입니다. 이미 존재하는 이미지는 덮어씌워집니다.',
+      '그룹의 이미지를 업로드하는 API 입니다. 이미 존재하는 이미지는 덮어씌워집니다. 필요 권한: GROUP_UPDATE',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -220,7 +221,7 @@ export class GroupController {
   @ApiOperation({
     summary: 'Delete a group',
     description:
-      '그룹을 삭제하는 API 입니다. 삭제시 그룹의 모든 정보가 삭제됩니다.',
+      '그룹을 삭제하는 API 입니다. 삭제시 그룹의 모든 정보가 삭제됩니다. 필요 권한: GROUP_DELETE',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -236,7 +237,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Get user role in group',
-    description: '그룹에 대한 자신의 역할을 가져오는 API입니다.',
+    description:
+      '그룹에 대한 자신의 역할을 가져오는 API입니다. 그룹 멤버만 접근 가능합니다.',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -253,7 +255,7 @@ export class GroupController {
   @ApiOperation({
     summary: 'Create an invite code',
     description:
-      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다. 코드가 유효한 duration의 최소값은 1, 최대값은 60 * 60 * 24 * 30 = 2592000입니다.',
+      '그룹에 초대 코드를 만드는 API 입니다. 초대 코드를 통해 그룹에 가입할 수 있습니다. 코드가 유효한 duration의 최소값은 1, 최대값은 60 * 60 * 24 * 30 = 2592000입니다. 필요 권한: MEMBER_UPDATE, ROLE_GRANT',
   })
   @ApiCreatedResponse({ type: InviteCodeResDto })
   @ApiForbiddenResponse()
@@ -293,7 +295,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'leave group userself',
-    description: '스스로 그룹을 나가는 API 입니다.',
+    description:
+      '스스로 그룹을 나가는 API 입니다. 단, president는 그룹을 나갈 수 없습니다.',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -310,7 +313,7 @@ export class GroupController {
   @ApiOperation({
     summary: 'Get Group members information',
     description:
-      '멤버 읽기 권한이 있는 그룹장 및 그룹원들이 그룹인원들의 정보를 가져옵니다.만약 그룹 멤버가 아니라면, public 그룹원들만 볼 수 있습니다. ',
+      '멤버 읽기 권한이 있는 그룹장 및 그룹원들이 그룹인원들의 정보를 가져옵니다. 만약 그룹 멤버가 아니라면, public 그룹원들만 볼 수 있습니다. 이메일과 역할 정보는 관리자만 볼 수 있습니다.',
   })
   @ApiOkResponse({ type: MemberListResDto })
   @ApiInternalServerErrorResponse()
@@ -329,7 +332,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'delete a member',
-    description: '그룹에 멤버를 추방하는 API 입니다.',
+    description:
+      '그룹 멤버를 추방하는 API 입니다. role name이 president인 경우 추방이 불가능합니다. 필요 권한: MEMBER_DELETE',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -346,7 +350,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'grant a role',
-    description: '그룹의 멤버의 역할을 추가하는 API 입니다.',
+    description:
+      '그룹 멤버의 역할을 추가하는 API 입니다. 필요 권한: ROLE_GRANT',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -364,7 +369,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Delete a role',
-    description: '그룹의 멤버의 역할을 삭제하는 API 입니다.',
+    description:
+      '그룹 멤버의 역할을 삭제하는 API 입니다. 필요 권한: ROLE_REVOKE',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -382,7 +388,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Update "visibility" of user in group',
-    description: '그룹 소속 여부의 공개/비공개 전환을 위한 API입니다.',
+    description:
+      '그룹 소속 여부의 공개/비공개 전환을 위한 API입니다. 자신의 그룹 내 공개 여부만 변경할 수 있습니다.',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()
@@ -403,7 +410,8 @@ export class GroupController {
 
   @ApiOperation({
     summary: 'Change president of the group',
-    description: '그룹의 President를 변경하는 API입니다.',
+    description:
+      '그룹의 President를 변경하는 API입니다. 현재 President만 변경할 수 있으며, 새로운 president는 반드시 해당 그룹의 멤버여야 합니다.',
   })
   @ApiOkResponse()
   @ApiForbiddenResponse()

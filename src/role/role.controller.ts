@@ -39,7 +39,7 @@ export class RoleController {
 
   @ApiOperation({
     summary: 'Get roles',
-    description: '그룹 내의 모든 Role을 가져옵니다.',
+    description: '그룹 내의 모든 Role을 가져옵니다. 그룹 멤버만 접근 가능합니다.',
   })
   @ApiOkResponse({ type: RoleListResDto })
   @ApiInternalServerErrorResponse({})
@@ -53,7 +53,7 @@ export class RoleController {
 
   @ApiOperation({
     summary: 'Create role',
-    description: '그룹 내의 Role을 생성합니다.',
+    description: '그룹 내의 Role을 생성합니다. 필요 권한: ROLE_CREATE',
   })
   @ApiCreatedResponse({ description: 'Role created' })
   @ApiConflictResponse({ description: 'Role already exists' })
@@ -72,7 +72,7 @@ export class RoleController {
   @ApiOperation({
     summary: 'Update role',
     description:
-      '그룹 내의 Role을 수정합니다. authorities를 수정할 경우, authorities를 전부 다시 넣어주어야 합니다.',
+      '그룹 내의 Role을 수정합니다. authorities를 수정할 경우, authorities를 전부 다시 넣어주어야 합니다. 필요 권한: ROLE_UPDATE',
   })
   @ApiOkResponse({ description: 'Role updated' })
   @ApiNotFoundResponse({ description: 'Role not found' })
@@ -91,7 +91,7 @@ export class RoleController {
 
   @ApiOperation({
     summary: 'Delete role',
-    description: '그룹 내 역할을 삭제합니다.',
+    description: '그룹 내 역할을 삭제합니다. 필요 권한: ROLE_DELETE',
   })
   @ApiOkResponse({ description: 'Role deleted' })
   @ApiNotFoundResponse({ description: 'Role not found' })
