@@ -168,6 +168,12 @@ export class GroupService {
         'You do not have permission to create an invite code',
       );
     }
+    const role = await this.groupRepository.getUserRoleInGroup(uuid, userUuid);
+    if (role.id < roleId) {
+      throw new ForbiddenException(
+        'You do not have permission to grant a role higher than yours',
+      );
+    }
     const code = crypto
       .randomBytes(32)
       .toString('base64')
