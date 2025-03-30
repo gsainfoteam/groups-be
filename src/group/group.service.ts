@@ -169,7 +169,7 @@ export class GroupService {
       );
     }
     const role = await this.groupRepository.getUserRoleInGroup(uuid, userUuid);
-    if (role.id < roleId) {
+    if (role.id > roleId) {
       throw new ForbiddenException(
         'You do not have permission to grant a role higher than yours',
       );
