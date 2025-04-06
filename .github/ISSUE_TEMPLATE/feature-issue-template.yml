@@ -2,7 +2,7 @@ name: Feature Issue Template
 description: An Issue Template for Features
 title: '[FEATURE] '
 labels: ['feature']
-projects: ['gsainfoteam/5','gsainfoteam/11']
+projects: ['gsainfoteam/5']
 assignees: []
 body:
   - type: textarea
