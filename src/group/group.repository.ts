@@ -290,8 +290,10 @@ export class GroupRepository {
           if (error.code === 'P2002') {
             throw new ConflictException('Group name already exists');
           }
+          this.logger.error(error, error.code);
           throw new InternalServerErrorException('unknown database error');
         }
+        this.logger.error(error);
         throw new InternalServerErrorException('unknown error');
       });
   }
