@@ -18,7 +18,7 @@ enum Grant {
   REJECT
 }
 
-enum Authority {
+enum Permission {
   MEMBER_UPDATE
   MEMBER_DELETE
   ROLE_CREATE
@@ -44,31 +44,32 @@ model Client {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ExternalAuthority ExternalAuthority[]
+  ExternalPermission ExternalPermission[]
 
   @@map("client")
 }
 
-model ExternalAuthority {
+model ExternalPermission {
   clientUuid String @map("client_uuid") @db.Uuid
   Client     Client @relation(fields: [clientUuid], references: [uuid])
-  authority  String
+  permission String
 
-  RoleExternalAuthority RoleExternalAuthority[]
+  RoleExternalPermission RoleExternalPermission[]
 
-  @@id([clientUuid, authority])
+  @@id([clientUuid, permission])
   @@map("client_authority")
 }
 
-model RoleExternalAuthority {
-  roleId            Int               @map("role_id")
-  roleGroupUuid     String            @map("role_group_uuid") @db.Uuid
-  Role              Role              @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
-  clientUuid        String            @map("client_uuid") @db.Uuid
-  authority         String
-  ExternalAuthority ExternalAuthority @relation(fields: [clientUuid, authority], references: [clientUuid, authority])
+model RoleExternalPermission {
+  roleId        Int    @map("role_id")
+  roleGroupUuid String @map("role_group_uuid") @db.Uuid
+  Role          Role   @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
+  clientUuid    String @map("client_uuid") @db.Uuid
+  permission    String
 
-  @@id([roleId, roleGroupUuid, clientUuid, authority])
+  ExternalPermission ExternalPermission @relation(fields: [clientUuid, permission], references: [clientUuid, permission])
+
+  @@id([roleId, roleGroupUuid, clientUuid, permission])
   @@map("role_authority")
 }
 
@@ -78,7 +79,6 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now()) @map("created_at")
 
-  UserGroup  UserGroup[]
   UserRole   UserRole[]
   OwnedGroup Group[]
 
@@ -98,34 +98,21 @@ model Group {
 
   President User @relation(fields: [presidentUuid], references: [uuid])
 
-  UserGroup UserGroup[]
-  Role      Role[]
-  UserRole  UserRole[]
+  Role     Role[]
+  UserRole UserRole[]
 
   @@map("group")
-}
-
-model UserGroup {
-  userUuid   String     @map("user_uuid") @db.Uuid
-  User       User       @relation(fields: [userUuid], references: [uuid])
-  groupUuid  String     @map("group_uuid") @db.Uuid
-  Group      Group      @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  createdAt  DateTime   @default(now()) @map("created_at")
-  visibility Visibility @default(Private) @map("visibility")
-
-  @@id([userUuid, groupUuid])
-  @@map("user_group")
 }
 
 model Role {
   id          Int
   name        String
-  groupUuid   String      @map("group_uuid") @db.Uuid
-  Group       Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  authorities Authority[] @map("authorities")
+  groupUuid   String       @map("group_uuid") @db.Uuid
+  Group       Group        @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
+  authorities Permission[] @map("permissions")
 
-  userRole              UserRole[]
-  RoleExternalAuthority RoleExternalAuthority[]
+  userRole               UserRole[]
+  RoleExternalPermission RoleExternalPermission[]
 
   @@id([id, groupUuid])
   @@unique([name, groupUuid])

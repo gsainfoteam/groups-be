@@ -14,17 +14,17 @@ Table client {
   grant Grant [not null, default: 'REJECT']
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  ExternalAuthority client_authority [not null]
+  ExternalPermission client_authority [not null]
 }
 
 Table client_authority {
   clientUuid String [not null]
   Client client [not null]
-  authority String [not null]
-  RoleExternalAuthority role_authority [not null]
+  permission String [not null]
+  RoleExternalPermission role_authority [not null]
 
   indexes {
-    (clientUuid, authority) [pk]
+    (clientUuid, permission) [pk]
   }
 }
 
@@ -33,11 +33,11 @@ Table role_authority {
   roleGroupUuid String [not null]
   Role role [not null]
   clientUuid String [not null]
-  authority String [not null]
-  ExternalAuthority client_authority [not null]
+  permission String [not null]
+  ExternalPermission client_authority [not null]
 
   indexes {
-    (roleId, roleGroupUuid, clientUuid, authority) [pk]
+    (roleId, roleGroupUuid, clientUuid, permission) [pk]
   }
 }
 
@@ -46,7 +46,6 @@ Table user {
   name String [not null]
   email String [unique, not null]
   createdAt DateTime [default: `now()`, not null]
-  UserGroup user_group [not null]
   UserRole user_role [not null]
   OwnedGroup group [not null]
 }
@@ -62,22 +61,8 @@ Table group {
   notionPageId String
   profileImageKey String
   President user [not null]
-  UserGroup user_group [not null]
   Role role [not null]
   UserRole user_role [not null]
-}
-
-Table user_group {
-  userUuid String [not null]
-  User user [not null]
-  groupUuid String [not null]
-  Group group [not null]
-  createdAt DateTime [default: `now()`, not null]
-  visibility Visibility [not null, default: 'Private']
-
-  indexes {
-    (userUuid, groupUuid) [pk]
-  }
 }
 
 Table role {
@@ -85,9 +70,9 @@ Table role {
   name String [not null]
   groupUuid String [not null]
   Group group [not null]
-  authorities Authority[] [not null]
+  authorities Permission[] [not null]
   userRole user_role [not null]
-  RoleExternalAuthority role_authority [not null]
+  RoleExternalPermission role_authority [not null]
 
   indexes {
     (id, groupUuid) [pk]
@@ -113,7 +98,7 @@ Enum Grant {
   REJECT
 }
 
-Enum Authority {
+Enum Permission {
   MEMBER_UPDATE
   MEMBER_DELETE
   ROLE_CREATE
@@ -134,13 +119,9 @@ Ref: client_authority.clientUuid > client.uuid
 
 Ref: role_authority.(roleId, roleGroupUuid) > role.(id, groupUuid)
 
-Ref: role_authority.(clientUuid, authority) > client_authority.(clientUuid, authority)
+Ref: role_authority.(clientUuid, permission) > client_authority.(clientUuid, permission)
 
 Ref: group.presidentUuid > user.uuid
-
-Ref: user_group.userUuid > user.uuid
-
-Ref: user_group.groupUuid > group.uuid [delete: Cascade]
 
 Ref: role.groupUuid > group.uuid [delete: Cascade]
 
