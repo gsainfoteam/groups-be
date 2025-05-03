@@ -1,17 +1,18 @@
-/** jwt api response type from infoteam idp */
-export type IdpJwtResponse = {
-  access_token: string;
-  refresh_token: string;
-};
-
 /** user info api response type from infoteam idp */
 export type IdpUserInfoRes = {
-  uuid: string;
-  email: string;
-  name: string;
-  student_id: string;
-  phone_number: string;
-  created_at: string;
-  updated_at: string;
-  access_level: string;
+  sub: string; // user uuid
+  profile?: string;
+  picture?: string;
+  name?: string;
+  email?: string;
+  student_id?: string;
+  phone_number?: string;
+};
+
+/** token api response type from infoteam idp of client credential flows */
+export type IdPTokenRes = {
+  access_token: string; // access token
+  token_type: string; // token type
+  expires_in: number; // expires in seconds
+  scope: string; // scope
 };
