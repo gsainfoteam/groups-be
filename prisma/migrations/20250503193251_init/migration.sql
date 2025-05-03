@@ -40,8 +40,6 @@ CREATE TABLE "role_authority" (
 -- CreateTable
 CREATE TABLE "user" (
     "uuid" UUID NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("uuid")
@@ -83,9 +81,6 @@ CREATE TABLE "user_role" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "client_name_key" ON "client"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "role_name_group_uuid_key" ON "role"("name", "group_uuid");

@@ -75,8 +75,6 @@ model RoleExternalPermission {
 
 model User {
   uuid      String   @id @db.Uuid
-  name      String
-  email     String   @unique
   createdAt DateTime @default(now()) @map("created_at")
 
   UserRole   UserRole[]

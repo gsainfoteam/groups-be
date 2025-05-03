@@ -43,8 +43,6 @@ Table role_authority {
 
 Table user {
   uuid String [pk]
-  name String [not null]
-  email String [unique, not null]
   createdAt DateTime [default: `now()`, not null]
   UserRole user_role [not null]
   OwnedGroup group [not null]
