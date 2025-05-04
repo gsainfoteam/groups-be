@@ -43,10 +43,39 @@ async function bootstrap() {
       },
       'client',
     )
+    .addOAuth2(
+      {
+        type: 'oauth2',
+        description: 'infoteam IdP OAuth2 with PKCE, and use id_token',
+        scheme: 'bearer',
+        in: 'header',
+        bearerFormat: 'token',
+        'x-tokenName': 'id_token',
+        flows: {
+          authorizationCode: {
+            authorizationUrl: configService.get('IDP_AUTH_URL'),
+            tokenUrl: configService.get('IDP_TOKEN_URL'),
+            scopes: {
+              openid: 'OpenId scope',
+              profile: 'Profile scope',
+              email: 'Email scope',
+            },
+          },
+        },
+      },
+      'idp:idtoken',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
+      initOAuth: {
+        usePkceWithAuthorizationCodeGrant: true,
+        additionalQueryStringParams: {
+          nonce: 'random-nonce',
+        },
+      },
+      oauth2RedirectUrl: `${configService.getOrThrow('BASE_URL')}/api/oauth2-redirect.html`,
       displayRequestDuration: true,
     },
   });

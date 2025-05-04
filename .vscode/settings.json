@@ -13,7 +13,8 @@
     "Loggable",
     "metatype",
     "nestjs",
-    "noreply"
+    "noreply",
+    "PKCE"
   ],
   "git.branchProtection": ["main"],
   "markdownlint.config": {
