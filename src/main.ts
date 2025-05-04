@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { ExceptionLoggerFilter } from '@lib/logger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,7 +36,7 @@ async function bootstrap() {
       {
         type: 'http',
       },
-      'user',
+      'user:jwt',
     )
     .addBasicAuth(
       {
@@ -79,6 +80,8 @@ async function bootstrap() {
       displayRequestDuration: true,
     },
   });
+  //apply global filter
+  app.useGlobalFilters(new ExceptionLoggerFilter());
   // start server
   await app.listen(3000);
 }

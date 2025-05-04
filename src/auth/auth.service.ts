@@ -19,7 +19,6 @@ export class AuthService {
     this.jwtExpiresIn = ms(
       configService.getOrThrow<string>('JWT_EXPIRES_IN') as StringValue,
     );
-    console.log('jwtExpiresIn', this.jwtExpiresIn);
   }
 
   async login(userUuid: string): Promise<AccessTokenDto> {
