@@ -47,7 +47,7 @@ export class InfoteamIdpService implements OnModuleInit {
     this.logger.log('onModuleInit called');
     const idpJwkResponse = await firstValueFrom(
       this.httpService
-        .get<{ keys: crypto.JsonWebKey[] }>(this.idpUrl + '/oauth/certs')
+        .get<{ keys: crypto.JsonWebKey[] }>(this.idpUrl + '/certs')
         .pipe(
           catchError((err) => {
             this.logger.error(err);

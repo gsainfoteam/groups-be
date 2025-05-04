@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { GroupsGuard } from './guard/groups.guard';
-import { GroupsStrategy } from './strategy/groups.strategy';
 import { LoggerModule } from '@lib/logger';
 import { InfoteamIdpModule } from '@lib/infoteam-idp';
 import { PrismaModule } from '@lib/prisma';
@@ -11,6 +9,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { IdpIdTokenStrategy } from './strategy/idpIdtoken.strategy';
 import { IdpIdtokenGuard } from './guard/idpIdtoken.guard';
 import { AuthRepository } from './auth.repository';
+import { UserGuard } from './guard/user.guard';
+import { UserStrategy } from './strategy/user.strategy';
 
 @Module({
   imports: [
@@ -36,11 +36,11 @@ import { AuthRepository } from './auth.repository';
   providers: [
     AuthService,
     AuthRepository,
-    GroupsGuard,
-    GroupsStrategy,
+    UserGuard,
+    UserStrategy,
     IdpIdTokenStrategy,
     IdpIdtokenGuard,
   ],
-  exports: [GroupsGuard, GroupsStrategy],
+  exports: [UserGuard, UserStrategy],
 })
 export class AuthModule {}
