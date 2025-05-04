@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,16 +11,21 @@ import { IdPTokenRes, IdpUserInfoRes } from './types/idp.type';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { UserInfo } from './types/userInfo.type';
+import { JwtService } from '@nestjs/jwt';
+
+import * as crypto from 'crypto';
 
 /**
  * This is the helper Class for infoteam idp service
  */
 @Injectable()
-export class InfoteamIdpService {
+export class InfoteamIdpService implements OnModuleInit {
   /** The object for logging */
   private readonly logger = new Logger(InfoteamIdpService.name);
   /** The url of infoteam idp service */
   private readonly idpUrl: string;
+  /** The jwk of idp id token */
+  private idpJwk: crypto.JsonWebKey;
   /** client token of the idp service */
   private clientToken: string;
   /** client token expire time */
@@ -27,9 +33,61 @@ export class InfoteamIdpService {
   /** setting the idpUrl and Using httpService and configService */
   constructor(
     private readonly httpService: HttpService,
+    private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
     this.idpUrl = this.configService.getOrThrow<string>('IDP_URL') + '/oauth';
+  }
+
+  /**
+   * this method is used to get the idp jwk from the idp service
+   * @returns idp jwk
+   */
+  async onModuleInit() {
+    this.logger.log('onModuleInit called');
+    const idpJwkResponse = await firstValueFrom(
+      this.httpService
+        .get<{ keys: crypto.JsonWebKey[] }>(this.idpUrl + '/oauth/certs')
+        .pipe(
+          catchError((err) => {
+            this.logger.error(err);
+            throw new InternalServerErrorException();
+          }),
+        ),
+    );
+    this.idpJwk = idpJwkResponse.data.keys[0];
+    this.logger.log('onModuleInit success');
+  }
+
+  /**
+   * this method is used to decode the id token from the idp service
+   * @param idToken this is the id token that is returned from the idp
+   */
+  async decodeIdToken(idToken: string): Promise<UserInfo> {
+    this.logger.log('decodeIdToken called');
+    if (
+      !this.jwtService.verify(idToken, {
+        publicKey: crypto
+          .createPublicKey({
+            format: 'jwk',
+            key: this.idpJwk,
+          })
+          .export({ format: 'pem', type: 'spki' }),
+      })
+    ) {
+      this.logger.debug('invalid id token');
+      throw new UnauthorizedException();
+    }
+    const {
+      name,
+      email,
+      profile,
+      picture,
+      phone_number: phoneNumber,
+      student_id: studentId,
+      sub: uuid,
+    } = this.jwtService.decode<IdpUserInfoRes>(idToken);
+    return { name, email, phoneNumber, studentId, uuid, profile, picture };
   }
 
   /**
@@ -61,11 +119,13 @@ export class InfoteamIdpService {
     const {
       name,
       email,
+      profile,
+      picture,
       phone_number: phoneNumber,
       student_id: studentNumber,
       sub: uuid,
     } = userInfoResponse.data;
-    return { name, email, phoneNumber, studentNumber, uuid };
+    return { name, email, phoneNumber, studentNumber, uuid, profile, picture };
   }
 
   /**
@@ -101,11 +161,13 @@ export class InfoteamIdpService {
     const {
       name,
       email,
+      profile,
+      picture,
       phone_number: phoneNumber,
       student_id: studentNumber,
       sub: uuid,
     } = userInfoResponse.data;
-    return { name, email, phoneNumber, studentNumber, uuid };
+    return { name, email, phoneNumber, studentNumber, uuid, profile, picture };
   }
 
   /**
