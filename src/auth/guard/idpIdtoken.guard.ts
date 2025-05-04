@@ -2,4 +2,4 @@ import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class GroupsGuard extends AuthGuard('groups') {}
+export class IdpIdtokenGuard extends AuthGuard('idp:idtoken') {}
