@@ -30,12 +30,12 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Groups API')
     .setDescription('The Groups API')
-    .setVersion('1.0')
+    .setVersion('2.0')
     .addBearerAuth(
       {
         type: 'http',
       },
-      'external',
+      'user',
     )
     .addBasicAuth(
       {
@@ -43,31 +43,10 @@ async function bootstrap() {
       },
       'client',
     )
-    .addOAuth2(
-      {
-        type: 'oauth2',
-        scheme: 'bearer',
-        in: 'header',
-        bearerFormat: 'token',
-        flows: {
-          authorizationCode: {
-            authorizationUrl: configService.get('IDP_AUTH_URL'),
-            tokenUrl: configService.get('IDP_TOKEN_URL'),
-            scopes: {
-              openid: 'openid',
-              email: 'email',
-              profile: ' profile',
-            },
-          },
-        },
-      },
-      'oauth2',
-    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      oauth2RedirectUrl: `${configService.getOrThrow('BASE_URL')}/api/oauth2-redirect.html`,
       displayRequestDuration: true,
     },
   });

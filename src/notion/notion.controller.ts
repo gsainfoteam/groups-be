@@ -9,17 +9,15 @@ import {
 import { NotionService } from './notion.service';
 import {
   ApiInternalServerErrorResponse,
-  ApiOAuth2,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { GroupsGuard } from 'src/auth/guard/groups.guard';
+import { UserGuard } from 'src/auth/guard/user.guard';
 
 @ApiTags('notion')
-@ApiOAuth2(['openid', 'email', 'profile'])
 @Controller('notion')
-@UseGuards(GroupsGuard)
+@UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class NotionController {
   constructor(private readonly notionService: NotionService) {}
