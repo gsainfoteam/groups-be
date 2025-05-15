@@ -6,12 +6,7 @@ export type IdpJwtResponse = {
 
 /** user info api response type from infoteam idp */
 export type IdpUserInfoRes = {
-  uuid: string;
+  sub: string;
   email: string;
   name: string;
-  student_id: string;
-  phone_number: string;
-  created_at: string;
-  updated_at: string;
-  access_level: string;
 };

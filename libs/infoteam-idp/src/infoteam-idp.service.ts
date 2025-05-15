@@ -103,13 +103,7 @@ export class InfoteamIdpService {
         ),
     );
     this.logger.log('getUserInfo success');
-    const {
-      name,
-      email,
-      phone_number: phoneNumber,
-      student_id: studentNumber,
-      uuid,
-    } = userInfoResponse.data;
-    return { name, email, phoneNumber, studentNumber, uuid };
+    const { name, email, sub: uuid } = userInfoResponse.data;
+    return { name, email, uuid };
   }
 }
