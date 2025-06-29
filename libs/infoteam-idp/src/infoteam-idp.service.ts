@@ -114,6 +114,7 @@ export class InfoteamIdpService implements OnModuleInit {
     return this.jwtService
       .verifyAsync<IdTokenPayload>(idToken, {
         publicKey: this.openidPk.export({ format: 'pem', type: 'spki' }),
+        issuer: this.idpUrl,
       })
       .then(
         ({
