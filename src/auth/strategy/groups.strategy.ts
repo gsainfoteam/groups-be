@@ -11,11 +11,6 @@ export class GroupsStrategy extends PassportStrategy(Strategy, 'groups') {
   }
 
   async validate(token: string): Promise<User> {
-    return {
-      name: 'test',
-      email: '',
-      uuid: 'test-uuid',
-      createdAt: new Date(),
-    }; // Mocked user for testing
+    return this.authService.validateUser(token);
   }
 }

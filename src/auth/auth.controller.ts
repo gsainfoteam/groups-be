@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { GroupsGuard } from './guard/groups.guard';
 import { GetUser } from './decorator/getUser.decorator';
 import { User } from '@prisma/client';
@@ -10,11 +10,21 @@ import {
 } from '@nestjs/swagger';
 import { UserResDto } from './dto/res/userRes.dto';
 import { AuthService } from './auth.service';
+import { LoginQueryDto } from './dto/req/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @ApiOperation({
+    summary: 'Login callback',
+    description: 'groups IdP token을 발급받습니다.',
+  })
+  @Get('login')
+  async login(@Query() { token }: LoginQueryDto): Promise<void> {
+    return this.authService.login(token);
+  }
 
   @ApiOperation({
     summary: 'Get user information',
