@@ -8,10 +8,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AccessTokenDto } from './dto/res/accessTokenRes.dto';
 import { UserResDto } from './dto/res/userRes.dto';
-import { LoginQueryDto } from './dto/req/login.dto';
 import { AuthService } from './auth.service';
+import { LoginQueryDto } from './dto/req/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,15 +21,9 @@ export class AuthController {
     summary: 'Login callback',
     description: 'groups IdP token을 발급받습니다.',
   })
-  @ApiOkResponse({
-    type: AccessTokenDto,
-    description: 'groups IdP token',
-  })
   @Get('login')
-  async login(
-    @Query() { code, redirectUri }: LoginQueryDto,
-  ): Promise<AccessTokenDto> {
-    return this.authService.login(code, redirectUri);
+  async login(@Query() { token }: LoginQueryDto): Promise<void> {
+    return this.authService.login(token);
   }
 
   @ApiOperation({
