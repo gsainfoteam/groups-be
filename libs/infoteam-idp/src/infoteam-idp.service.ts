@@ -31,9 +31,9 @@ export class InfoteamIdpService implements OnModuleInit {
   /** The pk of the openid key */
   private openidPk: crypto.KeyObject;
   /** The client idp access token */
-  private ClientAccessToken: string;
+  private clientAccessToken: string;
   /** The expire time of the client idp access token */
-  private ClientAccessTokenExpireAt: Date;
+  private clientAccessTokenExpireAt: Date;
   /** setting the idpUrl and Using httpService and configService */
   constructor(
     private readonly httpService: HttpService,
@@ -41,7 +41,7 @@ export class InfoteamIdpService implements OnModuleInit {
     private readonly jwtService: JwtService,
   ) {
     this.idpUrl = this.configService.getOrThrow<string>('IDP_URL');
-    this.ClientAccessTokenExpireAt = new Date();
+    this.clientAccessTokenExpireAt = new Date();
   }
 
   /**
@@ -147,7 +147,7 @@ export class InfoteamIdpService implements OnModuleInit {
       this.httpService
         .get<IdpUserInfoRes>(this.idpUrl + '/oauth/userinfo', {
           headers: {
-            Authorization: `Bearer ${this.ClientAccessToken}`,
+            Authorization: `Bearer ${this.clientAccessToken}`,
           },
           params: {
             sub: userUuid,
@@ -180,7 +180,7 @@ export class InfoteamIdpService implements OnModuleInit {
    * It will fetch a new token if the current one is expired
    */
   private async updateClientAccessToken(): Promise<void> {
-    if (this.ClientAccessTokenExpireAt > new Date()) {
+    if (this.clientAccessTokenExpireAt > new Date()) {
       return;
     }
     this.logger.log('Client access token is expired, fetching a new one');
@@ -205,8 +205,8 @@ export class InfoteamIdpService implements OnModuleInit {
           }),
         ),
     );
-    this.ClientAccessToken = clientTokenResponse.data.access_token;
-    this.ClientAccessTokenExpireAt = new Date(
+    this.clientAccessToken = clientTokenResponse.data.access_token;
+    this.clientAccessTokenExpireAt = new Date(
       Date.now() + clientTokenResponse.data.expires_in * 1000,
     );
   }
