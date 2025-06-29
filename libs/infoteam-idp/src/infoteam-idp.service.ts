@@ -53,9 +53,8 @@ export class InfoteamIdpService implements OnModuleInit {
       this.httpService
         .get<{ keys: crypto.JsonWebKey[] }>(this.idpUrl + '/oauth/certs')
         .pipe(
-          catchError((err: AxiosError) => {
+          catchError(() => {
             this.logger.error('Error fetching OpenID public key');
-            this.logger.error(err);
             throw new InternalServerErrorException();
           }),
         ),
@@ -186,16 +185,25 @@ export class InfoteamIdpService implements OnModuleInit {
     }
     this.logger.log('Client access token is expired, fetching a new one');
     const clientTokenResponse = await firstValueFrom(
-      this.httpService.post<
-        ClientAccessTokenResponse,
-        ClientAccessTokenRequest
-      >(this.idpUrl + '/oauth/token', {
-        grant_type: 'client_credentials',
-        client_id: this.configService.getOrThrow<string>('IDP_CLIENT_ID'),
-        client_secret:
-          this.configService.getOrThrow<string>('IDP_CLIENT_SECRET'),
-        scope: ['profile', 'email', 'student_id'].join(' '),
-      }),
+      this.httpService
+        .post<ClientAccessTokenResponse, ClientAccessTokenRequest>(
+          this.idpUrl + '/oauth/token',
+          {
+            grant_type: 'client_credentials',
+            client_id: this.configService.getOrThrow<string>('IDP_CLIENT_ID'),
+            client_secret:
+              this.configService.getOrThrow<string>('IDP_CLIENT_SECRET'),
+            scope: ['profile', 'email'].join(' '),
+          },
+        )
+        .pipe(
+          catchError((err: AxiosError) => {
+            this.logger.error('Error fetching client access token', err);
+            throw new InternalServerErrorException(
+              'Failed to fetch client access token',
+            );
+          }),
+        ),
     );
     this.ClientAccessToken = clientTokenResponse.data.access_token;
     this.ClientAccessTokenExpireAt = new Date(
