@@ -3,18 +3,10 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginQueryDto {
   @ApiProperty({
-    description: 'code',
-    example: 'code',
+    description: 'token',
+    example: 'token',
   })
   @IsString()
   @IsNotEmpty()
-  code: string;
-
-  @ApiProperty({
-    description: 'redirectUri',
-    example: 'redirectUri',
-  })
-  @IsString()
-  @IsNotEmpty()
-  redirectUri: string;
+  token: string;
 }
