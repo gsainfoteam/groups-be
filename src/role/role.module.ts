@@ -10,5 +10,6 @@ import { PrismaModule } from '@lib/prisma';
   imports: [PrismaModule, AuthModule, LoggerModule],
   controllers: [RoleController],
   providers: [RoleService, RoleRepository],
+  exports: [RoleService],
 })
 export class RoleModule {}
