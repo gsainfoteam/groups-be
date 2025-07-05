@@ -185,9 +185,9 @@ export class GroupController {
   async updateGroup(
     @Param('uuid') groupUuid: string,
     @Body() body: UpdateGroupDto,
-    @GetUser() user: User,
+    //@GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.updateGroup(body, groupUuid, user.uuid);
+    return this.groupService.updateGroup(body, groupUuid /*user.uuid*/);
   }
 
   @ApiOperation({
@@ -219,9 +219,9 @@ export class GroupController {
   async uploadGroupImage(
     @Param('uuid') groupUuid: string,
     @UploadedFile() file: Express.Multer.File,
-    @GetUser() user: User,
+    //@GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.uploadGroupImage(file, groupUuid, user.uuid);
+    return this.groupService.uploadGroupImage(file, groupUuid /*, user.uuid*/);
   }
 
   @ApiOperation({
@@ -236,9 +236,9 @@ export class GroupController {
   @Delete(':uuid')
   async deleteGroup(
     @Param('uuid') uuid: string,
-    @GetUser() user: User,
+    //@GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.deleteGroup(uuid, user.uuid);
+    return this.groupService.deleteGroup(uuid /*, user.uuid*/);
   }
 
   @ApiOperation({
@@ -374,13 +374,12 @@ export class GroupController {
     @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
-    @GetUser() user: User,
   ): Promise<void> {
     return this.groupService.grantRole(
       groupUuid,
       targetUuid,
       roleId,
-      user.uuid,
+      // user.uuid,
     );
   }
 
@@ -400,13 +399,13 @@ export class GroupController {
     @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
-    @GetUser() user: User,
+    // @GetUser() user: User,
   ): Promise<void> {
     return this.groupService.revokeRole(
       groupUuid,
       targetUuid,
       roleId,
-      user.uuid,
+      // user.uuid,
     );
   }
 

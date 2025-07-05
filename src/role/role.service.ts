@@ -32,11 +32,11 @@ export class RoleService {
   async createRole(
     groupUuid: string,
     createRoleDto: CreateRoleDto,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<void> {
     await this.roleRepository.createRole(
       { groupUuid, ...createRoleDto },
-      userUuid,
+      //userUuid,
     );
   }
 
@@ -51,11 +51,11 @@ export class RoleService {
     groupUuid: string,
     id: number,
     updateRoleDto: UpdateRoleDto,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<void> {
     await this.roleRepository.updateRole(
       { id, groupUuid, ...updateRoleDto },
-      userUuid,
+      //userUuid,
     );
   }
 
@@ -68,8 +68,8 @@ export class RoleService {
   async deleteRole(
     groupUuid: string,
     id: number,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<void> {
-    await this.roleRepository.deleteRole({ groupUuid, id }, userUuid);
+    await this.roleRepository.deleteRole({ groupUuid, id } /*, userUuid*/);
   }
 }

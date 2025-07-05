@@ -144,8 +144,8 @@ export class GroupRepository {
 
   async checkGroupExistenceByUuid(
     uuid: string,
-    userUuid?: string,
-    authority?: Authority,
+    // userUuid?: string,
+    // authority?: Authority,
   ): Promise<GroupWithUserRole | null> {
     return this.prismaService.group
       .findUnique({
@@ -154,20 +154,23 @@ export class GroupRepository {
           uuid,
         },
         include: {
-          ...(userUuid &&
-            authority && {
-              UserRole: {
-                where: {
-                  userUuid,
-                  Role: {
-                    authorities: {
-                      has: authority,
-                    },
-                  },
-                },
-              },
-            }),
+          UserRole: true,
         },
+        // include: {
+        //   ...(userUuid &&
+        //     authority && {
+        //       UserRole: {
+        //         where: {
+        //           userUuid,
+        //           Role: {
+        //             authorities: {
+        //               has: authority,
+        //             },
+        //           },
+        //         },
+        //       },
+        //     }),
+        // },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
@@ -305,22 +308,22 @@ export class GroupRepository {
       notionPageId,
     }: Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
     groupUuid: string,
-    userUuid: string,
+    // userUuid: string,
   ): Promise<void> {
     await this.prismaService.group
       .update({
         where: {
           uuid: groupUuid,
-          UserRole: {
-            some: {
-              userUuid,
-              Role: {
-                authorities: {
-                  has: Authority.GROUP_UPDATE,
-                },
-              },
-            },
-          },
+          // UserRole: {
+          //   some: {
+          //     userUuid,
+          //     Role: {
+          //       authorities: {
+          //         has: Authority.GROUP_UPDATE,
+          //       },
+          //     },
+          //   },
+          // },
         },
         data: {
           name,
@@ -358,21 +361,21 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup(uuid: string, userUuid: string): Promise<void> {
+  async deleteGroup(uuid: string /*, userUuid: string*/): Promise<void> {
     await this.prismaService.group
       .update({
         where: {
           uuid,
-          UserRole: {
-            some: {
-              userUuid,
-              Role: {
-                authorities: {
-                  has: Authority.GROUP_DELETE,
-                },
-              },
-            },
-          },
+          // UserRole: {
+          //   some: {
+          //     userUuid,
+          //     Role: {
+          //       authorities: {
+          //         has: Authority.GROUP_DELETE,
+          //       },
+          //     },
+          //   },
+          // },
         },
         data: {
           deletedAt: new Date(),
@@ -381,7 +384,7 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException();
+            throw new NotFoundException('Group not found');
           }
           this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
