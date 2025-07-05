@@ -53,6 +53,8 @@ import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 import { InvitationExpDto } from './dto/req/invitationExp.dto';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { ClientGuard } from 'src/client/guard/client.guard';
+import { RoleAuthoritiesGuard } from 'src/role/guard/role-authoritiy.guard';
+import { Authorities } from 'src/role/decorator/roles-authorities.decorator';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -177,13 +179,15 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('GROUP_UPDATE')
   @Patch(':uuid')
   async updateGroup(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Body() body: UpdateGroupDto,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.updateGroup(body, uuid, user.uuid);
+    return this.groupService.updateGroup(body, groupUuid, user.uuid);
   }
 
   @ApiOperation({
@@ -209,13 +213,15 @@ export class GroupController {
   @ApiInternalServerErrorResponse()
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('GROUP_UPDATE')
   @Post(':uuid/image')
   async uploadGroupImage(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @UploadedFile() file: Express.Multer.File,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.uploadGroupImage(file, uuid, user.uuid);
+    return this.groupService.uploadGroupImage(file, groupUuid, user.uuid);
   }
 
   @ApiOperation({
@@ -261,14 +267,16 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('MEMBER_UPDATE', 'ROLE_GRANT')
   @Post(':uuid/invite')
   async createInviteCode(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Query() query: InvitationExpDto,
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
     return this.groupService.createInviteCode(
-      uuid,
+      groupUuid,
       query.roleId,
       user.uuid,
       query.duration,
@@ -339,13 +347,15 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('MEMBER_DELETE')
   @Delete(':uuid/member/:targetUuid')
   async removeMember(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.removeMember(uuid, targetUuid, user.uuid);
+    return this.groupService.removeMember(groupUuid, targetUuid, user.uuid);
   }
 
   @ApiOperation({
@@ -357,14 +367,21 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('ROLE_GRANT')
   @Patch(':uuid/member/:targetUuid/role')
   async grantRoleToUser(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.grantRole(uuid, targetUuid, roleId, user.uuid);
+    return this.groupService.grantRole(
+      groupUuid,
+      targetUuid,
+      roleId,
+      user.uuid,
+    );
   }
 
   @ApiOperation({
@@ -376,14 +393,21 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard)
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('ROLE_REVOKE')
   @Delete(':uuid/member/:targetUuid/role')
   async revokeRoleFromUser(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.revokeRole(uuid, targetUuid, roleId, user.uuid);
+    return this.groupService.revokeRole(
+      groupUuid,
+      targetUuid,
+      roleId,
+      user.uuid,
+    );
   }
 
   @ApiOperation({

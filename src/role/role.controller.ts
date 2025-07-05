@@ -28,6 +28,8 @@ import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { RoleListResDto } from './dto/res/roleRes.dto';
+import { Authorities } from './decorator/roles-authorities.decorator';
+import { RoleAuthoritiesGuard } from './guard/role-authoritiy.guard';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
@@ -39,7 +41,8 @@ export class RoleController {
 
   @ApiOperation({
     summary: 'Get roles',
-    description: '그룹 내의 모든 Role을 가져옵니다. 그룹 멤버만 접근 가능합니다.',
+    description:
+      '그룹 내의 모든 Role을 가져옵니다. 그룹 멤버만 접근 가능합니다.',
   })
   @ApiOkResponse({ type: RoleListResDto })
   @ApiInternalServerErrorResponse({})
@@ -61,6 +64,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Post()
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('ROLE_CREATE')
   async createRole(
     @Param('groupUuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
@@ -80,6 +85,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Put(':id')
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('ROLE_UPDATE')
   async updateRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
@@ -99,6 +106,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Delete(':id')
+  @UseGuards(RoleAuthoritiesGuard)
+  @Authorities('ROLE_DELETE')
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
