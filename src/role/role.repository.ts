@@ -8,7 +8,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Role } from '@prisma/client';
+import { /*Authority,*/ Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class RoleRepository {
       groupUuid,
       authorities,
     }: Pick<Role, 'name' | 'groupUuid'> & Partial<Pick<Role, 'authorities'>>,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
       .create({
@@ -63,16 +63,16 @@ export class RoleRepository {
           Group: {
             connect: {
               uuid: groupUuid,
-              UserRole: {
-                some: {
-                  userUuid,
-                  Role: {
-                    authorities: {
-                      has: Authority.ROLE_CREATE,
-                    },
-                  },
-                },
-              },
+              // UserRole: {
+              //   some: {
+              //     userUuid,
+              //     Role: {
+              //       authorities: {
+              //         has: Authority.ROLE_CREATE,
+              //       },
+              //     },
+              //   },
+              // },
             },
           },
         },
@@ -106,7 +106,7 @@ export class RoleRepository {
       groupUuid,
       authorities,
     }: Pick<Role, 'groupUuid' | 'id'> & Partial<Pick<Role, 'authorities'>>,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
       .update({
@@ -115,18 +115,18 @@ export class RoleRepository {
             id,
             groupUuid,
           },
-          Group: {
-            UserRole: {
-              some: {
-                userUuid,
-                Role: {
-                  authorities: {
-                    has: Authority.ROLE_UPDATE,
-                  },
-                },
-              },
-            },
-          },
+          // Group: {
+          //   UserRole: {
+          //     some: {
+          //       userUuid,
+          //       Role: {
+          //         authorities: {
+          //           has: Authority.ROLE_UPDATE,
+          //         },
+          //       },
+          //     },
+          //   },
+          // },
         },
         data: {
           authorities,
@@ -153,7 +153,7 @@ export class RoleRepository {
    */
   async deleteRole(
     { id, groupUuid }: Pick<Role, 'groupUuid' | 'id'>,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<Role> {
     return this.prismaService.role
       .delete({
@@ -162,18 +162,18 @@ export class RoleRepository {
             id,
             groupUuid,
           },
-          Group: {
-            UserRole: {
-              some: {
-                userUuid,
-                Role: {
-                  authorities: {
-                    has: Authority.ROLE_DELETE,
-                  },
-                },
-              },
-            },
-          },
+          // Group: {
+          //   UserRole: {
+          //     some: {
+          //       userUuid,
+          //       Role: {
+          //         authorities: {
+          //           has: Authority.ROLE_DELETE,
+          //         },
+          //       },
+          //     },
+          //   },
+          // },
         },
       })
       .catch((error) => {

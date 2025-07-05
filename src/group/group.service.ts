@@ -10,7 +10,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Authority, Group, Visibility, User, Role } from '@prisma/client';
+import { /*Authority,*/ Group, Visibility, User, Role } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
@@ -84,7 +84,7 @@ export class GroupService {
   async updateGroup(
     updateGroupDto: UpdateGroupDto,
     groupUuid: string,
-    userUuid: string,
+    //userUuid: string,
   ): Promise<void> {
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(groupUuid);
@@ -93,19 +93,22 @@ export class GroupService {
       throw new NotFoundException('Group not found');
     }
 
-    await this.groupRepository.updateGroup(updateGroupDto, groupUuid, userUuid);
+    await this.groupRepository.updateGroup(
+      updateGroupDto,
+      groupUuid /*userUuid*/,
+    );
   }
 
   async uploadGroupImage(
     file: Express.Multer.File,
     groupUuid: string,
-    userUuid: string,
+    // userUuid: string,
   ): Promise<void> {
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(
         groupUuid,
-        userUuid,
-        Authority.GROUP_UPDATE,
+        // userUuid,
+        // Authority.GROUP_UPDATE,
       );
 
     if (!checkGroupExistence) {
@@ -124,7 +127,7 @@ export class GroupService {
     await this.groupRepository.updateGroupImage(key, groupUuid);
   }
 
-  async deleteGroup(uuid: string, userUuid: string): Promise<void> {
+  async deleteGroup(uuid: string /*, userUuid: string*/): Promise<void> {
     const checkGroupExistence =
       await this.groupRepository.checkGroupExistenceByUuid(uuid);
 
@@ -132,7 +135,7 @@ export class GroupService {
       throw new NotFoundException('Group not found');
     }
 
-    await this.groupRepository.deleteGroup(uuid, userUuid);
+    await this.groupRepository.deleteGroup(uuid /*, userUuid*/);
 
     if (checkGroupExistence.profileImageKey) {
       await this.objectService.deleteObject(
@@ -157,17 +160,17 @@ export class GroupService {
     userUuid: string,
     duration: number = 60 * 60,
   ): Promise<InviteCodeResDto> {
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.MEMBER_UPDATE, Authority.ROLE_GRANT],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException(
-        'You do not have permission to create an invite code',
-      );
-    }
+    // if (
+    //   !(await this.groupRepository.validateAuthority(
+    //     uuid,
+    //     [Authority.MEMBER_UPDATE, Authority.ROLE_GRANT],
+    //     userUuid,
+    //   ))
+    // ) {
+    //   throw new ForbiddenException(
+    //     'You do not have permission to create an invite code',
+    //   );
+    // }
     const role = await this.groupRepository.getUserRoleInGroup(uuid, userUuid);
     if (role.id > roleId) {
       throw new ForbiddenException(
@@ -242,17 +245,17 @@ export class GroupService {
     targetUuid: string,
     userUuid: string,
   ): Promise<void> {
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.MEMBER_DELETE],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException(
-        'You do not have permission to remove a member',
-      );
-    }
+    // if (
+    //   !(await this.groupRepository.validateAuthority(
+    //     uuid,
+    //     [Authority.MEMBER_DELETE],
+    //     userUuid,
+    //   ))
+    // ) {
+    //   throw new ForbiddenException(
+    //     'You do not have permission to remove a member',
+    //   );
+    // }
 
     const groupInfo = await this.groupRepository.getGroupByUuid(uuid);
 
@@ -286,17 +289,17 @@ export class GroupService {
     uuid: string,
     targetUuid: string,
     roleId: number,
-    userUuid: string,
+    // userUuid: string,
   ): Promise<void> {
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.ROLE_GRANT],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException('You do not have permission to grant role');
-    }
+    // if (
+    //   !(await this.groupRepository.validateAuthority(
+    //     uuid,
+    //     [Authority.ROLE_GRANT],
+    //     userUuid,
+    //   ))
+    // ) {
+    //   throw new ForbiddenException('You do not have permission to grant role');
+    // }
     await this.groupRepository.addRoleToUser(uuid, roleId, targetUuid);
   }
 
@@ -304,17 +307,17 @@ export class GroupService {
     uuid: string,
     targetUuid: string,
     roleId: number,
-    userUuid: string,
+    // userUuid: string,
   ): Promise<void> {
-    if (
-      !(await this.groupRepository.validateAuthority(
-        uuid,
-        [Authority.ROLE_REVOKE],
-        userUuid,
-      ))
-    ) {
-      throw new ForbiddenException('You do not have permission to revoke role');
-    }
+    // if (
+    //   !(await this.groupRepository.validateAuthority(
+    //     uuid,
+    //     [Authority.ROLE_REVOKE],
+    //     userUuid,
+    //   ))
+    // ) {
+    //   throw new ForbiddenException('You do not have permission to revoke role');
+    // }
     await this.groupRepository.removeRoleFromUser(uuid, roleId, targetUuid);
   }
 
