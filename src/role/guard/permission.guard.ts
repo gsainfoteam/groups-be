@@ -27,7 +27,7 @@ export class PermissionGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user; // GroupsGuard 통과하고 얻은 user
-    const groupUuid = request.params.groupUuid; // Param으로 받은 groupUuid
+    const groupUuid = request.params.uuid; // Param으로 받은 groupUuid
 
     if (!groupUuid) {
       throw new ForbiddenException('Group UUID is required');

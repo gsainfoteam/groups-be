@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   async validateUser(accessToken: string): Promise<User> {
-    const userInfo = await this.idpService.getUserInfo(accessToken);
+    const userInfo = await this.idpService.validateAccessToken(accessToken);
     if (!userInfo) {
       throw new UnauthorizedException('Invalid access token');
     }

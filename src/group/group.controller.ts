@@ -184,9 +184,8 @@ export class GroupController {
   async updateGroup(
     @Param('uuid') groupUuid: string,
     @Body() body: UpdateGroupDto,
-    //@GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.updateGroup(body, groupUuid /*user.uuid*/);
+    return this.groupService.updateGroup(body, groupUuid);
   }
 
   @ApiOperation({
@@ -217,9 +216,8 @@ export class GroupController {
   async uploadGroupImage(
     @Param('uuid') groupUuid: string,
     @UploadedFile() file: Express.Multer.File,
-    //@GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.uploadGroupImage(file, groupUuid /*, user.uuid*/);
+    return this.groupService.uploadGroupImage(file, groupUuid);
   }
 
   @ApiOperation({
@@ -230,13 +228,11 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.GROUP_DELETE)
   @Delete(':uuid')
-  async deleteGroup(
-    @Param('uuid') uuid: string,
-    //@GetUser() user: User,
-  ): Promise<void> {
-    return this.groupService.deleteGroup(uuid /*, user.uuid*/);
+  async deleteGroup(@Param('uuid') uuid: string): Promise<void> {
+    return this.groupService.deleteGroup(uuid);
   }
 
   @ApiOperation({
@@ -370,12 +366,7 @@ export class GroupController {
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
   ): Promise<void> {
-    return this.groupService.grantRole(
-      groupUuid,
-      targetUuid,
-      roleId,
-      // user.uuid,
-    );
+    return this.groupService.grantRole(groupUuid, targetUuid, roleId);
   }
 
   @ApiOperation({
@@ -393,14 +384,8 @@ export class GroupController {
     @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
-    // @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.revokeRole(
-      groupUuid,
-      targetUuid,
-      roleId,
-      // user.uuid,
-    );
+    return this.groupService.revokeRole(groupUuid, targetUuid, roleId);
   }
 
   @ApiOperation({

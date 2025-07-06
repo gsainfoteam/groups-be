@@ -69,12 +69,8 @@ export class RoleController {
   async createRole(
     @Param('groupUuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
-    //@GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.createRole(
-      groupUuid,
-      createRoleDto /*, user.uuid*/,
-    );
+    return this.roleService.createRole(groupUuid, createRoleDto);
   }
 
   @ApiOperation({
@@ -94,13 +90,8 @@ export class RoleController {
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
-    //@GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.updateRole(
-      groupUuid,
-      id,
-      updateRoleDto /*, user.uuid*/,
-    );
+    return this.roleService.updateRole(groupUuid, id, updateRoleDto);
   }
 
   @ApiOperation({
@@ -118,8 +109,7 @@ export class RoleController {
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
-    //@GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.deleteRole(groupUuid, id /*, user.uuid*/);
+    return this.roleService.deleteRole(groupUuid, id);
   }
 }

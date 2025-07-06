@@ -144,8 +144,6 @@ export class GroupRepository {
 
   async checkGroupExistenceByUuid(
     uuid: string,
-    // userUuid?: string,
-    // authority?: Authority,
   ): Promise<GroupWithUserRole | null> {
     return this.prismaService.group
       .findUnique({
@@ -156,21 +154,6 @@ export class GroupRepository {
         include: {
           UserRole: true,
         },
-        // include: {
-        //   ...(userUuid &&
-        //     authority && {
-        //       UserRole: {
-        //         where: {
-        //           userUuid,
-        //           Role: {
-        //             authorities: {
-        //               has: authority,
-        //             },
-        //           },
-        //         },
-        //       },
-        //     }),
-        // },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
@@ -308,22 +291,11 @@ export class GroupRepository {
       notionPageId,
     }: Partial<Pick<Group, 'name' | 'description' | 'notionPageId'>>,
     groupUuid: string,
-    // userUuid: string,
   ): Promise<void> {
     await this.prismaService.group
       .update({
         where: {
           uuid: groupUuid,
-          // UserRole: {
-          //   some: {
-          //     userUuid,
-          //     Role: {
-          //       authorities: {
-          //         has: Authority.GROUP_UPDATE,
-          //       },
-          //     },
-          //   },
-          // },
         },
         data: {
           name,
@@ -361,21 +333,11 @@ export class GroupRepository {
       });
   }
 
-  async deleteGroup(uuid: string /*, userUuid: string*/): Promise<void> {
+  async deleteGroup(uuid: string): Promise<void> {
     await this.prismaService.group
       .update({
         where: {
           uuid,
-          // UserRole: {
-          //   some: {
-          //     userUuid,
-          //     Role: {
-          //       authorities: {
-          //         has: Authority.GROUP_DELETE,
-          //       },
-          //     },
-          //   },
-          // },
         },
         data: {
           deletedAt: new Date(),
