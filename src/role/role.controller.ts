@@ -23,13 +23,13 @@ import {
 } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
-import { User } from '@prisma/client';
+import { Authority, User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { RoleListResDto } from './dto/res/roleRes.dto';
-import { Authorities } from './decorator/roles-authorities.decorator';
-import { RoleAuthoritiesGuard } from './guard/role-authoritiy.guard';
+import { Authorities } from './decorator/permission.decorator';
+import { PermissionGuard } from './guard/permission.guard';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
@@ -64,8 +64,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Post()
-  @UseGuards(RoleAuthoritiesGuard)
-  @Authorities('ROLE_CREATE')
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_CREATE)
   async createRole(
     @Param('groupUuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
@@ -88,8 +88,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Put(':id')
-  @UseGuards(RoleAuthoritiesGuard)
-  @Authorities('ROLE_UPDATE')
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_UPDATE)
   async updateRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
@@ -113,8 +113,8 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Delete(':id')
-  @UseGuards(RoleAuthoritiesGuard)
-  @Authorities('ROLE_DELETE')
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_DELETE)
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,

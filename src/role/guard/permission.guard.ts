@@ -1,4 +1,3 @@
-// authorities.guard.ts
 import {
   Injectable,
   CanActivate,
@@ -7,22 +6,23 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleService } from '../role.service';
+import { Authority } from '@prisma/client';
 
 @Injectable()
-export class RoleAuthoritiesGuard implements CanActivate {
+export class PermissionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly roleService: RoleService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredAuthorities = this.reflector.getAllAndOverride<string[]>(
+    const requiredAuthorities = this.reflector.getAllAndOverride<Authority[]>(
       'authorities',
       [context.getHandler(), context.getClass()],
     );
 
     if (!requiredAuthorities) {
-      return true; // 권한 없이도 통과됨(즉, 따로 권한을 안 걸어두기만 하면 됨)
+      return false; // 이 guard를 썼는데, 필요 권한 안 걸어두면 통과 X
     }
 
     const request = context.switchToHttp().getRequest();
@@ -42,7 +42,7 @@ export class RoleAuthoritiesGuard implements CanActivate {
     }
 
     // 유저가 가진 모든 권한을 중복 없이 추출
-    const userAuthorities = new Set<string>();
+    const userAuthorities = new Set<Authority>();
     userRoles.list.forEach((userRole) => {
       userRole.authorities.forEach((auth) => {
         userAuthorities.add(auth);
