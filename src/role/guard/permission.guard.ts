@@ -22,7 +22,9 @@ export class PermissionGuard implements CanActivate {
     );
 
     if (!requiredAuthorities) {
-      return false; // 이 guard를 썼는데, 필요 권한 안 걸어두면 통과 X
+      throw new ForbiddenException(
+        'Required authorities not configured for this endpoint',
+      );
     }
 
     const request = context.switchToHttp().getRequest();
