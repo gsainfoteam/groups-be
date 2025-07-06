@@ -56,7 +56,7 @@ async function bootstrap() {
             scopes: {
               openid: 'openid',
               email: 'email',
-              profile: ' profile',
+              profile: 'profile',
             },
           },
         },
@@ -69,6 +69,10 @@ async function bootstrap() {
     swaggerOptions: {
       oauth2RedirectUrl: `${configService.getOrThrow('BASE_URL')}/api/oauth2-redirect.html`,
       displayRequestDuration: true,
+      initOAuth: {
+        usePkceWithAuthorizationCodeGrant: true,
+        additionalQueryStringParams: { nonce: 'TheNonce' },
+      },
     },
   });
   // start server

@@ -23,11 +23,13 @@ import {
 } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
-import { User } from '@prisma/client';
+import { Authority, User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { RoleListResDto } from './dto/res/roleRes.dto';
+import { Authorities } from './decorator/permission.decorator';
+import { PermissionGuard } from './guard/permission.guard';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
@@ -39,7 +41,8 @@ export class RoleController {
 
   @ApiOperation({
     summary: 'Get roles',
-    description: '그룹 내의 모든 Role을 가져옵니다. 그룹 멤버만 접근 가능합니다.',
+    description:
+      '그룹 내의 모든 Role을 가져옵니다. 그룹 멤버만 접근 가능합니다.',
   })
   @ApiOkResponse({ type: RoleListResDto })
   @ApiInternalServerErrorResponse({})
@@ -61,12 +64,13 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Post()
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_CREATE)
   async createRole(
     @Param('groupUuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.createRole(groupUuid, createRoleDto, user.uuid);
+    return this.roleService.createRole(groupUuid, createRoleDto);
   }
 
   @ApiOperation({
@@ -80,13 +84,14 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Put(':id')
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_UPDATE)
   async updateRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.updateRole(groupUuid, id, updateRoleDto, user.uuid);
+    return this.roleService.updateRole(groupUuid, id, updateRoleDto);
   }
 
   @ApiOperation({
@@ -99,11 +104,12 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Delete(':id')
+  @UseGuards(PermissionGuard)
+  @Authorities(Authority.ROLE_DELETE)
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.roleService.deleteRole(groupUuid, id, user.uuid);
+    return this.roleService.deleteRole(groupUuid, id);
   }
 }

@@ -8,7 +8,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
@@ -45,14 +45,12 @@ export class RoleRepository {
    * @param param0 object containing the role name and group uuid and optionally it may containing authorities and external authorities
    * @returns the created role
    */
-  async createRole(
-    {
-      name,
-      groupUuid,
-      authorities,
-    }: Pick<Role, 'name' | 'groupUuid'> & Partial<Pick<Role, 'authorities'>>,
-    userUuid: string,
-  ): Promise<Role> {
+  async createRole({
+    name,
+    groupUuid,
+    authorities,
+  }: Pick<Role, 'name' | 'groupUuid'> &
+    Partial<Pick<Role, 'authorities'>>): Promise<Role> {
     return this.prismaService.role
       .create({
         data: {
@@ -63,16 +61,6 @@ export class RoleRepository {
           Group: {
             connect: {
               uuid: groupUuid,
-              UserRole: {
-                some: {
-                  userUuid,
-                  Role: {
-                    authorities: {
-                      has: Authority.ROLE_CREATE,
-                    },
-                  },
-                },
-              },
             },
           },
         },
@@ -100,32 +88,18 @@ export class RoleRepository {
    * @param param0 object containing the role id, group uuid and optionally it may containing authorities and external authorities
    * @returns the updated role
    */
-  async updateRole(
-    {
-      id,
-      groupUuid,
-      authorities,
-    }: Pick<Role, 'groupUuid' | 'id'> & Partial<Pick<Role, 'authorities'>>,
-    userUuid: string,
-  ): Promise<Role> {
+  async updateRole({
+    id,
+    groupUuid,
+    authorities,
+  }: Pick<Role, 'groupUuid' | 'id'> &
+    Partial<Pick<Role, 'authorities'>>): Promise<Role> {
     return this.prismaService.role
       .update({
         where: {
           id_groupUuid: {
             id,
             groupUuid,
-          },
-          Group: {
-            UserRole: {
-              some: {
-                userUuid,
-                Role: {
-                  authorities: {
-                    has: Authority.ROLE_UPDATE,
-                  },
-                },
-              },
-            },
           },
         },
         data: {
@@ -151,28 +125,16 @@ export class RoleRepository {
    * @param param0 object containing the role id and group uuid
    * @returns the deleted role
    */
-  async deleteRole(
-    { id, groupUuid }: Pick<Role, 'groupUuid' | 'id'>,
-    userUuid: string,
-  ): Promise<Role> {
+  async deleteRole({
+    id,
+    groupUuid,
+  }: Pick<Role, 'groupUuid' | 'id'>): Promise<Role> {
     return this.prismaService.role
       .delete({
         where: {
           id_groupUuid: {
             id,
             groupUuid,
-          },
-          Group: {
-            UserRole: {
-              some: {
-                userUuid,
-                Role: {
-                  authorities: {
-                    has: Authority.ROLE_DELETE,
-                  },
-                },
-              },
-            },
           },
         },
       })

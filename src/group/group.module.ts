@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from '@lib/logger';
 import { PrismaModule } from '@lib/prisma';
 import { ObjectModule } from '@lib/object';
+import { RoleModule } from 'src/role/role.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ObjectModule } from '@lib/object';
     RedisModule,
     LoggerModule,
     ObjectModule,
+    RoleModule,
   ],
   providers: [GroupService, GroupRepository],
   controllers: [GroupController],

@@ -32,7 +32,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { Role, User } from '@prisma/client';
+import { Authority, Role, User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
   GroupListResDto,
@@ -53,6 +53,8 @@ import { InvitationInfoResDto } from './dto/res/invitationInfoRes.dto';
 import { InvitationExpDto } from './dto/req/invitationExp.dto';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { ClientGuard } from 'src/client/guard/client.guard';
+import { PermissionGuard } from 'src/role/guard/permission.guard';
+import { Authorities } from 'src/role/decorator/permission.decorator';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -176,14 +178,14 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.GROUP_UPDATE)
   @Patch(':uuid')
   async updateGroup(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Body() body: UpdateGroupDto,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.updateGroup(body, uuid, user.uuid);
+    return this.groupService.updateGroup(body, groupUuid);
   }
 
   @ApiOperation({
@@ -208,14 +210,14 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.GROUP_UPDATE)
   @Post(':uuid/image')
   async uploadGroupImage(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @UploadedFile() file: Express.Multer.File,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.uploadGroupImage(file, uuid, user.uuid);
+    return this.groupService.uploadGroupImage(file, groupUuid);
   }
 
   @ApiOperation({
@@ -226,13 +228,11 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.GROUP_DELETE)
   @Delete(':uuid')
-  async deleteGroup(
-    @Param('uuid') uuid: string,
-    @GetUser() user: User,
-  ): Promise<void> {
-    return this.groupService.deleteGroup(uuid, user.uuid);
+  async deleteGroup(@Param('uuid') uuid: string): Promise<void> {
+    return this.groupService.deleteGroup(uuid);
   }
 
   @ApiOperation({
@@ -260,15 +260,16 @@ export class GroupController {
   @ApiCreatedResponse({ type: InviteCodeResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.MEMBER_UPDATE, Authority.ROLE_GRANT)
   @Post(':uuid/invite')
   async createInviteCode(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Query() query: InvitationExpDto,
     @GetUser() user: User,
   ): Promise<InviteCodeResDto> {
     return this.groupService.createInviteCode(
-      uuid,
+      groupUuid,
       query.roleId,
       user.uuid,
       query.duration,
@@ -338,14 +339,15 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.MEMBER_DELETE)
   @Delete(':uuid/member/:targetUuid')
   async removeMember(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.removeMember(uuid, targetUuid, user.uuid);
+    return this.groupService.removeMember(groupUuid, targetUuid, user.uuid);
   }
 
   @ApiOperation({
@@ -356,15 +358,15 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.ROLE_GRANT)
   @Patch(':uuid/member/:targetUuid/role')
   async grantRoleToUser(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.grantRole(uuid, targetUuid, roleId, user.uuid);
+    return this.groupService.grantRole(groupUuid, targetUuid, roleId);
   }
 
   @ApiOperation({
@@ -375,15 +377,15 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(GroupsGuard, PermissionGuard)
+  @Authorities(Authority.ROLE_REVOKE)
   @Delete(':uuid/member/:targetUuid/role')
   async revokeRoleFromUser(
-    @Param('uuid') uuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('targetUuid') targetUuid: string,
     @Query('roleId', ParseIntPipe) roleId: number,
-    @GetUser() user: User,
   ): Promise<void> {
-    return this.groupService.revokeRole(uuid, targetUuid, roleId, user.uuid);
+    return this.groupService.revokeRole(groupUuid, targetUuid, roleId);
   }
 
   @ApiOperation({
