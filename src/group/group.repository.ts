@@ -6,7 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Authority, Group, Visibility, User, Role } from '@prisma/client';
+import { Permission, Group, Visibility, User, Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
@@ -19,7 +19,7 @@ import { Loggable } from '@lib/logger/decorator/loggable';
 import { PrismaService } from '@lib/prisma';
 
 const ZIGGLE_CLIENT_UUID = '8df6f258-f096-4f56-9d1b-7701c7376efd';
-const ZIGGLE_AUTHORITIES = ['WRITE', 'DELETE'] as const;
+const ZIGGLE_PERMISSIONS = ['WRITE', 'DELETE'] as const;
 
 @Injectable()
 @Loggable()
@@ -71,7 +71,7 @@ export class GroupRepository {
             },
           },
           include: {
-            RoleExternalAuthority: {
+            RoleExternalPermission: {
               ...(clientUuid && { where: { clientUuid } }),
             },
           },
@@ -179,9 +179,9 @@ export class GroupRepository {
       });
   }
 
-  async validateAuthority(
+  async validatePermission(
     uuid: string,
-    authorities: Authority[],
+    permissions: Permission[],
     userUuid: string,
   ): Promise<Group | null> {
     return this.prismaService.group.findUnique({
@@ -191,8 +191,8 @@ export class GroupRepository {
           some: {
             userUuid,
             Role: {
-              authorities: {
-                hasSome: authorities,
+              permissions: {
+                hasSome: permissions,
               },
             },
           },
@@ -241,23 +241,23 @@ export class GroupRepository {
               {
                 id: 1,
                 name: 'admin',
-                authorities: [
-                  Authority.MEMBER_UPDATE,
-                  Authority.MEMBER_DELETE,
-                  Authority.ROLE_CREATE,
-                  Authority.ROLE_UPDATE,
-                  Authority.ROLE_DELETE,
-                  Authority.ROLE_GRANT,
-                  Authority.ROLE_REVOKE,
-                  Authority.GROUP_UPDATE,
-                  Authority.GROUP_DELETE,
+                permissions: [
+                  Permission.MEMBER_UPDATE,
+                  Permission.MEMBER_DELETE,
+                  Permission.ROLE_CREATE,
+                  Permission.ROLE_UPDATE,
+                  Permission.ROLE_DELETE,
+                  Permission.ROLE_GRANT,
+                  Permission.ROLE_REVOKE,
+                  Permission.GROUP_UPDATE,
+                  Permission.GROUP_DELETE,
                 ],
                 // TODO: it's hard coded. this should be changed.
-                RoleExternalAuthority: {
+                RoleExternalPermission: {
                   createMany: {
-                    data: ZIGGLE_AUTHORITIES.map((authority) => ({
+                    data: ZIGGLE_PERMISSIONS.map((permission) => ({
                       clientUuid: ZIGGLE_CLIENT_UUID,
-                      authority,
+                      permission,
                     })),
                   },
                 },

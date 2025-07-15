@@ -27,7 +27,7 @@ import { DeleteClientDto } from './dto/req/deleteClient.dto';
 import { ClientGuard } from './guard/client.guard';
 import { GetClient } from './decorator/getClient.decorator';
 import { Client } from '@prisma/client';
-import { AuthorityDto } from './dto/req/authority.dto';
+import { PermissionDto } from './dto/req/permission.dto';
 import { ExpandedClientResDto } from './dto/res/expandedClientRes.dto';
 
 @ApiTags('client')
@@ -94,38 +94,38 @@ export class ClientController {
   }
 
   @ApiOperation({
-    summary: 'Add authority to a client',
-    description: 'Add authority to a client by uuid',
+    summary: 'Add permission to a client',
+    description: 'Add permission to a client by uuid',
   })
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @ApiBasicAuth('client')
-  @Post('authority')
+  @Post('permission')
   @UseGuards(ClientGuard)
-  async addAuthority(
+  async addPermission(
     @GetClient() client: Client,
-    @Body() { authority }: AuthorityDto,
+    @Body() { permission }: PermissionDto,
   ): Promise<void> {
-    await this.clientService.addAuthority(client.uuid, authority);
+    await this.clientService.addPermission(client.uuid, permission);
   }
 
   @ApiOperation({
-    summary: 'Remove authority from a client',
-    description: 'Remove authority from a client by uuid',
+    summary: 'Remove permission from a client',
+    description: 'Remove permission from a client by uuid',
   })
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @ApiBasicAuth('client')
-  @Delete('authority')
+  @Delete('permission')
   @UseGuards(ClientGuard)
-  async removeAuthority(
+  async removePermission(
     @GetClient() client: Client,
-    @Body() { authority }: AuthorityDto,
+    @Body() { permission }: PermissionDto,
   ): Promise<void> {
-    await this.clientService.removeAuthority(client.uuid, authority);
+    await this.clientService.removePermission(client.uuid, permission);
   }
 }

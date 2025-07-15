@@ -30,7 +30,7 @@ export class ClientService {
    * @returns client
    */
   async getClient(uuid: string): Promise<ExpandedClient> {
-    const client = await this.clientRepository.findByUuidWithAuthority(uuid);
+    const client = await this.clientRepository.findByUuidWithPermission(uuid);
     if (!client) {
       this.logger.debug(`client not found`);
       throw new ForbiddenException('client not found');
@@ -70,12 +70,12 @@ export class ClientService {
     await this.clientRepository.deleteByUuid(uuid);
   }
 
-  async addAuthority(uuid: string, authority: string): Promise<void> {
-    await this.clientRepository.addAuthority(uuid, authority);
+  async addPermission(uuid: string, permission: string): Promise<void> {
+    await this.clientRepository.addPermission(uuid, permission);
   }
 
-  async removeAuthority(uuid: string, authority: string): Promise<void> {
-    await this.clientRepository.removeAuthority(uuid, authority);
+  async removePermission(uuid: string, permission: string): Promise<void> {
+    await this.clientRepository.removePermission(uuid, permission);
   }
 
   /**

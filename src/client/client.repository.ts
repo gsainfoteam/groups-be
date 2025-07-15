@@ -56,14 +56,14 @@ export class ClientRepository {
   }
 
   /**
-   * Find a client by uuid with authorities. if the client is not found, return null
+   * Find a client by uuid with permissions. if the client is not found, return null
    * @param uuid the uuid of the client to find
    * @returns Founded client or null
    */
-  async findByUuidWithAuthority(uuid: string): Promise<ExpandedClient | null> {
+  async findByUuidWithPermission(uuid: string): Promise<ExpandedClient | null> {
     return this.prismaService.client.findUnique({
       where: { uuid },
-      include: { ExternalAuthority: true },
+      include: { ExternalPermission: true },
     });
   }
 
@@ -93,14 +93,14 @@ export class ClientRepository {
       });
   }
 
-  async addAuthority(uuid: string, authority: string): Promise<void> {
+  async addPermission(uuid: string, permission: string): Promise<void> {
     await this.prismaService.client
       .update({
         where: { uuid },
         data: {
-          ExternalAuthority: {
+          ExternalPermission: {
             create: {
-              authority,
+              permission,
             },
           },
         },
@@ -119,12 +119,12 @@ export class ClientRepository {
       });
   }
 
-  async removeAuthority(uuid: string, authority: string): Promise<void> {
-    await this.prismaService.externalAuthority
+  async removePermission(uuid: string, permission: string): Promise<void> {
+    await this.prismaService.externalPermission
       .delete({
         where: {
-          clientUuid_authority: {
-            authority,
+          clientUuid_permission: {
+            permission,
             clientUuid: uuid,
           },
         },

@@ -1,8 +1,8 @@
 import { SetMetadata } from '@nestjs/common';
-import { Authority } from '@prisma/client';
+import { Permission } from '@prisma/client';
 
-export const AUTHORITIES_KEY = 'authorities';
+export const PERMISSIONS_KEY = 'permissions';
 
-export const Authorities = (...authorities: Authority[]) => {
-  return SetMetadata(AUTHORITIES_KEY, authorities);
+export const Permissions = (...permissions: Permission[]) => {
+  return SetMetadata(PERMISSIONS_KEY, permissions);
 };
