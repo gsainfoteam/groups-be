@@ -32,7 +32,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { Authority, Role, User } from '@prisma/client';
+import { Permission, Role, User } from '@prisma/client';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
   GroupListResDto,
@@ -54,7 +54,7 @@ import { InvitationExpDto } from './dto/req/invitationExp.dto';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { ClientGuard } from 'src/client/guard/client.guard';
 import { PermissionGuard } from 'src/role/guard/permission.guard';
-import { Authorities } from 'src/role/decorator/permission.decorator';
+import { Permissions } from 'src/role/decorator/permission.decorator';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -179,7 +179,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.GROUP_UPDATE)
+  @Permissions(Permission.GROUP_UPDATE)
   @Patch(':uuid')
   async updateGroup(
     @Param('uuid') groupUuid: string,
@@ -211,7 +211,7 @@ export class GroupController {
   @ApiInternalServerErrorResponse()
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.GROUP_UPDATE)
+  @Permissions(Permission.GROUP_UPDATE)
   @Post(':uuid/image')
   async uploadGroupImage(
     @Param('uuid') groupUuid: string,
@@ -229,7 +229,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.GROUP_DELETE)
+  @Permissions(Permission.GROUP_DELETE)
   @Delete(':uuid')
   async deleteGroup(@Param('uuid') uuid: string): Promise<void> {
     return this.groupService.deleteGroup(uuid);
@@ -261,7 +261,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.MEMBER_UPDATE, Authority.ROLE_GRANT)
+  @Permissions(Permission.MEMBER_UPDATE, Permission.ROLE_GRANT)
   @Post(':uuid/invite')
   async createInviteCode(
     @Param('uuid') groupUuid: string,
@@ -340,7 +340,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.MEMBER_DELETE)
+  @Permissions(Permission.MEMBER_DELETE)
   @Delete(':uuid/member/:targetUuid')
   async removeMember(
     @Param('uuid') groupUuid: string,
@@ -359,7 +359,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.ROLE_GRANT)
+  @Permissions(Permission.ROLE_GRANT)
   @Patch(':uuid/member/:targetUuid/role')
   async grantRoleToUser(
     @Param('uuid') groupUuid: string,
@@ -378,7 +378,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseGuards(GroupsGuard, PermissionGuard)
-  @Authorities(Authority.ROLE_REVOKE)
+  @Permissions(Permission.ROLE_REVOKE)
   @Delete(':uuid/member/:targetUuid/role')
   async revokeRoleFromUser(
     @Param('uuid') groupUuid: string,

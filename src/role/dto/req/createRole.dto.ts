@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Authority } from '@prisma/client';
+import { Permission } from '@prisma/client';
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateRoleDto {
@@ -12,13 +12,13 @@ export class CreateRoleDto {
 
   @ApiPropertyOptional({
     example: ['ROLE_CREATE'],
-    description: 'Authorities for the role',
-    enum: Authority,
+    description: 'Permissions for the role',
+    enum: Permission,
     isArray: true,
     required: false,
   })
   @IsArray()
-  @IsEnum(Authority, { each: true })
+  @IsEnum(Permission, { each: true })
   @IsOptional()
-  authorities?: Authority[];
+  permissions?: Permission[];
 }

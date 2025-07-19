@@ -42,22 +42,22 @@ export class RoleRepository {
 
   /**
    * this method creates a role for a group
-   * @param param0 object containing the role name and group uuid and optionally it may containing authorities and external authorities
+   * @param param0 object containing the role name and group uuid and optionally it may containing permissions and external permissions
    * @returns the created role
    */
   async createRole({
     name,
     groupUuid,
-    authorities,
+    permissions,
   }: Pick<Role, 'name' | 'groupUuid'> &
-    Partial<Pick<Role, 'authorities'>>): Promise<Role> {
+    Partial<Pick<Role, 'permissions'>>): Promise<Role> {
     return this.prismaService.role
       .create({
         data: {
           id:
             (await this.prismaService.role.count({ where: { groupUuid } })) + 1,
           name,
-          authorities,
+          permissions,
           Group: {
             connect: {
               uuid: groupUuid,
@@ -85,15 +85,15 @@ export class RoleRepository {
 
   /**
    * this method updates a role for a group
-   * @param param0 object containing the role id, group uuid and optionally it may containing authorities and external authorities
+   * @param param0 object containing the role id, group uuid and optionally it may containing permissions and external permissions
    * @returns the updated role
    */
   async updateRole({
     id,
     groupUuid,
-    authorities,
+    permissions,
   }: Pick<Role, 'groupUuid' | 'id'> &
-    Partial<Pick<Role, 'authorities'>>): Promise<Role> {
+    Partial<Pick<Role, 'permissions'>>): Promise<Role> {
     return this.prismaService.role
       .update({
         where: {
@@ -103,7 +103,7 @@ export class RoleRepository {
           },
         },
         data: {
-          authorities,
+          permissions,
         },
       })
       .catch((error) => {

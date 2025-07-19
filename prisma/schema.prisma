@@ -18,7 +18,7 @@ enum Grant {
   REJECT
 }
 
-enum Authority {
+enum Permission {
   MEMBER_UPDATE
   MEMBER_DELETE
   ROLE_CREATE
@@ -44,32 +44,32 @@ model Client {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ExternalAuthority ExternalAuthority[]
+  ExternalPermission ExternalPermission[]
 
   @@map("client")
 }
 
-model ExternalAuthority {
+model ExternalPermission {
   clientUuid String @map("client_uuid") @db.Uuid
   Client     Client @relation(fields: [clientUuid], references: [uuid])
-  authority  String
+  permission String
 
-  RoleExternalAuthority RoleExternalAuthority[]
+  RoleExternalPermission RoleExternalPermission[]
 
-  @@id([clientUuid, authority])
-  @@map("client_authority")
+  @@id([clientUuid, permission])
+  @@map("client_permission")
 }
 
-model RoleExternalAuthority {
+model RoleExternalPermission {
   roleId            Int               @map("role_id")
   roleGroupUuid     String            @map("role_group_uuid") @db.Uuid
   Role              Role              @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
   clientUuid        String            @map("client_uuid") @db.Uuid
-  authority         String
-  ExternalAuthority ExternalAuthority @relation(fields: [clientUuid, authority], references: [clientUuid, authority])
+  permission         String
+  ExternalPermission ExternalPermission @relation(fields: [clientUuid, permission], references: [clientUuid, permission])
 
-  @@id([roleId, roleGroupUuid, clientUuid, authority])
-  @@map("role_authority")
+  @@id([roleId, roleGroupUuid, clientUuid, permission])
+  @@map("role_permission")
 }
 
 model User {
@@ -122,10 +122,10 @@ model Role {
   name        String
   groupUuid   String      @map("group_uuid") @db.Uuid
   Group       Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
-  authorities Authority[] @map("authorities")
+  permissions Permission[] @map("permissions")
 
   userRole              UserRole[]
-  RoleExternalAuthority RoleExternalAuthority[]
+  RoleExternalPermission RoleExternalPermission[]
 
   @@id([id, groupUuid])
   @@unique([name, groupUuid])
