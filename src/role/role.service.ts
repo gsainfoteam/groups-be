@@ -25,7 +25,7 @@ export class RoleService {
   /**
    * this method creates a role for a group
    * @param groupName
-   * @param createRoleDto object containing the role name and optionally it may containing authorities and external authorities
+   * @param createRoleDto object containing the role name and optionally it may containing permissions and external permissions
    * @param userUuid the uuid of the user
    * @returns the created role
    */
@@ -40,7 +40,7 @@ export class RoleService {
    * this method updates a role for a group
    * @param groupName the name of the group
    * @param id the id of the role
-   * @param updateRoleDto object containing the role name and optionally it may containing authorities and external authorities
+   * @param updateRoleDto object containing the role name and optionally it may containing permissions and external permissions
    * @param userUuid the uuid of the user
    */
   async updateRole(

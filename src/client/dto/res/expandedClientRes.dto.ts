@@ -1,16 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ClientResDto } from './clientRes.dto';
-import { ExternalAuthority } from '@prisma/client';
+import { ExternalPermission } from '@prisma/client';
 
-class AuthorityResDto implements ExternalAuthority {
+class PermissionResDto implements ExternalPermission {
   @ApiProperty()
   clientUuid: string;
 
   @ApiProperty()
-  authority: string;
+  permission: string;
 }
 
 export class ExpandedClientResDto extends ClientResDto {
   @ApiProperty()
-  ExternalAuthority: AuthorityResDto[];
+  ExternalPermission: PermissionResDto[];
 }

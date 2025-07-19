@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleService } from '../role.service';
-import { Authority } from '@prisma/client';
+import { Permission } from '@prisma/client';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -16,14 +16,14 @@ export class PermissionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredAuthorities = this.reflector.getAllAndOverride<Authority[]>(
-      'authorities',
+    const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>(
+      'permissions',
       [context.getHandler(), context.getClass()],
     );
 
-    if (!requiredAuthorities) {
+    if (!requiredPermissions) {
       throw new ForbiddenException(
-        'Required authorities not configured for this endpoint',
+        'Required permissions not configured for this endpoint',
       );
     }
 
@@ -44,21 +44,21 @@ export class PermissionGuard implements CanActivate {
     }
 
     // 유저가 가진 모든 권한을 중복 없이 추출
-    const userAuthorities = new Set<Authority>();
+    const userPermissions = new Set<Permission>();
     userRoles.list.forEach((userRole) => {
-      userRole.authorities.forEach((auth) => {
-        userAuthorities.add(auth);
+      userRole.permissions.forEach((auth) => {
+        userPermissions.add(auth);
       });
     });
 
     // 요청한 API에서 요구하는 권한들을 가지고 있는지 체크
-    const hasRequiredAuthorities = requiredAuthorities.every((auth) =>
-      userAuthorities.has(auth),
+    const hasRequiredPermissions = requiredPermissions.every((auth) =>
+      userPermissions.has(auth),
     );
 
-    if (!hasRequiredAuthorities) {
+    if (!hasRequiredPermissions) {
       throw new ForbiddenException(
-        'User does not have the required authorities for this action',
+        'User does not have the required permissions for this action',
       );
     }
 

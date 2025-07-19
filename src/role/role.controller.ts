@@ -23,12 +23,12 @@ import {
 } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
-import { Authority, User } from '@prisma/client';
+import { Permission, User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
 import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { RoleListResDto } from './dto/res/roleRes.dto';
-import { Authorities } from './decorator/permission.decorator';
+import { Permissions } from './decorator/permission.decorator';
 import { PermissionGuard } from './guard/permission.guard';
 
 @ApiTags('Role')
@@ -65,7 +65,7 @@ export class RoleController {
   })
   @Post()
   @UseGuards(PermissionGuard)
-  @Authorities(Authority.ROLE_CREATE)
+  @Permissions(Permission.ROLE_CREATE)
   async createRole(
     @Param('groupUuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
@@ -76,7 +76,7 @@ export class RoleController {
   @ApiOperation({
     summary: 'Update role',
     description:
-      '그룹 내의 Role을 수정합니다. authorities를 수정할 경우, authorities를 전부 다시 넣어주어야 합니다. 필요 권한: ROLE_UPDATE',
+      '그룹 내의 Role을 수정합니다. permissions를 수정할 경우, permissions를 전부 다시 넣어주어야 합니다. 필요 권한: ROLE_UPDATE',
   })
   @ApiOkResponse({ description: 'Role updated' })
   @ApiNotFoundResponse({ description: 'Role not found' })
@@ -85,7 +85,7 @@ export class RoleController {
   })
   @Put(':id')
   @UseGuards(PermissionGuard)
-  @Authorities(Authority.ROLE_UPDATE)
+  @Permissions(Permission.ROLE_UPDATE)
   async updateRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
@@ -105,7 +105,7 @@ export class RoleController {
   })
   @Delete(':id')
   @UseGuards(PermissionGuard)
-  @Authorities(Authority.ROLE_DELETE)
+  @Permissions(Permission.ROLE_DELETE)
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,

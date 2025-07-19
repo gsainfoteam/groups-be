@@ -4,7 +4,7 @@ export type GroupWithRole = Prisma.GroupGetPayload<{
   include: {
     Role: {
       include: {
-        RoleExternalAuthority: true;
+        RoleExternalPermission: true;
       };
     };
   };

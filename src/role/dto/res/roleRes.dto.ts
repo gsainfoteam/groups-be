@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Authority, Role } from '@prisma/client';
+import { Permission, Role } from '@prisma/client';
 
 export class RoleResDto implements Role {
   @ApiProperty({
@@ -21,10 +21,10 @@ export class RoleResDto implements Role {
   groupUuid: string;
 
   @ApiProperty({
-    description: 'List of authorities',
+    description: 'List of permissions',
     example: ['ROLE_CREATE'],
   })
-  authorities: Authority[];
+  permissions: Permission[];
 }
 
 export class RoleListResDto {

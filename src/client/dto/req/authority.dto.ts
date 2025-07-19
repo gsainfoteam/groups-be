@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class AuthorityDto {
+export class PermissionDto {
   @ApiProperty({
-    description: 'The authority to be added',
+    description: 'The permission to be added',
   })
   @IsString()
-  authority: string;
+  permission: string;
 }
