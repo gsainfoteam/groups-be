@@ -5,7 +5,7 @@ import { AuthService } from '../auth.service';
 import { User } from '@prisma/client';
 
 @Injectable()
-export class GroupsStrategy extends PassportStrategy(Strategy, 'groups') {
+export class UserStrategy extends PassportStrategy(Strategy, 'user:idp') {
   constructor(private readonly authService: AuthService) {
     super();
   }

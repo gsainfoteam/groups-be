@@ -33,7 +33,6 @@ import {
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { Permission, Role, User } from '@prisma/client';
-import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import {
   GroupListResDto,
   GroupResDto,
@@ -55,6 +54,7 @@ import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { ClientGuard } from 'src/client/guard/client.guard';
 import { PermissionGuard } from 'src/role/guard/permission.guard';
 import { Permissions } from 'src/role/decorator/permission.decorator';
+import { UserGuard } from 'src/auth/guard/user.guard';
 
 @ApiTags('group')
 @ApiOAuth2(['openid', 'email', 'profile'])
@@ -70,7 +70,7 @@ export class GroupController {
   })
   @ApiOkResponse({ type: GroupListResDto })
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Get()
   async getGroupList(@GetUser() user: User): Promise<GroupListResDto> {
     return {
@@ -87,7 +87,7 @@ export class GroupController {
   @ApiOkResponse({ type: InvitationInfoResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Get('join')
   async getInvitationInfo(
     @Query('code') code: string,
@@ -145,7 +145,7 @@ export class GroupController {
   @ApiOkResponse({ type: CheckGroupExistenceByNameDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Get(':name/exist')
   async checkGroupExistenceByName(
     @Param('name') name: string,
@@ -161,7 +161,7 @@ export class GroupController {
   @ApiCreatedResponse()
   @ApiConflictResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Post()
   async createGroup(
     @Body() body: CreateGroupDto,
@@ -178,7 +178,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.GROUP_UPDATE)
   @Patch(':uuid')
   async updateGroup(
@@ -210,7 +210,7 @@ export class GroupController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.GROUP_UPDATE)
   @Post(':uuid/image')
   async uploadGroupImage(
@@ -228,7 +228,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.GROUP_DELETE)
   @Delete(':uuid')
   async deleteGroup(@Param('uuid') uuid: string): Promise<void> {
@@ -243,7 +243,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Get(':uuid/role')
   async getUserRoleInGroup(
     @Param('uuid') uuid: string,
@@ -260,7 +260,7 @@ export class GroupController {
   @ApiCreatedResponse({ type: InviteCodeResDto })
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.MEMBER_UPDATE, Permission.ROLE_GRANT)
   @Post(':uuid/invite')
   async createInviteCode(
@@ -288,7 +288,7 @@ export class GroupController {
       '옳지 않은 초대 코드입니다. 초대 코드가 만료되었거나, 존재하지 않습니다.',
   })
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Post('join')
   async joinGroup(@Body() body: JoinDto, @GetUser() user: User): Promise<void> {
     return this.groupService.joinMember(body.code, user.uuid);
@@ -302,7 +302,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Delete(':uuid/member/leave')
   async leaveFromGroup(
     @Param('uuid') uuid: string,
@@ -318,7 +318,7 @@ export class GroupController {
   })
   @ApiOkResponse({ type: MemberListResDto })
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Get(':uuid/member')
   async getMemberInGroup(
     @Param('uuid') uuid: string,
@@ -339,7 +339,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.MEMBER_DELETE)
   @Delete(':uuid/member/:targetUuid')
   async removeMember(
@@ -358,7 +358,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_GRANT)
   @Patch(':uuid/member/:targetUuid/role')
   async grantRoleToUser(
@@ -377,7 +377,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard, PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_REVOKE)
   @Delete(':uuid/member/:targetUuid/role')
   async revokeRoleFromUser(
@@ -396,7 +396,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Patch(':uuid/visibility')
   async updateUserVisibilityInGroup(
     @Param('uuid') groupUuid: string,
@@ -418,7 +418,7 @@ export class GroupController {
   @ApiOkResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   @Patch(':uuid/president')
   async changePresident(
     @Param('uuid') groupUuid: string,
