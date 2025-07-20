@@ -18,6 +18,8 @@ sequenceDiagram
   Groups ->> Client: Send authorization code through Redirect Uri
   Client ->>+ Groups: POST /third-party/token
   Groups ->>- Client: access token
-  Client ->>+ Groups: access token
-  Groups ->>- Client: user's groups information
+  loop Get user information
+    Client ->>+ Groups: access token
+    Groups ->>- Client: user's groups information
+  end
 ```
