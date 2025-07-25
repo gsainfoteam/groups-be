@@ -9,6 +9,7 @@ import { GroupModule } from './group/group.module';
 import { RoleModule } from './role/role.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { NotionModule } from './notion/notion.module';
+import { ThirdPartyModule } from './third-party/third-party.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotionModule } from './notion/notion.module';
     GroupModule,
     RoleModule,
     NotionModule,
+    ThirdPartyModule,
   ],
   controllers: [AppController],
 })

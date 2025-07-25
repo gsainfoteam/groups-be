@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
   UsePipes,
@@ -29,6 +30,7 @@ import { GetClient } from './decorator/getClient.decorator';
 import { Client } from '@prisma/client';
 import { PermissionDto } from './dto/req/permission.dto';
 import { ExpandedClientResDto } from './dto/res/expandedClientRes.dto';
+import { UpdateClientDto } from './dto/req/updateClient.dto';
 
 @ApiTags('client')
 @Controller('client')
@@ -70,6 +72,24 @@ export class ClientController {
   @Post()
   async register(@Body() body: RegisterClientDto): Promise<ClientResDto> {
     return this.clientService.register(body);
+  }
+
+  @ApiOperation({
+    summary: 'Update a client',
+    description: 'Update the redirect URI of the client by uuid',
+  })
+  @ApiOkResponse({
+    description: 'The client has been successfully updated.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Unknown errors',
+  })
+  @Patch(':uuid')
+  async update(
+    @Param('uuid') uuid: string,
+    @Body() body: UpdateClientDto,
+  ): Promise<void> {
+    return this.clientService.update(body, uuid);
   }
 
   @ApiOperation({

@@ -12,6 +12,7 @@ Table client {
   name String [unique, not null]
   password String [not null]
   grant Grant [not null, default: 'REJECT']
+  redirectUri String[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   ExternalPermission client_permission [not null]

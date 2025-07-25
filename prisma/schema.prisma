@@ -36,10 +36,11 @@ enum Visibility {
 }
 
 model Client {
-  uuid     String @id @default(uuid()) @db.Uuid
-  name     String @unique
-  password String
-  grant    Grant  @default(REJECT)
+  uuid        String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  password    String
+  grant       Grant    @default(REJECT)
+  redirectUri String[] @map("redirect_uri")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -61,10 +62,10 @@ model ExternalPermission {
 }
 
 model RoleExternalPermission {
-  roleId            Int               @map("role_id")
-  roleGroupUuid     String            @map("role_group_uuid") @db.Uuid
-  Role              Role              @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
-  clientUuid        String            @map("client_uuid") @db.Uuid
+  roleId             Int                @map("role_id")
+  roleGroupUuid      String             @map("role_group_uuid") @db.Uuid
+  Role               Role               @relation(fields: [roleId, roleGroupUuid], references: [id, groupUuid])
+  clientUuid         String             @map("client_uuid") @db.Uuid
   permission         String
   ExternalPermission ExternalPermission @relation(fields: [clientUuid, permission], references: [clientUuid, permission])
 
@@ -120,11 +121,11 @@ model UserGroup {
 model Role {
   id          Int
   name        String
-  groupUuid   String      @map("group_uuid") @db.Uuid
-  Group       Group       @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
+  groupUuid   String       @map("group_uuid") @db.Uuid
+  Group       Group        @relation(fields: [groupUuid], references: [uuid], onDelete: Cascade)
   permissions Permission[] @map("permissions")
 
-  userRole              UserRole[]
+  userRole               UserRole[]
   RoleExternalPermission RoleExternalPermission[]
 
   @@id([id, groupUuid])
