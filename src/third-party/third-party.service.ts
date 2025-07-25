@@ -49,7 +49,7 @@ export class ThirdPartyService {
       'EX',
       300, // 5 minutes expiration
     );
-    return `${client.redirectUri}?code=${code}`;
+    return `${redirectUri}?code=${code}`;
   }
 
   async token({
@@ -73,6 +73,7 @@ export class ThirdPartyService {
         `Client ID or redirect URI does not match for code ${code}`,
       );
     }
+    await this.redis.del(`${this.authorizationCodePrefix}:${code}`);
 
     return {
       accessToken: this.jwtService.sign({
