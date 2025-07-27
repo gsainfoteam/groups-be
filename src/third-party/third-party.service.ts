@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 import { AuthorizeCache } from './types/authorizeCache.type';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import ms, { StringValue } from 'ms';
+import * as ms from 'ms';
 import { UserRoleInfoResDto } from './dto/res/userRoleInfoRes.dto';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class ThirdPartyService {
     private readonly configService: ConfigService,
   ) {
     this.accessTokenExpireTime = ms(
-      configService.getOrThrow('THIRD_PARTY_JWT_EXPIRES_IN') as StringValue,
+      configService.getOrThrow('THIRD_PARTY_JWT_EXPIRES_IN') as ms.StringValue,
     );
   }
 
