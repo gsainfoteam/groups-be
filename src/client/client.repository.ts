@@ -25,10 +25,12 @@ export class ClientRepository {
   async create({
     name,
     password,
-  }: Pick<Client, 'name' | 'password'>): Promise<Client> {
+    redirectUri,
+  }: Pick<Client, 'name' | 'password'> &
+    Partial<Pick<Client, 'redirectUri'>>): Promise<Client> {
     return this.prismaService.client
       .create({
-        data: { name, password },
+        data: { name, password, redirectUri },
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
@@ -64,6 +66,18 @@ export class ClientRepository {
     return this.prismaService.client.findUnique({
       where: { uuid },
       include: { ExternalPermission: true },
+    });
+  }
+
+  /**
+   * Update the redirect URI of a client
+   * @param redirectUri new redirect URI
+   * @param uuid uuid of the client to update
+   */
+  async updateRedirectUri(redirectUri: string[], uuid: string): Promise<void> {
+    await this.prismaService.client.update({
+      where: { uuid },
+      data: { redirectUri },
     });
   }
 

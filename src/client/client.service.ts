@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { Loggable } from '@lib/logger/decorator/loggable';
 import { ExpandedClient } from './types/ExpandedClient.type';
+import { UpdateClientDto } from './dto/req/updateClient.dto';
 
 @Injectable()
 @Loggable()
@@ -44,17 +45,32 @@ export class ClientService {
    * @param param0 dto object containing the client name
    * @returns created client object
    */
-  async register({ name }: RegisterClientDto): Promise<Client> {
+  async register({ name, redirectUri }: RegisterClientDto): Promise<Client> {
     const { secretKey, hashed } = this.generateClientSecret();
     const result = await this.clientRepository.create({
       name,
       password: hashed,
+      redirectUri,
     });
     await this.grantRequestThroughSlack(result);
     return {
       ...result,
       password: secretKey,
     };
+  }
+
+  /**
+   * update the redirect URI of the client
+   * @param redirectUri new redirect URI
+   * @param uuid uuid of the client to update
+   */
+  async update({ redirectUri }: UpdateClientDto, uuid: string): Promise<void> {
+    const client = await this.clientRepository.findByUuid(uuid);
+    if (!client) {
+      this.logger.debug(`client not found`);
+      throw new ForbiddenException('client not found');
+    }
+    await this.clientRepository.updateRedirectUri(redirectUri, uuid);
   }
 
   /**

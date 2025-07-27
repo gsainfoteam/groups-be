@@ -17,6 +17,9 @@ export class ClientResDto implements Client {
   @ApiProperty()
   updatedAt: Date;
 
+  @ApiProperty()
+  redirectUri: string[];
+
   @ApiProperty({
     enum: Grant,
   })

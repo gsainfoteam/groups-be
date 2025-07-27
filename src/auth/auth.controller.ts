@@ -1,5 +1,4 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { GroupsGuard } from './guard/groups.guard';
 import { GetUser } from './decorator/getUser.decorator';
 import { User } from '@prisma/client';
 import {
@@ -11,6 +10,7 @@ import {
 import { UserResDto } from './dto/res/userRes.dto';
 import { AuthService } from './auth.service';
 import { LoginQueryDto } from './dto/req/login.dto';
+import { UserGuard } from './guard/user.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -37,7 +37,7 @@ export class AuthController {
     description: 'User information',
   })
   @Get('info')
-  @UseGuards(GroupsGuard)
+  @UseGuards(UserGuard)
   async getUserInfo(@GetUser() user: User): Promise<UserResDto> {
     return user;
   }

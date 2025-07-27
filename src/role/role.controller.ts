@@ -25,16 +25,16 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/req/createRole.dto';
 import { Permission, User } from '@prisma/client';
 import { UpdateRoleDto } from './dto/req/updateRole.dto';
-import { GroupsGuard } from 'src/auth/guard/groups.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { RoleListResDto } from './dto/res/roleRes.dto';
 import { Permissions } from './decorator/permission.decorator';
 import { PermissionGuard } from './guard/permission.guard';
+import { UserGuard } from 'src/auth/guard/user.guard';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
 @Controller('group/:groupUuid/role')
-@UseGuards(GroupsGuard)
+@UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
