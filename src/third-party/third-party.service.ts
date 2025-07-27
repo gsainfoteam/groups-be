@@ -94,9 +94,6 @@ export class ThirdPartyService {
         clientUuid,
         userUuid,
       );
-    if (!userRoleInfo) {
-      throw new ForbiddenException('User info not found');
-    }
     return userRoleInfo;
   }
 
