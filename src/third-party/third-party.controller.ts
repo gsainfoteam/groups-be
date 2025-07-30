@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiFoundResponse,
   ApiInternalServerErrorResponse,
@@ -84,6 +85,7 @@ export class ThirdPartyController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiBearerAuth('third-party')
   @UseGuards(ThirdPartyGuard)
   @Get('userinfo')
   async userinfo(

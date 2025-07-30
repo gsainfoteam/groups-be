@@ -37,6 +37,13 @@ async function bootstrap() {
       },
       'external',
     )
+    .addBearerAuth(
+      {
+        type: 'http',
+        description: 'Third-party client authentication',
+      },
+      'third-party',
+    )
     .addBasicAuth(
       {
         type: 'http',
