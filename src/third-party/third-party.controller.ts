@@ -16,6 +16,7 @@ import {
   ApiCreatedResponse,
   ApiFoundResponse,
   ApiInternalServerErrorResponse,
+  ApiOAuth2,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -47,6 +48,7 @@ export class ThirdPartyController {
       'it move to client uri with certain query parameters, ex) https://client.com/callback?code=123',
   })
   @ApiBadRequestResponse({ description: 'invalid request' })
+  @ApiOAuth2(['openid', 'email', 'profile'])
   @Redirect()
   @Get('authorize')
   @UseGuards(UserGuard)
