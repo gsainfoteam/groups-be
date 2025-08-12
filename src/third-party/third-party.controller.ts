@@ -9,6 +9,8 @@ import {
   Redirect,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -35,6 +37,7 @@ import { ThirdPartyGuard } from './guard/third-party.guard';
 @ApiTags('Third Party')
 @Controller('third-party')
 @UseInterceptors(ClassSerializerInterceptor)
+@UsePipes(new ValidationPipe({ transform: true }))
 export class ThirdPartyController {
   constructor(private readonly thirdPartyService: ThirdPartyService) {}
 
