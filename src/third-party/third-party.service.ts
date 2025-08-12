@@ -11,7 +11,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as ms from 'ms';
 import { UserRoleInfoResDto } from './dto/res/userRoleInfoRes.dto';
+import { Loggable } from '@lib/logger';
 
+@Loggable()
 @Injectable()
 export class ThirdPartyService {
   private readonly authorizationCodePrefix = 'authorizationCode';

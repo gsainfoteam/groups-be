@@ -9,11 +9,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThirdPartyStrategy } from './strategy/third-party.strategy';
 import { ThirdPartyGuard } from './guard/third-party.guard';
+import { LoggerModule } from '@lib/logger';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
+    LoggerModule,
     RedisModule,
     ConfigModule,
     JwtModule.registerAsync({
