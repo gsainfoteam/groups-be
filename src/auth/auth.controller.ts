@@ -18,8 +18,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({
-    summary: 'Login callback',
-    description: 'groups IdP token을 발급받습니다.',
+    summary: 'Groups 로그인',
+    description:
+      'IdP에서 받은 토큰으로, groups의 데이터 베이스에 사용자 정보를 저장합니다.',
   })
   @Get('login')
   async login(@Query() { token }: LoginQueryDto): Promise<void> {
