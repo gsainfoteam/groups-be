@@ -33,7 +33,7 @@ import { UserGuard } from 'src/auth/guard/user.guard';
 
 @ApiTags('Role')
 @ApiOAuth2(['email', 'profile', 'openid'], 'oauth2')
-@Controller('group/:groupUuid/role')
+@Controller('group/:uuid/role')
 @UseGuards(UserGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class RoleController {
@@ -48,7 +48,7 @@ export class RoleController {
   @ApiInternalServerErrorResponse({})
   @Get()
   async getRoles(
-    @Param('groupUuid') groupUuid: string,
+    @Param('uuid') groupUuid: string,
     @GetUser() user: User,
   ): Promise<RoleListResDto> {
     return this.roleService.getRoles(groupUuid, user.uuid);
@@ -67,7 +67,7 @@ export class RoleController {
   @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_CREATE)
   async createRole(
-    @Param('groupUuid') groupUuid: string,
+    @Param('uuid') groupUuid: string,
     @Body() createRoleDto: CreateRoleDto,
   ): Promise<void> {
     return this.roleService.createRole(groupUuid, createRoleDto);
@@ -87,7 +87,7 @@ export class RoleController {
   @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_UPDATE)
   async updateRole(
-    @Param('groupUuid') groupUuid: string,
+    @Param('uuid') groupUuid: string,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
   ): Promise<void> {
