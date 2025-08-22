@@ -64,7 +64,7 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Post()
-  @UseGuards(PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_CREATE)
   async createRole(
     @Param('groupUuid') groupUuid: string,
@@ -84,7 +84,7 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Put(':id')
-  @UseGuards(PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_UPDATE)
   async updateRole(
     @Param('groupUuid') groupUuid: string,
@@ -104,7 +104,7 @@ export class RoleController {
     description: 'Database error or server unknown error',
   })
   @Delete(':id')
-  @UseGuards(PermissionGuard)
+  @UseGuards(UserGuard, PermissionGuard)
   @Permissions(Permission.ROLE_DELETE)
   async deleteRole(
     @Param('groupUuid') groupUuid: string,
