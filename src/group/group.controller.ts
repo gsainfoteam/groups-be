@@ -17,7 +17,6 @@ import {
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {
-  ApiBasicAuth,
   ApiBody,
   ApiConflictResponse,
   ApiConsumes,
@@ -104,7 +103,6 @@ export class GroupController {
   })
   @ApiOkResponse({ type: GroupListResDto })
   @ApiUnauthorizedResponse()
-  @ApiBasicAuth('client')
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @Get('search')
