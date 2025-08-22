@@ -106,7 +106,7 @@ export class GroupRepository {
           },
         },
       })
-      .catch((error) => {
+      .catch((error: any) => {
         if (error instanceof PrismaClientKnownRequestError) {
           throw new InternalServerErrorException('unknown database error');
         }
@@ -131,7 +131,7 @@ export class GroupRepository {
         },
         orderBy: [{ name: 'asc' }, { createdAt: 'desc' }],
       })
-      .catch((error) => {
+      .catch((error: any) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             throw new NotFoundException('Group not found');
@@ -217,7 +217,7 @@ export class GroupRepository {
           group: {
             profileImageUrl: {
               needs: { profileImageKey: true },
-              compute(user) {
+              compute(user: any) {
                 if (!user.profileImageKey || !s3Url) return null;
                 return `${s3Url}/${user.profileImageKey}`;
               },
@@ -271,7 +271,7 @@ export class GroupRepository {
           },
         },
       })
-      .catch((error) => {
+      .catch((error: any) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
             throw new ConflictException('Group name already exists');
@@ -684,7 +684,7 @@ export class GroupRepository {
         group: {
           profileImageUrl: {
             needs: { profileImageKey: true },
-            compute(group) {
+            compute(group: Group) {
               if (!group.profileImageKey) return null;
               return `${s3Url}/${group.profileImageKey}`;
             },
