@@ -31,7 +31,7 @@ import { TokenResDto } from './dto/res/tokenRes.dto';
 import { UserGuard } from 'src/auth/guard/user.guard';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
 import { User } from '@prisma/client';
-import { UserRoleInfoResDto } from './dto/res/userRoleInfoRes.dto';
+import { UserGroupInfoResDto } from './dto/res/userRoleInfoRes.dto';
 import { ThirdPartyGuard } from './guard/third-party.guard';
 
 @ApiTags('Third Party')
@@ -85,8 +85,9 @@ export class ThirdPartyController {
       'Retrieves user role information for the specified third-party client.',
   })
   @ApiOkResponse({
-    description: 'Returns user role information for the third-party client.',
-    type: [UserRoleInfoResDto],
+    description:
+      'Returns user group and role information for the third-party client.',
+    type: [UserGroupInfoResDto],
   })
   @ApiUnauthorizedResponse({ description: 'Invalid request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
@@ -96,7 +97,7 @@ export class ThirdPartyController {
   async userinfo(
     @GetUser()
     { userUuid, clientUuid }: { userUuid: string; clientUuid: string },
-  ): Promise<UserRoleInfoResDto[]> {
+  ): Promise<UserGroupInfoResDto[]> {
     return this.thirdPartyService.userinfo(userUuid, clientUuid);
   }
 }

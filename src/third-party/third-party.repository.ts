@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Client } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { UserRoleInfo } from './types/userRoleInfo.type';
+import { UserGroupInfo } from './types/userGroupInfo.type';
 
 @Injectable()
 export class ThirdPartyRepository {
@@ -28,25 +28,33 @@ export class ThirdPartyRepository {
       });
   }
 
-  async findRoleByClientUuidAndUserUuid(
+  async findGroupByClientUuidAndUserUuid(
     clientUuid: string,
     userUuid: string,
-  ): Promise<UserRoleInfo[]> {
-    return this.prismaService.role.findMany({
+  ): Promise<UserGroupInfo[]> {
+    return this.prismaService.group.findMany({
       where: {
-        userRole: {
+        UserRole: {
           some: {
             userUuid,
           },
         },
       },
       include: {
-        RoleExternalPermission: {
+        Role: {
           where: {
-            clientUuid,
+            userRole: {
+              some: {
+                userUuid,
+              },
+            },
           },
           include: {
-            ExternalPermission: true,
+            RoleExternalPermission: {
+              where: {
+                clientUuid,
+              },
+            },
           },
         },
       },
