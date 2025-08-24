@@ -10,7 +10,7 @@ import { AuthorizeCache } from './types/authorizeCache.type';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as ms from 'ms';
-import { UserRoleInfoResDto } from './dto/res/userRoleInfoRes.dto';
+import { UserGroupInfoResDto } from './dto/res/userRoleInfoRes.dto';
 import { Loggable } from '@lib/logger';
 
 @Loggable()
@@ -90,9 +90,9 @@ export class ThirdPartyService {
   async userinfo(
     userUuid: string,
     clientUuid: string,
-  ): Promise<UserRoleInfoResDto[]> {
+  ): Promise<UserGroupInfoResDto[]> {
     const userRoleInfo =
-      await this.thirdPartyRepository.findRoleByClientUuidAndUserUuid(
+      await this.thirdPartyRepository.findGroupByClientUuidAndUserUuid(
         clientUuid,
         userUuid,
       );

@@ -1,23 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  $Enums,
-  ExternalPermission,
-  RoleExternalPermission,
-} from '@prisma/client';
-import { UserRoleInfo } from 'src/third-party/types/userRoleInfo.type';
-
-class ExternalPermissionDto implements ExternalPermission {
-  @ApiProperty()
-  clientUuid: string;
-
-  @ApiProperty()
-  permission: string;
-}
+import { $Enums, Role, RoleExternalPermission } from '@prisma/client';
+import { UserGroupInfo } from 'src/third-party/types/userGroupInfo.type';
 
 class RoleExternalPermissionDto implements RoleExternalPermission {
-  @ApiProperty({ type: ExternalPermissionDto })
-  ExternalPermission: ExternalPermissionDto;
-
   @ApiProperty()
   clientUuid: string;
 
@@ -31,7 +16,7 @@ class RoleExternalPermissionDto implements RoleExternalPermission {
   roleGroupUuid: string;
 }
 
-export class UserRoleInfoResDto implements UserRoleInfo {
+class RoleDto implements Role {
   @ApiProperty({ type: [RoleExternalPermissionDto] })
   RoleExternalPermission: RoleExternalPermissionDto[];
 
@@ -46,4 +31,35 @@ export class UserRoleInfoResDto implements UserRoleInfo {
 
   @ApiProperty({ enum: $Enums.Permission, isArray: true })
   permissions: $Enums.Permission[];
+}
+export class UserGroupInfoResDto implements UserGroupInfo {
+  @ApiProperty({ type: [RoleDto] })
+  Role: RoleDto[];
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  description: string | null;
+
+  @ApiProperty()
+  uuid: string;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  verifiedAt: Date | null;
+
+  @ApiProperty()
+  presidentUuid: string;
+
+  @ApiProperty()
+  deletedAt: Date | null;
+
+  @ApiProperty()
+  notionPageId: string | null;
+
+  @ApiProperty()
+  profileImageKey: string | null;
 }
