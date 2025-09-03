@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { MethodNotAllowedException } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,18 +12,53 @@ async function bootstrap() {
     /https:\/\/.*groups-fe.pages.dev/,
     /http:\/\/localhost:3000/,
   ];
-  app.enableCors({
-    origin: function (origin, callback) {
-      if (!origin || whitelist.some((regex) => regex.test(origin))) {
-        callback(null, origin);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    credentials: true,
+  const pathWhitelist = [
+    '/third-party/authorize',
+    '/third-party/token',
+    '/third-party/userinfo',
+  ];
+  app.enableCors((req, callback) => {
+    const origin = req.headers.origin;
+    const url = req.url;
+    // Extract pathname from URL (remove query parameters)
+    const pathname = url.split('?')[0];
+    if (!origin) {
+      // No origin, no CORS
+      callback(null, {
+        origin: whitelist,
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        optionsSuccessStatus: 204,
+        preflightContinue: false,
+        credentials: true,
+      });
+      return;
+    } else if (pathWhitelist.some((path) => pathname.endsWith(path))) {
+      // Allow all origins for the specified paths
+      callback(null, {
+        origin,
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        optionsSuccessStatus: 204,
+        preflightContinue: false,
+        credentials: true,
+      });
+    } else if (whitelist.some((regex) => regex.test(origin))) {
+      // Allow only whitelisted origins
+      callback(null, {
+        origin,
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        optionsSuccessStatus: 204,
+        preflightContinue: false,
+        credentials: true,
+      });
+    } else {
+      callback(new MethodNotAllowedException(), {
+        origin: false,
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        optionsSuccessStatus: 204,
+        preflightContinue: false,
+        credentials: true,
+      });
+    }
   });
   // load config service
   const configService = app.get(ConfigService);
