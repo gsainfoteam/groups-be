@@ -10,7 +10,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { InviteCodeResDto } from './dto/res/inviteCodeRes.dto';
 import * as crypto from 'crypto';
-import { Group, Visibility, User, Role } from '@prisma/client';
+import { Group, Visibility, User } from '@prisma/client';
 import { GroupWithRole } from './types/groupWithRole';
 import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
@@ -133,10 +133,6 @@ export class GroupService {
         checkGroupExistence.profileImageKey,
       );
     }
-  }
-
-  getUserRoleInGroup(uuid: string, userUuid: string): Promise<Role> {
-    return this.groupRepository.getUserRoleInGroup(uuid, userUuid);
   }
 
   /**

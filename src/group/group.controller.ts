@@ -31,7 +31,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateGroupDto } from './dto/req/createGroup.dto';
 import { GetUser } from 'src/auth/decorator/getUser.decorator';
-import { Permission, Role, User } from '@prisma/client';
+import { Permission, User } from '@prisma/client';
 import {
   GroupListResDto,
   GroupResDto,
@@ -236,24 +236,6 @@ export class GroupController {
   @Delete(':uuid')
   async deleteGroup(@Param('uuid') uuid: string): Promise<void> {
     return this.groupService.deleteGroup(uuid);
-  }
-
-  @ApiOperation({
-    summary: 'Get user role in group',
-    description:
-      '그룹에 대한 자신의 역할을 가져오는 API입니다. 그룹 멤버만 접근 가능합니다.',
-  })
-  @ApiOkResponse()
-  @ApiForbiddenResponse()
-  @ApiInternalServerErrorResponse()
-  @ApiOAuth2(['openid', 'email', 'profile'])
-  @UseGuards(UserGuard)
-  @Get(':uuid/role')
-  async getUserRoleInGroup(
-    @Param('uuid') uuid: string,
-    @GetUser() user: User,
-  ): Promise<Role> {
-    return this.groupService.getUserRoleInGroup(uuid, user.uuid);
   }
 
   @ApiOperation({
