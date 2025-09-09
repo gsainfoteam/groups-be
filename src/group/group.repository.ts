@@ -484,7 +484,6 @@ export class GroupRepository {
     return expandedUsers;
   }
 
-  //나중에 userGroup필드 자체가 없어질 예정
   async removeUserFromGroup(uuid: string, targetUuid: string): Promise<void> {
     await this.prismaService.userGroup
       .deleteMany({
