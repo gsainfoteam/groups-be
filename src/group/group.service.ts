@@ -16,7 +16,6 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
-import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
@@ -31,7 +30,6 @@ export class GroupService {
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
     private readonly objectService: ObjectService,
-    private readonly configService: ConfigService,
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
@@ -246,7 +244,7 @@ export class GroupService {
         'You cannot leave as the president, transfer ownership first',
       );
     }
-    await this.groupRepository.removeUserFromGroupSelf(uuid, userUuid);
+    await this.groupRepository.removeUserFromGroup(uuid, userUuid);
   }
 
   async grantRole(

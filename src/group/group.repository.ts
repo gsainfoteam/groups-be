@@ -501,29 +501,6 @@ export class GroupRepository {
         }
         throw new InternalServerErrorException('unknown error');
       });
-  }
-
-  //나중에 userGroup필드 자체가 없어질 예정
-  async removeUserFromGroupSelf(
-    uuid: string,
-    targetUuid: string,
-  ): Promise<void> {
-    await this.prismaService.userGroup
-      .deleteMany({
-        where: {
-          userUuid: targetUuid,
-          groupUuid: uuid,
-        },
-      })
-      .catch((error) => {
-        if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code === 'P2025') {
-            throw new ForbiddenException('User not found');
-          }
-          throw new InternalServerErrorException('unknown database error');
-        }
-        throw new InternalServerErrorException('unknown error');
-      });
 
     await this.prismaService.userRole
       .deleteMany({
