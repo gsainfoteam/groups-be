@@ -34,6 +34,7 @@ export class ThirdPartyRepository {
   ): Promise<UserGroupInfo[]> {
     return this.prismaService.group.findMany({
       where: {
+        deletedAt: null,
         UserRole: {
           some: {
             userUuid,

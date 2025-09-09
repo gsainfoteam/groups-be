@@ -16,13 +16,11 @@ import { ExpandedGroup } from './types/ExpandedGroup.type';
 import { UpdateGroupDto } from './dto/req/updateGroup.dto';
 import { CheckGroupExistenceByNameDto } from './dto/res/checkGroupExistenceByName.dto';
 import { GroupCreateResDto } from './dto/res/groupCreateRes.dto';
-import { ConfigService } from '@nestjs/config';
 import { ExpandedUser } from './types/ExpandedUser';
 import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
 import { ObjectService } from '@lib/object';
 import { InviteCache } from './types/InviteCache.type';
-import { RoleRepository } from 'src/role/role.repository';
 
 @Injectable()
 @Loggable()
@@ -32,8 +30,6 @@ export class GroupService {
     private readonly groupRepository: GroupRepository,
     @InjectRedis() private readonly redis: Redis,
     private readonly objectService: ObjectService,
-    private readonly configService: ConfigService,
-    private readonly roleRepository: RoleRepository,
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
