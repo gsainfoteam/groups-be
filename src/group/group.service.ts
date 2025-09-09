@@ -22,6 +22,7 @@ import { GetGroupByNameQueryDto } from './dto/req/getGroup.dto';
 import { Loggable } from '@lib/logger/decorator/loggable';
 import { ObjectService } from '@lib/object';
 import { InviteCache } from './types/InviteCache.type';
+import { RoleRepository } from 'src/role/role.repository';
 
 @Injectable()
 @Loggable()
@@ -32,6 +33,7 @@ export class GroupService {
     @InjectRedis() private readonly redis: Redis,
     private readonly objectService: ObjectService,
     private readonly configService: ConfigService,
+    private readonly roleRepository: RoleRepository,
   ) {}
 
   async getGroupList(userUuid: string): Promise<Group[]> {
@@ -246,7 +248,7 @@ export class GroupService {
         'You cannot leave as the president, transfer ownership first',
       );
     }
-    await this.groupRepository.removeUserFromGroupSelf(uuid, userUuid);
+    await this.groupRepository.removeUserFromGroup(uuid, userUuid);
   }
 
   async grantRole(
