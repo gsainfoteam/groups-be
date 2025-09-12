@@ -7,6 +7,15 @@ import {
 import { Reflector } from '@nestjs/core';
 import { RoleService } from '../role.service';
 import { Permission } from '@prisma/client';
+import { Request } from 'express';
+
+// Group UUID 추출 함수 타입 정의
+export type GroupUuidExtractor = (request: Request) => string | undefined;
+
+// 기본 추출 함수
+export const defaultGroupUuidExtractor = (request: Request): string | undefined => request.params?.uuid
+
+export const GROUP_UUID_EXTRACTOR_KEY = 'groupUuidExtractor';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -27,9 +36,14 @@ export class PermissionGuard implements CanActivate {
       );
     }
 
+      const groupUuidExtractor = this.reflector.getAllAndOverride<GroupUuidExtractor>(
+        GROUP_UUID_EXTRACTOR_KEY,
+        [context.getHandler(), context.getClass()],
+      ) || defaultGroupUuidExtractor;
+
     const request = context.switchToHttp().getRequest();
     const user = request.user; // GroupsGuard 통과하고 얻은 user
-    const groupUuid = request.params.uuid; // Param으로 받은 groupUuid
+    const groupUuid = groupUuidExtractor(request);
 
     if (!groupUuid) {
       throw new ForbiddenException('Group UUID is required');
