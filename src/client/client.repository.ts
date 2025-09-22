@@ -6,6 +6,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Client } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -35,7 +36,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.debug(`client name already exists`);
+            this.logger.warn(`client name already exists`);
             throw new ConflictException('client name already exists');
           }
           this.logger.error(`unknown database error`);
@@ -52,9 +53,16 @@ export class ClientRepository {
    * @returns Founded client or null
    */
   async findByUuid(uuid: string): Promise<Client | null> {
-    return this.prismaService.client.findUnique({
+    this.logger.debug(`finding client by uuid`);
+  
+    const client = await this.prismaService.client.findUnique({
       where: { uuid },
     });
+
+    if (!client) {
+      this.logger.debug(`client not found`);
+    }
+    return client;
   }
 
   /**
@@ -63,10 +71,16 @@ export class ClientRepository {
    * @returns Founded client or null
    */
   async findByUuidWithPermission(uuid: string): Promise<ExpandedClient | null> {
-    return this.prismaService.client.findUnique({
+    this.logger.debug(`finding client with permissions`);
+    const client = this.prismaService.client.findUnique({
       where: { uuid },
       include: { ExternalPermission: true },
     });
+
+    if (!client) {
+      this.logger.debug(`client not found`);
+    }
+    return client;
   }
 
   /**
@@ -96,8 +110,8 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`client not found`);
-            throw new ForbiddenException('client not found');
+            this.logger.warn(`client not found`);
+            throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);
           throw new InternalServerErrorException('unknown database error');
@@ -122,8 +136,8 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`client not found`);
-            throw new ForbiddenException('client not found');
+            this.logger.warn(`client not found`);
+            throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);
           throw new InternalServerErrorException('unknown database error');
@@ -146,7 +160,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`client not found`);
+            this.logger.warn(`client not found`);
             throw new ForbiddenException('client not found');
           }
           this.logger.error(`unknown database error`);

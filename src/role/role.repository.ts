@@ -51,6 +51,8 @@ export class RoleRepository {
     permissions,
   }: Pick<Role, 'name' | 'groupUuid'> &
     Partial<Pick<Role, 'permissions'>>): Promise<Role> {
+      this.logger.log(`creating role: ${name}`);
+
     return this.prismaService.role
       .create({
         data: {
@@ -68,11 +70,11 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.debug(`Role already exists for group ${groupUuid}`);
+            this.logger.warn(`Role already exists for group ${groupUuid}`);
             throw new ConflictException('Role already exists');
           }
           if (error.code === 'P2025') {
-            this.logger.debug(`Group ${groupUuid} not found`);
+            this.logger.warn(`Group ${groupUuid} not found`);
             throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -109,7 +111,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Group ${groupUuid} not found`);
+            this.logger.warn(`Group ${groupUuid} not found`);
             throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -141,8 +143,8 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.debug(`Role not found for group ${groupUuid}`);
-            throw new ForbiddenException('Role not found');
+            this.logger.warn(`Role not found for group ${groupUuid}`);
+            throw new NotFoundException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);
           throw new InternalServerErrorException('Database error');
