@@ -72,13 +72,13 @@ export class ClientRepository {
    */
   async findByUuidWithPermission(uuid: string): Promise<ExpandedClient | null> {
     this.logger.debug(`finding client with permissions`);
-    const client = this.prismaService.client.findUnique({
+    const client = await this.prismaService.client.findUnique({
       where: { uuid },
       include: { ExternalPermission: true },
     });
 
     if (!client) {
-      this.logger.debug(`client not found`);
+      this.logger.warn(`client not found`);
     }
     return client;
   }

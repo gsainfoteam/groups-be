@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ClientRepository } from './client.repository';
 import { Client } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
@@ -33,8 +33,8 @@ export class ClientService {
   async getClient(uuid: string): Promise<ExpandedClient> {
     const client = await this.clientRepository.findByUuidWithPermission(uuid);
     if (!client) {
-      this.logger.debug(`client not found`);
-      throw new ForbiddenException('client not found');
+      this.logger.warn(`client not found`);
+      throw new NotFoundException('client not found');
     }
 
     return client;
@@ -67,8 +67,8 @@ export class ClientService {
   async update({ redirectUri }: UpdateClientDto, uuid: string): Promise<void> {
     const client = await this.clientRepository.findByUuid(uuid);
     if (!client) {
-      this.logger.debug(`client not found`);
-      throw new ForbiddenException('client not found');
+      this.logger.warn(`client not found`);
+      throw new NotFoundException('client not found');
     }
     await this.clientRepository.updateRedirectUri(redirectUri, uuid);
   }

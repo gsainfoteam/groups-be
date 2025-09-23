@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { User } from '@prisma/client';
 import { Loggable } from '@lib/logger/decorator/loggable';
@@ -11,7 +11,7 @@ export class UserService {
   async getUserInfo(uuid: string): Promise<User> {
     const user = await this.userRepository.getUserByUuid(uuid);
     if (!user) {
-      throw new ForbiddenException('User not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }

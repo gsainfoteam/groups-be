@@ -17,7 +17,7 @@ export class UserRepository {
       },
     });
     if (!user) {
-      this.logger.debug(`user not found`);
+      this.logger.warn(`user not found`);
     }
     return user;
   }
@@ -25,18 +25,18 @@ export class UserRepository {
   async upsertUser({ uuid, name, email }: Pick<User, 'uuid' | 'name' | 'email'>): Promise<User> {
     this.logger.log(`upserting user: ${name}`);
 
-    try {
-      const user = await this.prismaService.user.upsert({
-        where: { uuid },
-        create: { uuid, name, email },
-        update: { name, email },
-      });
-    
+    return this.prismaService.user.upsert({
+      where: { uuid },
+      create: { uuid, name, email },
+      update: { name, email },
+    })
+    .then(user => {
       this.logger.log(`successfully upserted user: ${name}`);
       return user;
-    } catch (error) {
+    })
+    .catch(error => {
       this.logger.error(`failed to upsert user: ${name}`);
       throw error;
-    }
+    });
   }
 }
