@@ -17,7 +17,7 @@ export class UserRepository {
       },
     });
     if (!user) {
-      this.logger.warn(`user not found`);
+      this.logger.debug(`user not found`);
     }
     return user;
   }

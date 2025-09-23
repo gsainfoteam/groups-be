@@ -2,7 +2,6 @@ import { Loggable } from '@lib/logger/decorator/loggable';
 import { PrismaService } from '@lib/prisma';
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
