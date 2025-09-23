@@ -161,7 +161,7 @@ export class ClientRepository {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             this.logger.warn(`client not found`);
-            throw new ForbiddenException('client not found');
+            throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);
           throw new InternalServerErrorException('unknown database error');
