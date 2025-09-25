@@ -77,7 +77,7 @@ export class ClientRepository {
     });
 
     if (!client) {
-      this.logger.warn(`client not found`);
+      this.logger.debug(`client not found`);
     }
     return client;
   }
