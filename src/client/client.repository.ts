@@ -109,7 +109,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.warn(`client not found`);
+            this.logger.debug(`client not found`);
             throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);
@@ -135,7 +135,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.warn(`client not found`);
+            this.logger.debug(`client not found`);
             throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);
@@ -159,7 +159,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.warn(`client not found`);
+            this.logger.debug(`client not found`);
             throw new NotFoundException('client not found');
           }
           this.logger.error(`unknown database error`);

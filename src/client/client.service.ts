@@ -33,7 +33,7 @@ export class ClientService {
   async getClient(uuid: string): Promise<ExpandedClient> {
     const client = await this.clientRepository.findByUuidWithPermission(uuid);
     if (!client) {
-      this.logger.warn(`client not found`);
+      this.logger.debug(`client not found`);
       throw new NotFoundException('client not found');
     }
 
@@ -67,7 +67,7 @@ export class ClientService {
   async update({ redirectUri }: UpdateClientDto, uuid: string): Promise<void> {
     const client = await this.clientRepository.findByUuid(uuid);
     if (!client) {
-      this.logger.warn(`client not found`);
+      this.logger.debug(`client not found`);
       throw new NotFoundException('client not found');
     }
     await this.clientRepository.updateRedirectUri(redirectUri, uuid);

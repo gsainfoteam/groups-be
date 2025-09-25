@@ -73,7 +73,7 @@ export class RoleRepository {
             throw new ConflictException('Role already exists');
           }
           if (error.code === 'P2025') {
-            this.logger.warn(`Group ${groupUuid} not found`);
+            this.logger.debug(`Group ${groupUuid} not found`);
             throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -110,7 +110,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.warn(`Group ${groupUuid} not found`);
+            this.logger.debug(`Group ${groupUuid} not found`);
             throw new NotFoundException('Group not found');
           }
           this.logger.error(`Database error: ${error.message}`);
@@ -142,7 +142,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            this.logger.warn(`Role not found for group ${groupUuid}`);
+            this.logger.debug(`Role not found for group ${groupUuid}`);
             throw new NotFoundException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);
