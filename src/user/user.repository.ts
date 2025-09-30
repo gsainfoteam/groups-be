@@ -11,16 +11,13 @@ export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getUserByUuid(uuid: string): Promise<User | null> {
-    const user = await this.prismaService.user.findUnique({
+    return this.prismaService.user.findUnique({
       where: {
         uuid,
       },
     });
-    if (!user) {
-      this.logger.debug(`user not found`);
-    }
-    return user;
   }
+
 
   async upsertUser({ uuid, name, email }: Pick<User, 'uuid' | 'name' | 'email'>): Promise<User> {
     this.logger.log(`upserting user: ${name}`);

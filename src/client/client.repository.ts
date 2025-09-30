@@ -35,7 +35,7 @@ export class ClientRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.warn(`client name already exists`);
+            this.logger.debug(`client name already exists`);
             throw new ConflictException('client name already exists');
           }
           this.logger.error(`unknown database error`);
@@ -51,17 +51,20 @@ export class ClientRepository {
    * @param uuid the uuid of the client to find
    * @returns Founded client or null
    */
-  async findByUuid(uuid: string): Promise<Client | null> {
-    this.logger.debug(`finding client by uuid`);
-  
-    const client = await this.prismaService.client.findUnique({
+  async findByUuid(uuid: string): Promise<Client> {
+    return this.prismaService.client.findUniqueOrThrow({
       where: { uuid },
+    })
+    .catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          this.logger.debug(`client not found`);
+          throw new NotFoundException('client not found');
+        }
+      }
+      this.logger.error(`unknown error finding client`);
+      throw new InternalServerErrorException('unknown error');
     });
-
-    if (!client) {
-      this.logger.debug(`client not found`);
-    }
-    return client;
   }
 
   /**
@@ -69,17 +72,21 @@ export class ClientRepository {
    * @param uuid the uuid of the client to find
    * @returns Founded client or null
    */
-  async findByUuidWithPermission(uuid: string): Promise<ExpandedClient | null> {
-    this.logger.debug(`finding client with permissions`);
-    const client = await this.prismaService.client.findUnique({
+  async findByUuidWithPermission(uuid: string): Promise<ExpandedClient> {
+    return this.prismaService.client.findUniqueOrThrow({
       where: { uuid },
       include: { ExternalPermission: true },
+    })
+    .catch((error) => {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          this.logger.debug(`client not found`);
+          throw new NotFoundException('client not found');
+        }
+      }
+      this.logger.error(`unknown error finding client with permissions`);
+      throw new InternalServerErrorException('unknown error');
     });
-
-    if (!client) {
-      this.logger.debug(`client not found`);
-    }
-    return client;
   }
 
   /**
