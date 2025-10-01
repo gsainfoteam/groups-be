@@ -2,7 +2,6 @@ import { Loggable } from '@lib/logger/decorator/loggable';
 import { PrismaService } from '@lib/prisma';
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -51,6 +50,7 @@ export class RoleRepository {
     permissions,
   }: Pick<Role, 'name' | 'groupUuid'> &
     Partial<Pick<Role, 'permissions'>>): Promise<Role> {
+
     return this.prismaService.role
       .create({
         data: {
@@ -68,7 +68,7 @@ export class RoleRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2002') {
-            this.logger.debug(`Role already exists for group ${groupUuid}`);
+            this.logger.warn(`Role already exists for group ${groupUuid}`);
             throw new ConflictException('Role already exists');
           }
           if (error.code === 'P2025') {
@@ -142,7 +142,7 @@ export class RoleRepository {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
             this.logger.debug(`Role not found for group ${groupUuid}`);
-            throw new ForbiddenException('Role not found');
+            throw new NotFoundException('Role not found');
           }
           this.logger.error(`Database error: ${error.message}`);
           throw new InternalServerErrorException('Database error');

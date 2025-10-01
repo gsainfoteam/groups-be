@@ -327,6 +327,10 @@ export class GroupRepository {
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new NotFoundException('Group not found');
+          }
+          this.logger.error(error);
           throw new InternalServerErrorException('unknown database error');
         }
         throw new InternalServerErrorException('unknown error');
@@ -495,10 +499,13 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('User not found');
+            this.logger.debug(`user not found in group`);
+            throw new NotFoundException('User not found');
           }
+          this.logger.error(`unknown database error`);
           throw new InternalServerErrorException('unknown database error');
         }
+        this.logger.error(`unknown error`);
         throw new InternalServerErrorException('unknown error');
       });
 
@@ -512,7 +519,7 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('User not found');
+            throw new NotFoundException('User not found');
           }
           throw new InternalServerErrorException('unknown database error');
         }
@@ -536,7 +543,7 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('User not found');
+            throw new NotFoundException('User not found');
           }
           throw new InternalServerErrorException('unknown database error');
         }
@@ -562,7 +569,7 @@ export class GroupRepository {
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
           if (error.code === 'P2025') {
-            throw new ForbiddenException('User not found');
+            throw new NotFoundException('User not found');
           }
           throw new InternalServerErrorException('unknown database error');
         }
