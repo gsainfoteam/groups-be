@@ -50,7 +50,6 @@ export class RoleRepository {
     permissions,
   }: Pick<Role, 'name' | 'groupUuid'> &
     Partial<Pick<Role, 'permissions'>>): Promise<Role> {
-      this.logger.log(`creating role: ${name}`);
 
     return this.prismaService.role
       .create({

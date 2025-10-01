@@ -11,7 +11,7 @@ export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getUserByUuid(uuid: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({
+    return await this.prismaService.user.findUnique({
       where: {
         uuid,
       },
@@ -22,7 +22,7 @@ export class UserRepository {
   async upsertUser({ uuid, name, email }: Pick<User, 'uuid' | 'name' | 'email'>): Promise<User> {
     this.logger.log(`upserting user: ${name}`);
 
-    return this.prismaService.user.upsert({
+    return await this.prismaService.user.upsert({
       where: { uuid },
       create: { uuid, name, email },
       update: { name, email },
